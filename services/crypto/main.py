@@ -1,0 +1,85 @@
+from flask import Flask, request, redirect, url_for, render_template, session
+import user_model
+import redis_controller
+import database_controller
+
+app = Flask(__name__)
+app.secret_key = "useless_key"
+
+def check_auth():
+    try:
+        cookie = session["user"]
+        print(f"cookie is {cookie}")
+        if not user_model.check_auth(cookie):
+            return False
+        return True
+    except KeyError:
+        return False
+
+@app.route('/send_money', methods=['GET', 'POST'])
+def send_money():
+    if not check_auth():
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        return "TODO"
+    return "TODO"
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        print("login_post1")
+        login = request.form['login']
+        password = request.form['password']
+        print(f"log {login}, pass {password}", flush=True)
+        with database_controller.DatabaseClient() as db:
+            print(f"all users {db.get_all_users()}")
+            print_all_users()
+            user = db.select_user(login, password)
+            print(f"login {user}", flush=True)
+            if not user:
+                return "Incorrect username or password"
+        session['user'] = user.cookie
+        redis_controller.add_to_store(login, session['user'])
+        return "you have logined"
+    print("login_get")
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        print("reg_post")
+        login = request.form['login']
+        password = request.form['password']
+        credit_card_credentials = request.form['credit_card_credentials']
+        public_key_base64 = request.form['public_key_base64']
+        print(f"reg {login}, pass {password}, credit_card {credit_card_credentials} pubkey {public_key_base64}")
+        try:
+            user = user_model.User(login, password, public_key_base64, credit_card_credentials)
+            print(f"will add user {user}", flush=True)
+            with database_controller.DatabaseClient() as db:
+                db.add_user(user)
+            session['user'] = user.cookie
+            redis_controller.add_to_store(login, session['user'])
+            return redirect(url_for('send_money'))
+        except ValueError:
+            message = "Incorrect username"
+            return message
+    return render_template('register.html')
+
+
+@app.route('/transactions/')
+def get_transactions():
+    return "here will be encrypted transactions"
+
+@app.route('/users/')
+def get_users():
+    with database_controller.DatabaseClient() as db:
+        return '\n'.join([str(x) for x in db.get_all_users()])
+
+def print_all_users():
+    with database_controller.DatabaseClient() as db:
+        print('\n'.join([str(x) for x in db.get_all_users_all_info()]), flush=True)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=3113)

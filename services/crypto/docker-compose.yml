@@ -1,0 +1,27 @@
+version: '2.4'
+
+services:
+  postgres:
+    image: postgres:11-alpine
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: on-failure
+
+  web:
+    build: .
+    restart: on-failure
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "3113:3113"
+    environment:
+      - REDIS_HOST=redis
+
+  redis:
+    image: redis
+    restart: "always"
