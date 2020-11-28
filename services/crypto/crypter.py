@@ -1,4 +1,4 @@
-class Cryptor:
+class Crypter:
     def __init__(self):
         pass
 

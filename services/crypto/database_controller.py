@@ -2,6 +2,7 @@ import psycopg2
 from psycopg2 import sql
 from hashlib import md5
 import user_model
+from crypter import Crypter
 
 class DatabaseClient:
     def __init__(self):
@@ -84,3 +85,11 @@ class DatabaseClient:
         self.cursor.execute('select * from transactions')
         u = self.cursor.fetchall()
         return u
+    
+    def add_transaction(self, transaction):
+        c = Crypter()
+        data = transaction.dumps()
+        encrypted_data = c.encrypt(data)
+        self.cursor.execute("INSERT INTO public.transactions (login_from, encrypted_data) VALUES(%s, %s)", (transaction.login_from, encrypted_data))
+        self.conn.commit()
+

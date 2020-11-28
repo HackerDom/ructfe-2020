@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, url_for, render_template, session
 import user_model
+import transaction_model
 import database_controller
 
 app = Flask(__name__)
@@ -22,8 +23,17 @@ def send_money():
     if not check_auth():
         return redirect(url_for('login'))
     if request.method == 'POST':
-        return "TODO"
-    return "TODO"
+        cookie = session["user"]
+        with database_controller.DatabaseClient() as db:
+            login_from = db.select_user_by_cookie(cookie).login
+        login_to = int(request.form['to'])
+        amount = int(request.form['amount'])
+        description = request.form['description']
+        transaction = transaction_model.Transaction(login_from, login_to, amount, description)
+        with database_controller.DatabaseClient() as db:
+            db.add_transaction(transaction)
+        return redirect(url_for('get_transactions'))
+    return render_template("send_money.html")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -83,4 +93,4 @@ def print_all_users():
         print('\n'.join([str(x) for x in db.get_all_users_all_info()]), flush=True)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3113)
+    app.run(host="0.0.0.0", port=3113, debug=True)
