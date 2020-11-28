@@ -18,7 +18,7 @@ class DatabaseClient:
             self.conn.close()
     
     def check_user(self, user):
-        self.cursor.execute('select * from users where login = %s', (user.login, ))
+        self.cursor.execute('select * from public.users where login = %s', (user.login, ))
         u = self.cursor.fetchone()
         print(f"user {u}, hash: {user.password_hash}")
         if u is None or u[1] != user.password_hash:
@@ -27,7 +27,7 @@ class DatabaseClient:
             return True
     
     def check_if_username_free(self, username):
-        self.cursor.execute('select * from users where login = %s', (username, ))
+        self.cursor.execute('select * from public.users where login = %s', (username, ))
         u = self.cursor.fetchone()
         print(f"user in check_username {u}", flush=True)
         if u is None:
@@ -36,16 +36,16 @@ class DatabaseClient:
             return False
         
     def add_user(self, user):
-        self.cursor.execute("INSERT INTO users (login, password_hash, public_key, credit_card_credentials, balance, cookie) VALUES(%s, %s, %s, %s, %s, %s)", (user.login, user.password_hash, user.public_key_base64, user.credit_card_credentials, user.balance, user.cookie))
+        self.cursor.execute("INSERT INTO public.users (login, password_hash, public_key, credit_card_credentials, balance, cookie) VALUES(%s, %s, %s, %s, %s, %s)", (user.login, user.password_hash, user.public_key_base64, user.credit_card_credentials, user.balance, user.cookie))
         self.conn.commit()
 
     def get_all_users_all_info(self):
-        self.cursor.execute('select * from users')
+        self.cursor.execute('select * from public.users')
         u = self.cursor.fetchall()
         return u
     
     def get_all_users(self):
-        self.cursor.execute('select (login, public_key) from users')
+        self.cursor.execute('select (login, public_key) from public.users')
         u = self.cursor.fetchall()
         return u
 
@@ -53,29 +53,34 @@ class DatabaseClient:
         print("in select user", flush=True)
         password_hash = md5(password.encode('utf-8')).hexdigest()
         print(username, password_hash, flush=True)
-        self.cursor.execute('select * from users where login=%s AND password_hash=%s', (username, password_hash))
+        self.cursor.execute('select * from public.users where login=%s AND password_hash=%s', (username, password_hash))
         u = self.cursor.fetchone()
         print(f"user in select_user {u}", flush=True)
         if u:
-            return user_model.User(*u)
+            return user_model.User(*(u[1:])) # strange notation because of timeshtamp
         return None
     
     def select_user_by_login(self, username):
         print("in select user without password", flush=True)
         print(username, flush=True)
-        self.cursor.execute('select * from users where login=%s', (username, ))
+        self.cursor.execute('select * from public.users where login=%s', (username, ))
         u = self.cursor.fetchone()
         print(f"user in select_user_without_password {u}", flush=True)
         if u:
-            return user_model.User(*u)
+            return user_model.User(*(u[1:])) # strange notation because of timeshtamp
         return None
     
     def select_user_by_cookie(self, cookie):
         print("in select user by cookie", flush=True)
         print(cookie, flush=True)
-        self.cursor.execute('select * from users where cookie=%s', (cookie, ))
+        self.cursor.execute('select * from public.users where cookie=%s', (cookie, ))
         u = self.cursor.fetchone()
         print(f"user in select_user_by_cookie {u}", flush=True)
         if u:
-            return user_model.User(*u)
+            return user_model.User(*(u[1:])) # strange notation because of timeshtamp
         return None
+    
+    def get_all_transactions(self):
+        self.cursor.execute('select * from transactions')
+        u = self.cursor.fetchall()
+        return u

@@ -69,10 +69,12 @@ def register():
 
 @app.route('/transactions/')
 def get_transactions():
-    return "here will be encrypted transactions"
+    with database_controller.DatabaseClient() as db:
+        return '\n'.join([str(x) for x in db.get_all_transactions()])
 
 @app.route('/users/')
 def get_users():
+    print_all_users()
     with database_controller.DatabaseClient() as db:
         return '\n'.join([str(x) for x in db.get_all_users()])
 
