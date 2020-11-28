@@ -26,7 +26,7 @@ class DatabaseClient:
         else:
             return True
     
-    def check_username(self, username):
+    def check_if_username_free(self, username):
         self.cursor.execute('select * from users where login = %s', (username, ))
         u = self.cursor.fetchone()
         print(f"user in check_username {u}", flush=True)
@@ -36,9 +36,7 @@ class DatabaseClient:
             return False
         
     def add_user(self, user):
-        if not self.check_username(user.login):
-            raise ValueError
-        self.cursor.execute("INSERT INTO users (login, password_hash, public_key, credit_card_credentials) VALUES(%s, %s, %s, %s)", (user.login, user.password_hash, user.public_key_base64, user.credit_card_credentials))
+        self.cursor.execute("INSERT INTO users (login, password_hash, public_key, credit_card_credentials, balance, cookie) VALUES(%s, %s, %s, %s, %s, %s)", (user.login, user.password_hash, user.public_key_base64, user.credit_card_credentials, user.balance, user.cookie))
         self.conn.commit()
 
     def get_all_users_all_info(self):
@@ -51,7 +49,7 @@ class DatabaseClient:
         u = self.cursor.fetchall()
         return u
 
-    def select_user(self, username, password):
+    def select_user_by_login_and_pass(self, username, password):
         print("in select user", flush=True)
         password_hash = md5(password.encode('utf-8')).hexdigest()
         print(username, password_hash, flush=True)
@@ -59,5 +57,25 @@ class DatabaseClient:
         u = self.cursor.fetchone()
         print(f"user in select_user {u}", flush=True)
         if u:
-            return user_model.User(u[0], u[1], u[2], u[3])
+            return user_model.User(*u)
+        return None
+    
+    def select_user_by_login(self, username):
+        print("in select user without password", flush=True)
+        print(username, flush=True)
+        self.cursor.execute('select * from users where login=%s', (username, ))
+        u = self.cursor.fetchone()
+        print(f"user in select_user_without_password {u}", flush=True)
+        if u:
+            return user_model.User(*u)
+        return None
+    
+    def select_user_by_cookie(self, cookie):
+        print("in select user by cookie", flush=True)
+        print(cookie, flush=True)
+        self.cursor.execute('select * from users where cookie=%s', (cookie, ))
+        u = self.cursor.fetchone()
+        print(f"user in select_user_by_cookie {u}", flush=True)
+        if u:
+            return user_model.User(*u)
         return None

@@ -1,6 +1,5 @@
 from flask import Flask, request, redirect, url_for, render_template, session
 import user_model
-import redis_controller
 import database_controller
 
 app = Flask(__name__)
@@ -10,9 +9,11 @@ def check_auth():
     try:
         cookie = session["user"]
         print(f"cookie is {cookie}")
-        if not user_model.check_auth(cookie):
-            return False
-        return True
+        with database_controller.DatabaseClient() as db:
+            user = db.select_user_by_cookie(cookie)
+            if not user:
+                return False
+            return True
     except KeyError:
         return False
 
@@ -35,12 +36,11 @@ def login():
         with database_controller.DatabaseClient() as db:
             print(f"all users {db.get_all_users()}")
             print_all_users()
-            user = db.select_user(login, password)
+            user = db.select_user_by_login_and_pass(login, password)
             print(f"login {user}", flush=True)
             if not user:
                 return "Incorrect username or password"
         session['user'] = user.cookie
-        redis_controller.add_to_store(login, session['user'])
         return "you have logined"
     print("login_get")
     return render_template('login.html')
@@ -54,17 +54,16 @@ def register():
         credit_card_credentials = request.form['credit_card_credentials']
         public_key_base64 = request.form['public_key_base64']
         print(f"reg {login}, pass {password}, credit_card {credit_card_credentials} pubkey {public_key_base64}")
-        try:
-            user = user_model.User(login, password, public_key_base64, credit_card_credentials)
-            print(f"will add user {user}", flush=True)
-            with database_controller.DatabaseClient() as db:
+        with database_controller.DatabaseClient() as db:
+            if db.check_if_username_free(login):
+                user = user_model.create_new(login, password, public_key_base64, credit_card_credentials)
+                print(f"will add user {user}", flush=True)
                 db.add_user(user)
-            session['user'] = user.cookie
-            redis_controller.add_to_store(login, session['user'])
-            return redirect(url_for('send_money'))
-        except ValueError:
-            message = "Incorrect username"
-            return message
+                session['user'] = user.cookie
+            else:
+                return "this user already exists"
+        return redirect(url_for('send_money'))
+
     return render_template('register.html')
 
 
