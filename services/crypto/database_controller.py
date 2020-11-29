@@ -30,7 +30,7 @@ class DatabaseClient:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
+        self.cursor.close()
     
     def check_user(self, user):
         self.cursor.execute('select * from public.users where login = %s', (user.login, ))
