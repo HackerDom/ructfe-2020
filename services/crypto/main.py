@@ -6,6 +6,10 @@ import database_controller
 app = Flask(__name__)
 app.secret_key = "useless_key"
 
+@app.before_first_request
+def before_request():
+    database_controller.connect_to_db()
+
 def check_auth():
     try:
         cookie = session["user"]

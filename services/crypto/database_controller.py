@@ -4,19 +4,33 @@ from hashlib import md5
 import user_model
 from crypter import Crypter
 
+conn = None
+
+def connect_to_db():
+    global conn
+    conn = psycopg2.connect(dbname='postgres', user='postgres',
+                                     password='postgres', host='postgres')
+
+def check_and_refresh_connect():
+    global conn
+    try:
+        conn.isolation_level
+    except psycopg2.OperationalError:
+        connect_to_db()
+
 class DatabaseClient:
     def __init__(self):
         pass
-
+    
     def __enter__(self):
-        self.conn = psycopg2.connect(dbname='postgres', user='postgres',
-                                     password='postgres', host='postgres')
-        self.cursor = self.conn.cursor()
+        check_and_refresh_connect()
+        global conn
+        self.conn = conn  
+        self.cursor = conn.cursor()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.cursor:
-            self.conn.close()
+        pass
     
     def check_user(self, user):
         self.cursor.execute('select * from public.users where login = %s', (user.login, ))
