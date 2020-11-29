@@ -2,13 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="02c15607-c6ee-4eb1-8035-ee51cffd75f8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/pkg/eval/cel.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/eval/funcs/funcs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/main" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/server/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/storage/storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/storage.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/eval/cel.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/eval/cel.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/eval/funcs/funcs.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/eval/funcs/funcs.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

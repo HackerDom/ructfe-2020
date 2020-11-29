@@ -1,9 +1,10 @@
 package storage
 
 import (
+	"github.com/coreos/etcd/clientv3"
+
 	"context"
 	"fmt"
-	"github.com/coreos/etcd/clientv3"
 	"time"
 )
 

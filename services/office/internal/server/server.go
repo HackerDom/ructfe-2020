@@ -1,17 +1,18 @@
 package server
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"github.com/HackerDom/ructfe2020/internal/hashutil"
 	"github.com/HackerDom/ructfe2020/internal/manager"
 	"github.com/HackerDom/ructfe2020/pkg/eval"
-	"io"
-	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 )
 
 const (
@@ -29,7 +30,6 @@ func New(m *manager.Manager) *server {
 
 func RunServer() error {
 	mux := chi.NewMux()
-	mux.Use(middleware.Logger)
 	Register(mux)
 	return Serve(mux)
 }
@@ -50,13 +50,14 @@ func (s *server) handleListUsers(w http.ResponseWriter, _ *http.Request) {
 	_, _ = io.Copy(w, bytes.NewBuffer(users))
 }
 
-func (s *server) handleRand(w http.ResponseWriter, _ *http.Request) {
-	_, _ = fmt.Fprintf(w, hashutil.RandDigest("some random text"))
+func (s *server) handleRand(w http.ResponseWriter, r *http.Request) {
+	text := chi.URLParam(r, "text")
+	_, _ = fmt.Fprintf(w, hashutil.RandDigest(text))
 }
 
 func (s *server) handleEval(w http.ResponseWriter, r *http.Request) {
 	expr := chi.URLParam(r, "expr")
-	res, err := eval.Eval(expr, make(map[string]string))
+	res, err := eval.Eval(expr, map[string]string{"secret": "lol_wow"})
 	if err != nil {
 		handleErr(w, err)
 		return
@@ -71,8 +72,14 @@ func handleErr(w http.ResponseWriter, err error) {
 
 func Register(mux *chi.Mux) {
 	s := &server{}
+
+	mux.Use(middleware.RequestID)
+	mux.Use(middleware.RealIP)
+	mux.Use(middleware.Logger)
+	mux.Use(middleware.Recoverer)
+
 	mux.HandleFunc("/", s.handleHello)
 	mux.HandleFunc("/users", s.handleListUsers)
-	mux.HandleFunc("/rand", s.handleRand)
+	mux.HandleFunc("/rand/{text}", s.handleRand)
 	mux.HandleFunc("/eval/{expr}", s.handleEval)
 }
