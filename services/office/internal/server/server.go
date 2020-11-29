@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/HackerDom/ructfe2020/internal/hashutil"
 	"github.com/HackerDom/ructfe2020/internal/manager"
+	"github.com/HackerDom/ructfe2020/pkg/eval"
 	"io"
 	"net/http"
 
@@ -53,9 +54,25 @@ func (s *server) handleRand(w http.ResponseWriter, _ *http.Request) {
 	_, _ = fmt.Fprintf(w, hashutil.RandDigest("some random text"))
 }
 
+func (s *server) handleEval(w http.ResponseWriter, r *http.Request) {
+	expr := chi.URLParam(r, "expr")
+	res, err := eval.Eval(expr, make(map[string]string))
+	if err != nil {
+		handleErr(w, err)
+		return
+	}
+	_, _ = fmt.Fprintf(w, "%t", res)
+}
+
+func handleErr(w http.ResponseWriter, err error) {
+	w.WriteHeader(500)
+	_, _ = w.Write([]byte(err.Error()))
+}
+
 func Register(mux *chi.Mux) {
 	s := &server{}
 	mux.HandleFunc("/", s.handleHello)
 	mux.HandleFunc("/users", s.handleListUsers)
 	mux.HandleFunc("/rand", s.handleRand)
+	mux.HandleFunc("/eval/{expr}", s.handleEval)
 }
