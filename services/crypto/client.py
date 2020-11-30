@@ -43,5 +43,3 @@ def get_user_by_token(token):
 def get_user_by_login_and_password(login, password):
     token = get_token(login, password)
     return get_user_by_token(token)
-a=get_user_by_login_and_password("6","2")
-print(a)

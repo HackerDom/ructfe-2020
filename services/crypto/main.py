@@ -54,7 +54,8 @@ def get_user(token=None):
                     "result": True, "addition": {
                         "login":user.login, "password_hash":user.password_hash, 
                         "credit_card_credentials":user.credit_card_credentials, 
-                        "public_key_base64": user.public_key_base64}
+                        "public_key_base64": user.public_key_base64,
+                        "balance": user.balance},
                         }
                     )
 
