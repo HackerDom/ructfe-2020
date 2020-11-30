@@ -1,9 +1,9 @@
 import psycopg2
 from psycopg2 import sql
 from hashlib import md5
-import user_model
+import helpers.user_model as user_model
 from crypter import Crypter
-from helpers import *
+from helpers.helpers import *
 
 conn = None
 

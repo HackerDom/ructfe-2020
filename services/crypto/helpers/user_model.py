@@ -1,6 +1,6 @@
 from hashlib import md5
 import re
-from helpers import *
+from helpers.helpers import *
 
 class User:
     def __init__(self, login, password, public_key_base64, credit_card_credentials, balance, cookie):

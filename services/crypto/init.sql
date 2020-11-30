@@ -5,7 +5,7 @@ password_hash varchar not null,
 public_key varchar not null,
 credit_card_credentials varchar not null, --it is a place for flag for auth vuln, if we will create it
 balance int not null,
-cookie bytea not null); 
+cookie varchar not null); 
 
 CREATE FUNCTION delete_old_users() RETURNS trigger
     LANGUAGE plpgsql
