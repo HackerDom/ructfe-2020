@@ -35,7 +35,7 @@ def send_money():
         description = request.form['description']
         transaction = transaction_model.Transaction(login_from, login_to, amount, description)
         with database_controller.DatabaseClient() as db:
-            db.add_transaction(transaction)
+            db.send_money(transaction)
         return redirect(url_for('get_transactions'))
     return render_template("send_money.html")
 
@@ -88,13 +88,13 @@ def get_transactions():
 
 @app.route('/users/')
 def get_users():
-    print_all_users()
     with database_controller.DatabaseClient() as db:
         return '\n'.join([str(x) for x in db.get_all_users()])
 
-def print_all_users():
+@app.route('/users_all_info/') #debug only
+def _get_users():
     with database_controller.DatabaseClient() as db:
-        print('\n'.join([str(x) for x in db.get_all_users_all_info()]), flush=True)
+        return '\n'.join([str(x) for x in db.get_all_users_all_info()])
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3113, debug=True)

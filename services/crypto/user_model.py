@@ -19,4 +19,5 @@ class User:
 
 def create_new(login, password, public_key_base64, credit_card_credentials):
     cookie = create_cookie(login, password)
-    return User(login, password, public_key_base64, credit_card_credentials, 0, cookie)
+    default_balace = 100
+    return User(login, password, public_key_base64, credit_card_credentials, default_balace, cookie)

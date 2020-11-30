@@ -3,6 +3,7 @@ from psycopg2 import sql
 from hashlib import md5
 import user_model
 from crypter import Crypter
+from helpers import *
 
 conn = None
 
@@ -76,6 +77,7 @@ class DatabaseClient:
         return None
     
     def select_user_by_login(self, username):
+        username = str(username)
         print("in select user without password", flush=True)
         print(username, flush=True)
         self.cursor.execute('select * from public.users where login=%s', (username, ))
@@ -100,10 +102,31 @@ class DatabaseClient:
         u = self.cursor.fetchall()
         return u
     
-    def add_transaction(self, transaction):
+    def _add_transaction(self, transaction):
         c = Crypter()
         data = transaction.dumps()
         encrypted_data = c.encrypt(data)
         self.cursor.execute("INSERT INTO public.transactions (login_from, encrypted_data) VALUES(%s, %s)", (transaction.login_from, encrypted_data))
+    
+    def send_money(self, transaction):
+        username_from = transaction.login_from
+        username_to = transaction.login_to
+        user_from = self.select_user_by_login(username_from)
+        user_to = self.select_user_by_login(username_to)
+        print(f"login_from{user_from} login_to{user_to}")
+        if user_from is None or user_to is None:
+            raise UserNotFoundException
+        user_from_new_balance = user_from.balance - transaction.money_amount
+        user_to_new_balance = user_to.balance + transaction.money_amount
+        self._update_balance(user_from.login, user_from_new_balance)
+        self._update_balance(user_to.login, user_to_new_balance)
+        self._add_transaction(transaction)
         self.conn.commit()
+
+    def _update_balance(self, login, new_balance):
+        print(f"update {login} to {new_balance}", flush=True)
+        self.cursor.execute(
+            'update users set balance=%s where login=%s', ((new_balance, login)))
+
+
 
