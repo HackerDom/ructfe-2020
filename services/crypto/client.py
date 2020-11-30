@@ -4,17 +4,6 @@ import urllib.request
 
 host = "localhost:3113"
 
-def get_status_dict(uuid_str):
-    newConditions = {"addition": {"uuid": uuid_str}}
-    req = urllib.request.Request("http://"+host+"/api/status", data=json.dumps(newConditions).encode('utf-8'),
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
-
-def get_subs_json_bytes():
-    response = urllib.request.urlopen("http://"+host+"/api/subs")
-    return response.read()
-
 def get_token(login, password):
     newConditions = {"addition": {"login": login, "password":password}}
     req = urllib.request.Request("http://"+host+"/get_token", data=json.dumps(newConditions).encode('utf-8'),
