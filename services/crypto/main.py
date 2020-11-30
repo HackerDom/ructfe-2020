@@ -40,6 +40,24 @@ def login(login=None, password=None):
             return "Incorrect username or password"
     return jsonify({"status": 200, "result": True, "addition": {"token":str(user.cookie)}})
 
+@app.route('/get_user', methods=['POST'])
+@d.need_args("token")
+def get_user(token=None):
+    print("get user by token")
+    with database_controller.DatabaseClient() as db:
+        print(f"all users {db.get_all_users()}")
+        user = db.select_user_by_cookie(token)
+        print(f"get {user}", flush=True)
+        if not user:
+            return "Incorrect username or password"
+    return jsonify({"status": 200, 
+                    "result": True, "addition": {
+                        "login":user.login, "password_hash":user.password_hash, 
+                        "credit_card_credentials":user.credit_card_credentials, 
+                        "public_key_base64": user.public_key_base64}
+                        }
+                    )
+
 @app.route('/register', methods=['POST'])
 @d.need_args("login", "password", "credit_card_credentials", "public_key_base64")
 def register(login=None, password=None, credit_card_credentials=None, public_key_base64=None):
@@ -55,17 +73,20 @@ def register(login=None, password=None, credit_card_credentials=None, public_key
     return jsonify({"status": 200, "result": True, "addition": {"token":str(user.cookie)}})
 
 
-@app.route('/transactions/')
+@app.route('/transactions')
 def get_transactions():
     with database_controller.DatabaseClient() as db:
         return jsonify({"status": 200, "result": True, "addition": db.get_all_transactions()})
 
-@app.route('/users/')
+@app.route('/users_pubkeys')
 def get_users():
     with database_controller.DatabaseClient() as db:
-        return jsonify({"status": 200, "result": True, "addition": db.get_all_users()})
+        return jsonify({"status": 200, "result": True, "addition": 
+        [
+            {x[1]:x[3]} for x in db.get_all_users_all_info() #depends on fields order in select *
+        ]})
 
-@app.route('/users_all_info/') #debug only
+@app.route('/users_all_info') #debug only
 def _get_users():
     with database_controller.DatabaseClient() as db:
         return jsonify({"status": 200, "result": True, "addition": db.get_all_users_all_info()})
