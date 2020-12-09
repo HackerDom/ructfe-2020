@@ -1,0 +1,21 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+}
+
+group 'ru.hackerdom'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    compile 'com.github.serceman:jnr-fuse:0.5.4'
+    compile("br.com.devsrsouza:redissed:1.1.0")
+    compile "org.slf4j:slf4j-simple:1.8.0-beta4"
+    compile 'io.javalin:javalin:3.11.0'
+    implementation("redis.clients:jedis:3.2.0")
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-html-jvm', version: '0.6.10'
+}
