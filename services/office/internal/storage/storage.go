@@ -1,6 +1,7 @@
 package storage
 
 import (
+	pb "github.com/HackerDom/ructfe2020/proto"
 	"time"
 )
 
@@ -11,7 +12,7 @@ const (
 
 type Users interface {
 	List() ([]string, error)
-	Register(string) error
+	Upsert(user *pb.User) error
 }
 
 var (

@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	err := server.RunServer(manager.New(storage.NewEtcdUsers()))
+	err := server.RunServer(manager.New(storage.NewPgUsers()))
 	if err != nil {
 		panic(err)
 	}
