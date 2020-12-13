@@ -3,16 +3,25 @@ package storage
 import (
 	pb "github.com/HackerDom/ructfe2020/proto"
 	sq "github.com/Masterminds/squirrel"
+	_ "github.com/jackc/pgx/v4"
 	"github.com/jmoiron/sqlx"
+	"net"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // TODO: [12/13/20] (vaspahomov):
 var usersSchema = `CREATE TABLE users ....`
 
-func NewPgUsers() *UsersPg {
-	return &UsersPg{}
+func NewPgUsers() (*UsersPg, error) {
+	db, err := sqlx.Open("pgx", ConnString("", "", "", ""))
+	if err != nil {
+		return nil, err
+	}
+	db.SetMaxOpenConns(100)
+	db.SetConnMaxLifetime(time.Minute)
+	return &UsersPg{db: db}, nil
 }
 
 type userModel struct {
@@ -54,6 +63,35 @@ func (u *UsersPg) List() ([]*pb.User, error) {
 		}
 	}
 	return usersProto, nil
+}
+
+// ConnString constructs PostgreSQL connection string
+func ConnString(addr, dbname, user, password string) string {
+	var connParams []string
+
+	host, port, err := net.SplitHostPort(addr)
+	if err == nil {
+		connParams = append(connParams, "host="+host)
+		connParams = append(connParams, "port="+port)
+	} else {
+		connParams = append(connParams, "host="+addr)
+	}
+
+	if dbname != "" {
+		connParams = append(connParams, "dbname="+dbname)
+	}
+
+	if user != "" {
+		connParams = append(connParams, "user="+user)
+	}
+
+	if password != "" {
+		connParams = append(connParams, "password="+password)
+	}
+
+	connParams = append(connParams, "sslmode="+"require")
+
+	return strings.Join(connParams, " ")
 }
 
 func ReplaceSQL(old, searchPattern string) string {

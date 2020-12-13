@@ -7,6 +7,7 @@ require (
 	github.com/go-chi/chi v1.5.0
 	github.com/golang/protobuf v1.4.3
 	github.com/google/cel-go v0.6.0
+	github.com/jackc/pgx/v4 v4.10.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/rs/cors v1.7.0
 	google.golang.org/genproto v0.0.0-20201211151036-40ec1c210f7a
