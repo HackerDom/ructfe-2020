@@ -41,8 +41,10 @@ func VarsDecls(vars map[string]interface{}) []*exprpb.Decl {
 
 func UsefulFunc(inerCtx map[string]string, funcs []*functions.Overload, declarations []*exprpb.Decl) ([]*functions.Overload, []*exprpb.Decl) {
 	hasTag := func(tag string, inerCtx map[string]string) bool {
-		return true
+		_, ok := inerCtx[tag]
+		return ok
 	}
+	// has_tag('some shit')
 	f, d := &functions.Overload{
 		Operator: "has_tag_string",
 		Unary: func(lhs ref.Val) ref.Val {

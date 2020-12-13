@@ -8,10 +8,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 )
 
@@ -21,16 +18,18 @@ const (
 )
 
 type server struct {
+	*users
 	m *manager.Manager
 }
 
 func New(m *manager.Manager) *server {
-	return &server{m: m}
+	return &server{m: m, users: &users{m}}
 }
 
-func RunServer() error {
+func RunServer(m *manager.Manager) error {
 	mux := chi.NewMux()
-	Register(mux)
+	s := New(m)
+	s.Register(mux)
 	return Serve(mux)
 }
 
@@ -40,14 +39,6 @@ func Serve(mux *chi.Mux) error {
 
 func (s *server) handleHello(w http.ResponseWriter, r *http.Request) {
 	_, _ = fmt.Fprintf(w, "Hello World!")
-}
-
-func (s *server) handleListUsers(w http.ResponseWriter, _ *http.Request) {
-	users, err := json.Marshal(s.m.GetUsers())
-	if err != nil {
-		_, _ = fmt.Fprintf(w, err.Error())
-	}
-	_, _ = io.Copy(w, bytes.NewBuffer(users))
 }
 
 func (s *server) handleRand(w http.ResponseWriter, r *http.Request) {
@@ -70,16 +61,16 @@ func handleErr(w http.ResponseWriter, err error) {
 	_, _ = w.Write([]byte(err.Error()))
 }
 
-func Register(mux *chi.Mux) {
-	s := &server{}
-
+func (s *server) Register(mux *chi.Mux) {
 	mux.Use(middleware.RequestID)
 	mux.Use(middleware.RealIP)
 	mux.Use(middleware.Logger)
 	mux.Use(middleware.Recoverer)
 
+	// mount controllers
+	s.users.Register(mux)
+
 	mux.HandleFunc("/", s.handleHello)
-	mux.HandleFunc("/users", s.handleListUsers)
 	mux.HandleFunc("/rand/{text}", s.handleRand)
 	mux.HandleFunc("/eval/{expr}", s.handleEval)
 }
