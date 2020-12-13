@@ -18,12 +18,12 @@ const (
 )
 
 type server struct {
-	*users
+	*usersService
 	m *manager.Manager
 }
 
 func New(m *manager.Manager) *server {
-	return &server{m: m, users: &users{m}}
+	return &server{m: m, usersService: NewUsers(m)}
 }
 
 func RunServer(m *manager.Manager) error {
@@ -68,7 +68,7 @@ func (s *server) Register(mux *chi.Mux) {
 	mux.Use(middleware.Recoverer)
 
 	// mount controllers
-	s.users.Register(mux)
+	s.usersService.Mount(mux)
 
 	mux.HandleFunc("/", s.handleHello)
 	mux.HandleFunc("/rand/{text}", s.handleRand)

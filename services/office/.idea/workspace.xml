@@ -2,17 +2,27 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4f2087ba-3f4a-47fa-866b-f7c7b4f98bcd" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/build-proto.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/proto/office.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/httprtc/httprpc.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/httputil/headers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/manager/manager.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/manager/manager.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/server/server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/server/users.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/server/users.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
   </component>
   <component name="GOROOT" path="$PROJECT_DIR$/../../../../../../go1.14.4" />
   <component name="Git.Settings">
@@ -28,6 +38,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
