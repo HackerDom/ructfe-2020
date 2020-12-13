@@ -1,9 +1,9 @@
 package manager
 
 import (
-	"fmt"
 	"github.com/HackerDom/ructfe2020/internal/hashutil"
 	"github.com/HackerDom/ructfe2020/internal/storage"
+	pb "github.com/HackerDom/ructfe2020/proto"
 )
 
 type Manager struct {
@@ -14,20 +14,22 @@ func New(s storage.Users) *Manager {
 	return &Manager{s}
 }
 
-func (m *Manager) GetUsers() []string {
+func (m *Manager) GetUsers() ([]string, error) {
 	users, err := m.s.List()
 	if err != nil {
-		fmt.Println(err)
-		return make([]string, 0)
+		return make([]string, 0), err
 	}
-	return users
+	return users, nil
 }
 
-func (m *Manager) RegisterUser(username string) string {
+func (m *Manager) RegisterUser(username string) (*pb.User, error) {
 	d := hashutil.RandDigest(username)
 	err := m.s.Register(d)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
-	return d
+	return &pb.User{
+		Name:  username,
+		Token: d,
+	}, nil
 }

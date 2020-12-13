@@ -1,0 +1,1 @@
+protoc proto/office.proto --go_out=plugins=grpc:.
