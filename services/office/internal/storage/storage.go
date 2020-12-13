@@ -11,8 +11,8 @@ const (
 )
 
 type Users interface {
-	List() ([]string, error)
-	Upsert(user *pb.User) error
+	List() ([]*pb.User, error)
+	Insert(user *pb.User) error
 }
 
 var (

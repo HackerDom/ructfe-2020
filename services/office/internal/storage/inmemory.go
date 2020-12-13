@@ -10,7 +10,7 @@ type UsersInMemory struct {
 	users []string
 }
 
-func (u *UsersInMemory) Upsert(user *pb.User) error {
+func (u *UsersInMemory) Insert(user *pb.User) error {
 	u.users = append(u.users, user.Name)
 	return nil
 }

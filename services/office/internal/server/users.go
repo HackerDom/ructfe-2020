@@ -36,7 +36,7 @@ func (s *usersService) Mount(mux *chi.Mux) {
 
 func (s *usersService) List(ctx context.Context, req *pb.ListRequest) (*pb.ListResponse, error) {
 	// TODO: [12/13/20] (vaspahomov): pagination
-	names, err := s.m.GetUsers()
+	names, err := s.m.GetNames()
 	if err != nil {
 		return nil, err
 	}

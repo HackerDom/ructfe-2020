@@ -101,4 +101,3 @@ func ReplaceSQL(old, searchPattern string) string {
 	}
 	return old
 }
-

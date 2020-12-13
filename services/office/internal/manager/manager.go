@@ -7,24 +7,44 @@ import (
 )
 
 type Manager struct {
-	s storage.Users
+	*users
 }
 
 func New(s storage.Users) *Manager {
-	return &Manager{s}
+	return &Manager{&users{s}}
 }
 
-func (m *Manager) GetUsers() ([]string, error) {
+type users struct {
+	s storage.Users
+}
+
+func (m *users) GetUsers() ([]*pb.User, error) {
 	users, err := m.s.List()
 	if err != nil {
-		return make([]string, 0), err
+		return nil, err
 	}
 	return users, nil
 }
 
-func (m *Manager) RegisterUser(username string) (*pb.User, error) {
+func (m *users) GetNames() ([]string, error) {
+	users, err := m.s.List()
+	if err != nil {
+		return nil, err
+	}
+	names := make([]string, len(users))
+	for i, user := range users {
+		names[i] = user.Name
+	}
+	return names, nil
+}
+
+func (m *users) RegisterUser(username string) (*pb.User, error) {
 	d := hashutil.RandDigest(username)
-	err := m.s.Register(d)
+	user := &pb.User{
+		Name:  username,
+		Token: d,
+	}
+	err := m.s.Insert(user)
 	if err != nil {
 		return nil, err
 	}
