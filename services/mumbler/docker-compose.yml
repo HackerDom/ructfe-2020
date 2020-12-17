@@ -1,0 +1,11 @@
+version: '3'
+services:
+  mumbler:
+    image: mumbler
+    build: .
+    ports:
+     - "7124:7124"
+     - "7125:7125/udp"
+    volumes:
+      - ./storage:/app/storage
+    restart: unless-stopped
