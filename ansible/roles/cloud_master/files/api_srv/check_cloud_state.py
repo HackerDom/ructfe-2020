@@ -93,6 +93,10 @@ def get_do_vms_ips():
 
         try:
             ip = vm["networks"]["v4"][0]["ip_address"]
+            if ip.startswith("10."):
+                # take next
+                ip = vm['networks']['v4'][1]['ip_address']
+            
             team2ip[team] = ip
         except (KeyError, IndexError):
             log_team(team, "warning no ip in do router")
