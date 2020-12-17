@@ -11,6 +11,7 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
 
 class ThreadedUDPServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
     def get_request(self):
-        arr = bytearray(self.max_packet_size)
+        print u"shit is happening"
+        arr = bytearray()
         nbytes, client_addr = self.socket.recvfrom_into(arr, self.max_packet_size)
         return (arr, self.socket), client_addr
