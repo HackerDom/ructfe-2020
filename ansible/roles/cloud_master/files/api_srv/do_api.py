@@ -136,7 +136,13 @@ def get_ip_by_id(droplet_id, attempts=5, timeout=20):
             resp = requests.get(url, headers=HEADERS)
             data = json.loads(resp.text)
 
-            return data['droplet']['networks']['v4'][0]['ip_address']
+            ip = data['droplet']['networks']['v4'][0]['ip_address']
+
+            if ip.startswith("10."):
+                # take next
+                ip = data['droplet']['networks']['v4'][1]['ip_address']
+
+            return ip
         except Exception as e:
             log("get_ip_by_id trying again %s" % (e,))
         time.sleep(timeout)

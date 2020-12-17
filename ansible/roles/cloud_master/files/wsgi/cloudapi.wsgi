@@ -209,7 +209,7 @@ def cmd_get_team_openvpn_config(team, args):
     if not DEV_MODE:
         config = open("%s/team%d/client_entergame.ovpn" % (DB_PATH, team)).read().strip()
     else:
-        url = ("https://github.com/HackerDom/ructfe-2019/blob/master/ansible/"
+        url = ("https://github.com/HackerDom/ructfe-2020/blob/main/ansible/"
                "roles/cloud_master/files/api_srv/db_init_state_dev/team%d/client_entergame.ovpn" % team)
         config = "DEV_MODE=ON\nTake the config here:\n%s" % url
     return "200 Ok", {"result": "ok", "msg": config}
