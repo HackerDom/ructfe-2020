@@ -34,6 +34,17 @@ void respond(int32 fd, uint64 code, const char *text, const char *content_type)
 		printf("failed to write response!\n");
 }
 
+void redirect(int32 fd, const char *location)
+{
+	char response[256];
+	sprintf(response, 
+		"HTTP/1.1 301 Moved Permanently\r\n"
+		"Location: /%s\r\n", location);
+
+	if (write(fd, response, strlen(response)) < 0)
+		printf("failed to write response!\n");
+}
+
 struct strbuf
 {
 	size_t length;
@@ -61,11 +72,7 @@ bool try_add_char(struct strbuf * buf, char c)
 
 void render_page(char * buffer, const char * key, const char * secret)
 {
-	char form_buffer[256];
-	bzero(form_buffer, sizeof(buffer));
-	if (secret)
-		sprintf(form_buffer, pg_form, secret);
-	sprintf(buffer, pg_index, key, form_buffer);
+	sprintf(buffer, pg_index, key, secret ? secret : "");
 }
 
 #define ST_VERB 0
@@ -118,7 +125,7 @@ void process_request(int32 fd, char *request)
 	printf("Verb: %s\nUrl: %s\nSecret: %s\n\n", 
 		bufs[ST_VERB].data, bufs[ST_URL].data, bufs[ST_SECRET].data);
 
-	char page[512];
+	char page[1024];
 	bzero(page, sizeof(page));
 
 	if (!strcmp("GET", bufs[ST_VERB].data))
@@ -135,11 +142,16 @@ void process_request(int32 fd, char *request)
 		return;
 	}
 	
-	if (!strcmp("POST", bufs[ST_VERB].data) && bufs[ST_URL].length == 32)
+	if (!strcmp("POST", bufs[ST_VERB].data))
 	{
-		store_item(bufs[ST_URL].data, bufs[ST_SECRET].data);
-		render_page(page, bufs[ST_URL].data, bufs[ST_SECRET].data);
-		respond(fd, 200, page, "text/html");
+		char key[64];
+		bzero(key, sizeof(key));
+		gen_key(key);
+		printf("saving by key: %s\n", key);
+
+		store_item(key, bufs[ST_SECRET].data);
+		render_page(page, key, bufs[ST_SECRET].data);
+		redirect(fd, key);
 		return;
 	}
 

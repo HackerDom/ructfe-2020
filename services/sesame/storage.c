@@ -1,3 +1,5 @@
+#include <uuid/uuid.h>
+
 #include "storage.h"
 
 #define MAXITEMS 4096
@@ -233,6 +235,20 @@ char * list_items(uint64 skip, uint64 take, char *buffer, uint64 length)
 
 		strncat(buffer, slots[idx].key, 32);
 		strcat(buffer, "\n");
+	}
+
+	return buffer;
+}
+
+char * gen_key(char *buffer)
+{
+	byte binuuid[16];
+	uuid_generate_random(binuuid);
+
+	for (int i = 0; i < 16; i++)
+	{
+		buffer[2 * i] = 'A' + ((binuuid[i] & 7) % 26);
+		buffer[2 * i + 1] = 'A' + (((binuuid[i] >> 4) & 7) % 26);
 	}
 
 	return buffer;

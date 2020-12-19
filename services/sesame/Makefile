@@ -1,3 +1,3 @@
 sesame: sesame.* storage.* http.* *.html
 	python3 embed_face.py > face.html.h
-	gcc-7 sesame.c storage.c http.c -m64 -O2 -o sesame
+	gcc-7 sesame.c storage.c http.c -m64 -O2 -luuid -o sesame
