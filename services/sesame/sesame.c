@@ -55,16 +55,12 @@ void make_nonblocking(int32 sfd)
 	}
 }
 
-#define MAXEVENTS 64
+#define MAXEVENTS 1023
+struct epoll_event event;
+struct epoll_event events[MAXEVENTS];
 
 void run()
 {
-	struct epoll_event event;
-	struct epoll_event events[MAXEVENTS];
-
-	bzero(&event, sizeof(event));
-	bzero(events, sizeof(events));
-
 	int32 listener = create_listener();
 
 	make_nonblocking(listener);

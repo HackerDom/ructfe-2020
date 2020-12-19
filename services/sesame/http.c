@@ -38,8 +38,9 @@ void redirect(int32 fd, const char *location)
 {
 	char response[256];
 	sprintf(response, 
-		"HTTP/1.1 301 Moved Permanently\r\n"
-		"Location: /%s\r\n", location);
+		"HTTP/1.1 303 See Other\r\n"
+		"Location: /%s\r\n"
+		"Connection: close\r\n\r\n", location);
 
 	if (write(fd, response, strlen(response)) < 0)
 		printf("failed to write response!\n");
@@ -82,7 +83,7 @@ void render_page(char * buffer, const char * key, const char * secret)
 
 void process_request(int32 fd, char *request)
 {
-	// printf("Request:\n%s\n", request);
+	printf("Request:\n%s\n", request);
 
 	int state = ST_VERB;
 	struct strbuf bufs[3];
