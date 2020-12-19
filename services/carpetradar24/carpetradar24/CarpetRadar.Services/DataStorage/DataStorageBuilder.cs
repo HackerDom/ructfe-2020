@@ -57,13 +57,15 @@ namespace CarpetRadar.Services.DataStorage
                 "password_hash bigint, " +
                 "company text, " +
                 "PRIMARY KEY(login));");
+
             var createTokens = new SimpleStatement(
                 $"CREATE COLUMNFAMILY IF NOT EXISTS {Constants.ColumnFamily.Tokens}(" +
                 "token_ ascii, " +
                 "user_id uuid, " +
                 "time timestamp, " +
                 "PRIMARY KEY(token_));");
-            var createCoordinates = new SimpleStatement(
+
+            var createFlights = new SimpleStatement(
                 $"CREATE COLUMNFAMILY IF NOT EXISTS {Constants.ColumnFamily.CarpetFlights}(" +
                 "id uuid, " +
                 "user_id uuid, " +
@@ -74,6 +76,7 @@ namespace CarpetRadar.Services.DataStorage
                 "y list<int>, " +
                 "finished boolean, " +
                 "PRIMARY KEY(id));");
+
             var createCurrentPositions = new SimpleStatement(
                 $"CREATE COLUMNFAMILY IF NOT EXISTS {Constants.ColumnFamily.CurrentPositions}(" +
                 "id uuid, " +
@@ -81,10 +84,12 @@ namespace CarpetRadar.Services.DataStorage
                 "label text, " +
                 "x int, " +
                 "y int, " +
+                "finished boolean, " +
                 "PRIMARY KEY(id));");
+
             session.Execute(createUsers);
             session.Execute(createTokens);
-            session.Execute(createCoordinates);
+            session.Execute(createFlights);
             session.Execute(createCurrentPositions);
         }
     }

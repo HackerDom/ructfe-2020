@@ -3,9 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using CarpetRadar.Services;
 using CarpetRadar.Services.DataStorage;
 using CarpetRadar.Services.IdentityServices;
@@ -14,7 +16,7 @@ using NLog;
 
 namespace CarpetRadar.TrackServer
 {
-    public class CarpetTrackServer
+    public class CarpetTracker
     {
         private readonly TcpListener server;
 
@@ -22,7 +24,7 @@ namespace CarpetRadar.TrackServer
         private readonly IDataStorage dataStorage;
         private readonly IAuthenticationService authService;
 
-        public CarpetTrackServer(string ip, int port)
+        public CarpetTracker(string ip, int port)
         {
             var localAddress = IPAddress.Parse(ip);
 
@@ -37,11 +39,38 @@ namespace CarpetRadar.TrackServer
 
         private void AddSomeTestData()
         {
+            var rs = new RegistrationService(dataStorage, logger);
+            for (int i = 0; i < 5; i++)
+            {
+                var id = Guid.NewGuid().ToString("N").Substring(0, 5);
+                var login = i + "_" + id;
+                var userId = rs.RegisterUser(login, "password", "company" + i).Result;
 
+                var r = new Random();
+                var flightId = Guid.NewGuid();
+
+                for (int j = 0; j < 20; j++)
+                {
+                    int x = r.Next();
+                    int y = r.Next();
+                    var c = new Coordinates
+                    {
+                        FlightId = flightId,
+                        Finished = false,
+                        Label = "label " + id,
+                        License = "license " + id,
+                        X = x,
+                        Y = y
+                    };
+                    dataStorage.AddCurrentCoordinates(c, userId.Value).GetAwaiter().GetResult();
+                }
+            }
         }
 
         public void StartListener()
         {
+            AddSomeTestData();
+
             try
             {
                 while (true)
@@ -73,10 +102,10 @@ namespace CarpetRadar.TrackServer
                     logger.Info($"{Thread.CurrentThread.ManagedThreadId}: Received: {data}");
 
                     var bf = new BinaryFormatter();
-                    Coords c;
+                    Coordinates c;
                     using (var m = new MemoryStream(bytes))
                     {
-                        c = (Coords) bf.Deserialize(m);
+                        c = (Coordinates) bf.Deserialize(m);
                     }
 
                     var str = "Hey Device!";
@@ -99,18 +128,24 @@ namespace CarpetRadar.TrackServer
             try
             {
                 var bf = new BinaryFormatter();
-                var request = (Coords) bf.Deserialize(stream); /// ошибка при слишком коротком стриме. надо вычитывать отдельно, чтобы форматтер знал, что больше байтов не будет
+                var request = (Coordinates) bf.Deserialize(stream); /// ошибка при слишком коротком стриме. надо вычитывать отдельно, чтобы форматтер знал, что больше байтов не будет
+
                 var userId = await authService.ResolveUser(request.Token);
                 if (userId == null)
                 {
                     stream.Send("Authentication error.");
-                    ///return; /// потенциальная бага))))
+                    return; /// потенциальная бага))))
                 }
 
-                // ReSharper disable once PossibleInvalidOperationException
-                await dataStorage.AddCurrentCoordinates(request, userId.Value);
+                var errorMsg = await dataStorage.AddCurrentCoordinates(request, userId.Value);
+                if (errorMsg != null)
+                {
+                    stream.Send(errorMsg);
+                    return;
+                }
 
                 var currentPositions = await dataStorage.GetCurrentPositions();
+
                 using (var ms = new MemoryStream())
                 {
                     bf.Serialize(ms, currentPositions.ToArray());

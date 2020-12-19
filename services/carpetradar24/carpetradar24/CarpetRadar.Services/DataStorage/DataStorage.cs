@@ -10,9 +10,9 @@ namespace CarpetRadar.Services.DataStorage
 {
     public interface IDataStorage
     {
-        Task AddCurrentCoordinates(Coords coords, Guid userId);
+        Task<string> AddCurrentCoordinates(Coordinates coordinates, Guid userId);
 
-        Task<IEnumerable<Coords>> GetCurrentPositions();
+        Task<IEnumerable<Coordinates>> GetCurrentPositions();
 
         Task SaveUserInfo(string login, Guid userId, long passwordHash, string company);
 
@@ -37,46 +37,36 @@ namespace CarpetRadar.Services.DataStorage
             /// try sql injection
         }
 
-        public async Task AddCurrentCoordinates(Coords coords, Guid userId, bool isFinished = false)
+        public async Task<string> AddCurrentCoordinates(Coordinates coordinates, Guid userId)
         {
-            var addToCarpets = new SimpleStatement(
-                $"UPDATE {Constants.ColumnFamily.CarpetFlights} SET " +
-                $"x = x + [{coords.X}], " +
-                $"y = y + [{coords.Y}], " +
-                $"time = time + [{DateTime.UtcNow.Ticks}],  " +
-                $"finished = {isFinished}, " +
-                $"user_id = {userId}, " +
-                $"label = {coords.Label}, " +
-                $"license = {coords.License}," +
-                $"WHERE id = {coords.FlightId};");
+            if (string.IsNullOrEmpty(coordinates.Label)
+                || string.IsNullOrEmpty(coordinates.License)
+                || coordinates.FlightId == Guid.Empty
+                || coordinates.X < 0
+                || coordinates.Y < 0)
+                return "Empty request parameters";
+
+            var c = $"UPDATE {Constants.ColumnFamily.CarpetFlights} SET " +
+                    $"user_id = {userId}, " +
+                    $"label = '{coordinates.Label}', " +
+                    $"license = '{coordinates.License}', " +
+                    $"finished = {coordinates.Finished}, " +
+                    $"x = x + [{coordinates.X}], " +
+                    $"y = y + [{coordinates.Y}], " +
+                    $"time = time + [{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}] " +
+                    $"WHERE id = {coordinates.FlightId};";
+            var addToCarpets = new SimpleStatement(c);
+
             var addToPositions = new SimpleStatement(
-                $"INSERT INTO {Constants.ColumnFamily.CurrentPositions} (user_id, id, label, x, y) VALUES (?, ?, ?, ?, ?)",
-                userId, coords.FlightId, coords.Label, coords.X, coords.Y);
+                $"INSERT INTO {Constants.ColumnFamily.CurrentPositions} (user_id, id, label, x, y, finished) VALUES (?, ?, ?, ?, ?, ?)",
+                userId, coordinates.FlightId, coordinates.Label, coordinates.X, coordinates.Y, coordinates.Finished);
             await session.ExecuteAsync(new BatchStatement()
                 .Add(addToCarpets)
                 .Add(addToPositions));
+            return null;
         }
 
-        public async Task FinishFlight(Coords coords, Guid userId, bool isFinished = false)
-        {
-            /// try prepared statements
-            /// try sql injection
-            var addToCarpets = new SimpleStatement(
-                $"UPDATE {Constants.ColumnFamily.CarpetFlights} SET " +
-                $"x = x + [{coords.X}], " +
-                $"y = y + [{coords.Y}], " +
-                $"time = time + [{DateTime.UtcNow.Ticks}]  " +
-                $"finished = {isFinished}" +
-                $"WHERE id = {userId};");
-            var addToPositions = new SimpleStatement(
-                $"INSERT INTO {Constants.ColumnFamily.CurrentPositions} (id, x, y) VALUES (?, ?, ?)",
-                userId, coords.X, coords.Y);
-            await session.ExecuteAsync(new BatchStatement()
-                .Add(addToCarpets)
-                .Add(addToPositions));
-        }
-
-        public async Task<IEnumerable<Coords>> GetCurrentPositions()
+        public async Task<IEnumerable<Coordinates>> GetCurrentPositions()
         {
             /// нужно чистить curPos
             var statement = new SimpleStatement(
@@ -84,11 +74,12 @@ namespace CarpetRadar.Services.DataStorage
             statement.SetPageSize(100);
             var rs = session.Execute(statement);
             var coordinates = rs.Select(row =>
-                new Coords
+                new Coordinates
                 {
                     Label = row.GetValue<string>("label"),
                     X = row.GetValue<int>("x"),
-                    Y = row.GetValue<int>("y")
+                    Y = row.GetValue<int>("y"),
+                    Finished = row.GetValue<bool>("finished"),
                 });
             return coordinates;
         }
@@ -100,7 +91,7 @@ namespace CarpetRadar.Services.DataStorage
                 $"id = {userId}, " +
                 $"password_hash = {passwordHash}, " +
                 $"company = '{company}' " +
-                $"WHERE login = '{login}';").EnableTracing();
+                $"WHERE login = '{login}';");
             session.Execute(statement);
         }
 

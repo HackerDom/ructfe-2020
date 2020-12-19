@@ -3,7 +3,7 @@
 namespace CarpetRadar.Services.Models
 {
     [Serializable]
-    public class Coords
+    public class Coordinates
     {
         public string Token { get; set; }
 
@@ -14,5 +14,8 @@ namespace CarpetRadar.Services.Models
 
         public string Label { get; set; }
         public string License { get; set; }
+
+        public bool Finished { get; set; }
+
     }
 }

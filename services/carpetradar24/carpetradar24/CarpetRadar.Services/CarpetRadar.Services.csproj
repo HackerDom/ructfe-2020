@@ -151,7 +151,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="DataStorage\DataStorage.cs" />
     <Compile Include="DataStorage\DataStorageBuilder.cs" />
-    <Compile Include="Models\Coords.cs" />
+    <Compile Include="Models\Coordinates.cs" />
     <Compile Include="NetworkStreamExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

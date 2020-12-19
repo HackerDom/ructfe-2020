@@ -9,7 +9,7 @@ namespace CarpetRadar.TrackServer
     {
         static void Main()
         {
-            var coords = new Coords
+            var coords = new Coordinates
             {
                 X = int.MaxValue,
                 Y = 0,
@@ -23,14 +23,14 @@ namespace CarpetRadar.TrackServer
             }
 
             // ReSharper disable once NotAccessedVariable
-            Coords c;
+            Coordinates c;
             using (var f = new FileStream("D:/temp/stream.bin", FileMode.Open))
             {
                 // ReSharper disable once RedundantAssignment
-                c = (Coords) bf.Deserialize(f);
+                c = (Coordinates) bf.Deserialize(f);
             }
 
-            var server = new CarpetTrackServer("0.0.0.0", 12345);
+            var server = new CarpetTracker("0.0.0.0", 12345);
             server.StartListener();
         }
     }
