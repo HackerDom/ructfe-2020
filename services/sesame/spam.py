@@ -14,7 +14,7 @@ while True:
 	ts = time.time()
 
 	url = 'http://' + host + ':4280/' + ''.join([random.choice(string.ascii_uppercase) for _ in range(32)])
-	response = http.request('GET', url)
+	response = http.request('POST', url, fields={ "secret": "FOO" })
 	html = response.read()
 
 	delta = time.time() - ts
