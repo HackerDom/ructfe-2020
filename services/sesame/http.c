@@ -147,10 +147,15 @@ void process_request(int32 fd, char *request)
 	{
 		char key[64];
 		bzero(key, sizeof(key));
-		gen_key(key);
-		printf("saving by key: %s\n", key);
 
-		store_item(key, bufs[ST_SECRET].data);
+		for (int i = 0; i < 64; i++)
+		{	
+			gen_key(key, i);
+
+			if (store_item(key, bufs[ST_SECRET].data))
+				break;
+		}
+
 		render_page(page, key, bufs[ST_SECRET].data);
 		redirect(fd, key);
 		return;

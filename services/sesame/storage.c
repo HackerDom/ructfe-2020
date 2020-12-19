@@ -1,4 +1,5 @@
 #include <uuid/uuid.h>
+#include <time.h>
 
 #include "storage.h"
 
@@ -240,15 +241,21 @@ char * list_items(uint64 skip, uint64 take, char *buffer, uint64 length)
 	return buffer;
 }
 
-char * gen_key(char *buffer)
+char * gen_key(char *buffer, uint64 modifier)
 {
 	byte binuuid[16];
 	uuid_generate_random(binuuid);
 
-	for (int i = 0; i < 16; i++)
+	time_t now = time(0);
+	struct tm *now_tm = localtime(&now);
+	uint64 time_id = now_tm->tm_year + now_tm->tm_mon * 7 + 
+		now_tm->tm_mday * 31 + now_tm->tm_hour * 167 + now_tm->tm_min * 401;
+
+	uint64 multiplier = binuuid[0];
+	for (int i = 0; i < 32; i++)
 	{
-		buffer[2 * i] = 'A' + ((binuuid[i] & 7) % 26);
-		buffer[2 * i + 1] = 'A' + (((binuuid[i] >> 4) & 7) % 26);
+		buffer[i] = 'A' + ((time_id * multiplier) % 26);
+		multiplier = (multiplier * 167 + modifier) % 16769023;
 	}
 
 	return buffer;
