@@ -1,7 +1,9 @@
 import sys
+import htmlmin
 
 with open('index.html', 'r') as f:
 	index = f.read()
+	index = htmlmin.minify(index, remove_empty_space=True)
 
 output = [ 
 	'#pragma once', 
