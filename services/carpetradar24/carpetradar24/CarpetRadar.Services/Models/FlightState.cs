@@ -3,7 +3,7 @@
 namespace CarpetRadar.Services.Models
 {
     [Serializable]
-    public class Coordinates
+    public class FlightState
     {
         public string Token { get; set; }
 

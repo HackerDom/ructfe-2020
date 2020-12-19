@@ -1,12 +1,13 @@
-﻿
-<%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="CarpetRadar.Web._Default" %>
+﻿<%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="CarpetRadar.Web._Default" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 
     <div class="jumbotron">
         <h1>ASP.NET</h1>
         <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-        <p><a href="http://www.asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+        <p>
+            <a href="http://www.asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a>
+        </p>
     </div>
 
     <div class="row">
@@ -14,7 +15,7 @@
             <h2>Getting started</h2>
             <p>
                 ASP.NET Web Forms lets you build dynamic websites using a familiar drag-and-drop, event-driven model.
-            A design surface and hundreds of controls and components let you rapidly build sophisticated, powerful UI-driven sites with data access.
+                A design surface and hundreds of controls and components let you rapidly build sophisticated, powerful UI-driven sites with data access.
             </p>
             <p>
                 <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301948">Learn more &raquo;</a>
@@ -40,4 +41,33 @@
         </div>
     </div>
 
+
+    <h3> Now there are <% Response.Write(flights.Count(d => !d.Finished)); %> magic carpets in the air</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Aerial vehicle</th>
+            <th>License</th>
+            <th>Start location</th>
+            <th>Last location</th>
+            <th>Total distance</th>
+            <th>Start time</th>
+            <th>Last time</th>
+            <th>Total travel time</th>
+            <th>Is flight finished</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+            foreach (var fl in flights.Where(d => !d.Finished))
+            {
+                string htmlString = "<tr>" +
+                                    $"<td>{fl.Label}</td>" +
+                                    $"<td>{fl.X}</td>" +
+                                    $"<td>{fl.Y}</td>" +
+                                    "<tr/>";
+                Response.Write(htmlString);
+            } %>
+        </tbody>
+    </table>
 </asp:Content>

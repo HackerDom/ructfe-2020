@@ -53,7 +53,7 @@ namespace CarpetRadar.TrackServer
                 {
                     int x = r.Next();
                     int y = r.Next();
-                    var c = new Coordinates
+                    var c = new FlightState
                     {
                         FlightId = flightId,
                         Finished = false,
@@ -62,7 +62,7 @@ namespace CarpetRadar.TrackServer
                         X = x,
                         Y = y
                     };
-                    dataStorage.AddCurrentCoordinates(c, userId.Value).GetAwaiter().GetResult();
+                    dataStorage.AddFlightState(c, userId.Value).GetAwaiter().GetResult();
                 }
             }
         }
@@ -102,10 +102,10 @@ namespace CarpetRadar.TrackServer
                     logger.Info($"{Thread.CurrentThread.ManagedThreadId}: Received: {data}");
 
                     var bf = new BinaryFormatter();
-                    Coordinates c;
+                    FlightState c;
                     using (var m = new MemoryStream(bytes))
                     {
-                        c = (Coordinates) bf.Deserialize(m);
+                        c = (FlightState) bf.Deserialize(m);
                     }
 
                     var str = "Hey Device!";
@@ -128,7 +128,7 @@ namespace CarpetRadar.TrackServer
             try
             {
                 var bf = new BinaryFormatter();
-                var request = (Coordinates) bf.Deserialize(stream); /// ошибка при слишком коротком стриме. надо вычитывать отдельно, чтобы форматтер знал, что больше байтов не будет
+                var request = (FlightState) bf.Deserialize(stream); /// ошибка при слишком коротком стриме. надо вычитывать отдельно, чтобы форматтер знал, что больше байтов не будет
 
                 var userId = await authService.ResolveUser(request.Token);
                 if (userId == null)
@@ -137,7 +137,7 @@ namespace CarpetRadar.TrackServer
                     return; /// потенциальная бага))))
                 }
 
-                var errorMsg = await dataStorage.AddCurrentCoordinates(request, userId.Value);
+                var errorMsg = await dataStorage.AddFlightState(request, userId.Value);
                 if (errorMsg != null)
                 {
                     stream.Send(errorMsg);

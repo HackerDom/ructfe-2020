@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using CarpetRadar.Services.Models;
 using Cassandra;
 using NLog;
@@ -10,9 +11,11 @@ namespace CarpetRadar.Services.DataStorage
 {
     public interface IDataStorage
     {
-        Task<string> AddCurrentCoordinates(Coordinates coordinates, Guid userId);
+        Task<string> AddFlightState(FlightState flightState, Guid userId);
 
-        Task<IEnumerable<Coordinates>> GetCurrentPositions();
+        Task<IEnumerable<CurrentPosition>> GetCurrentPositions();
+
+        Task<IEnumerable<(Guid Id, string Login, string Company)>> GetUserInfos();
 
         Task SaveUserInfo(string login, Guid userId, long passwordHash, string company);
 
@@ -37,36 +40,36 @@ namespace CarpetRadar.Services.DataStorage
             /// try sql injection
         }
 
-        public async Task<string> AddCurrentCoordinates(Coordinates coordinates, Guid userId)
+        public async Task<string> AddFlightState(FlightState flightState, Guid userId)
         {
-            if (string.IsNullOrEmpty(coordinates.Label)
-                || string.IsNullOrEmpty(coordinates.License)
-                || coordinates.FlightId == Guid.Empty
-                || coordinates.X < 0
-                || coordinates.Y < 0)
+            if (string.IsNullOrEmpty(flightState.Label)
+                || string.IsNullOrEmpty(flightState.License)
+                || flightState.FlightId == Guid.Empty
+                || flightState.X < 0
+                || flightState.Y < 0)
                 return "Empty request parameters";
 
             var c = $"UPDATE {Constants.ColumnFamily.CarpetFlights} SET " +
                     $"user_id = {userId}, " +
-                    $"label = '{coordinates.Label}', " +
-                    $"license = '{coordinates.License}', " +
-                    $"finished = {coordinates.Finished}, " +
-                    $"x = x + [{coordinates.X}], " +
-                    $"y = y + [{coordinates.Y}], " +
+                    $"label = '{flightState.Label}', " +
+                    $"license = '{flightState.License}', " +
+                    $"finished = {flightState.Finished}, " +
+                    $"x = x + [{flightState.X}], " +
+                    $"y = y + [{flightState.Y}], " +
                     $"time = time + [{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}] " +
-                    $"WHERE id = {coordinates.FlightId};";
+                    $"WHERE id = {flightState.FlightId};";
             var addToCarpets = new SimpleStatement(c);
 
             var addToPositions = new SimpleStatement(
                 $"INSERT INTO {Constants.ColumnFamily.CurrentPositions} (user_id, id, label, x, y, finished) VALUES (?, ?, ?, ?, ?, ?)",
-                userId, coordinates.FlightId, coordinates.Label, coordinates.X, coordinates.Y, coordinates.Finished);
+                userId, flightState.FlightId, flightState.Label, flightState.X, flightState.Y, flightState.Finished);
             await session.ExecuteAsync(new BatchStatement()
                 .Add(addToCarpets)
                 .Add(addToPositions));
             return null;
         }
 
-        public async Task<IEnumerable<Coordinates>> GetCurrentPositions()
+        public async Task<IEnumerable<CurrentPosition>> GetCurrentPositions()
         {
             /// нужно чистить curPos
             var statement = new SimpleStatement(
@@ -74,14 +77,29 @@ namespace CarpetRadar.Services.DataStorage
             statement.SetPageSize(100);
             var rs = session.Execute(statement);
             var coordinates = rs.Select(row =>
-                new Coordinates
+                new CurrentPosition
                 {
+                    UserId = row.GetValue<Guid>("user_id"),
+                    FlightId = row.GetValue<Guid>("id"),
                     Label = row.GetValue<string>("label"),
                     X = row.GetValue<int>("x"),
                     Y = row.GetValue<int>("y"),
                     Finished = row.GetValue<bool>("finished"),
                 });
             return coordinates;
+        }
+
+        public async Task<IEnumerable<(Guid Id, string Login, string Company)>> GetUserInfos()
+        {
+            var statement = new SimpleStatement(
+                $"SELECT id, login, company FROM {Constants.ColumnFamily.Users}");
+            statement.SetPageSize(100);
+            var rs = session.Execute(statement);
+            var users = rs.Select(row => (
+                Id: row.GetValue<Guid>("id"),
+                Login: row.GetValue<string>("login"),
+                Company: row.GetValue<string>("company")));
+            return users;
         }
 
         public async Task SaveUserInfo(string login, Guid userId, long passwordHash, string company)
