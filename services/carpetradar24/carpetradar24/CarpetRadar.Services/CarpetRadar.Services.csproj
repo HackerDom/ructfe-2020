@@ -151,6 +151,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="DataStorage\DataStorage.cs" />
     <Compile Include="DataStorage\DataStorageBuilder.cs" />
+    <Compile Include="Models\Flight.cs" />
     <Compile Include="Models\FlightState.cs" />
     <Compile Include="Models\CurrentPosition.cs" />
     <Compile Include="NetworkStreamExtensions.cs" />

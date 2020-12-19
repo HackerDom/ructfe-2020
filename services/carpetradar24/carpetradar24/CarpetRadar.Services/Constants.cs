@@ -8,7 +8,7 @@
         {
             public const string Users = "users";
             public const string Tokens = "tokens";
-            public const string CarpetFlights = "carpetsFlights";
+            public const string CarpetFlights = "carpetFlights";
             public const string CurrentPositions = "currentPositions";
         }
     }

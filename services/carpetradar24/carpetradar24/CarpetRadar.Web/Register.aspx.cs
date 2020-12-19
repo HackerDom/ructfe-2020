@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
@@ -27,9 +28,7 @@ namespace CarpetRadar.Web
 
         private async Task<(bool IsRegistered, string Token)> RegisterUser(string userName, string companyName, string passWord)
         {
-            // Check for invalid userName.
-            // userName must not be null and must be between 1 and 15 characters.
-            if ((null == userName) || (0 == userName.Length) || (userName.Length > 15))
+            if (userName == null || !Regex.IsMatch(userName, "\\w{3,15}"))
             {
                 logger.Info("[RegisterUser] Input validation of userName failed.");
                 return (false, null);

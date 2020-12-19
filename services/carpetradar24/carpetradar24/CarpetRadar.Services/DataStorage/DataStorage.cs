@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.UI.WebControls;
 using CarpetRadar.Services.Models;
 using Cassandra;
 using NLog;
@@ -15,7 +14,11 @@ namespace CarpetRadar.Services.DataStorage
 
         Task<IEnumerable<CurrentPosition>> GetCurrentPositions();
 
+        Task<IEnumerable<Flight>> GetUserFlights(Guid userId);
+
         Task<IEnumerable<(Guid Id, string Login, string Company)>> GetUserInfos();
+
+        Task<(string Login, string Company)> GetUserInfo(Guid userId);
 
         Task SaveUserInfo(string login, Guid userId, long passwordHash, string company);
 
@@ -73,7 +76,7 @@ namespace CarpetRadar.Services.DataStorage
         {
             /// нужно чистить curPos
             var statement = new SimpleStatement(
-                $"SELECT label, x, y FROM {Constants.ColumnFamily.CurrentPositions}");
+                $"SELECT * FROM {Constants.ColumnFamily.CurrentPositions}");
             statement.SetPageSize(100);
             var rs = session.Execute(statement);
             var coordinates = rs.Select(row =>
@@ -89,6 +92,26 @@ namespace CarpetRadar.Services.DataStorage
             return coordinates;
         }
 
+        public async Task<IEnumerable<Flight>> GetUserFlights(Guid userId)
+        {
+            var statement = new SimpleStatement(
+                $"SELECT * FROM {Constants.ColumnFamily.CarpetFlights} WHERE user_id = {userId} ALLOW FILTERING;");///
+            statement.SetPageSize(100);
+            var rs = session.Execute(statement);
+            var coordinates = rs.Select(row =>
+                new Flight
+                {
+                    FlightId = row.GetValue<Guid>("id"),
+                    Label = row.GetValue<string>("label"),
+                    License = row.GetValue<string>("license"),
+                    X = row.GetValue<List<int>>("x"),
+                    Y = row.GetValue<List<int>>("y"),
+                    ReportMoments = row.GetValue<List<DateTimeOffset>>("time").Select(time => time.UtcDateTime).ToList(),
+                    Finished = row.GetValue<bool>("finished")
+                });
+            return coordinates;
+        }
+
         public async Task<IEnumerable<(Guid Id, string Login, string Company)>> GetUserInfos()
         {
             var statement = new SimpleStatement(
@@ -100,6 +123,18 @@ namespace CarpetRadar.Services.DataStorage
                 Login: row.GetValue<string>("login"),
                 Company: row.GetValue<string>("company")));
             return users;
+        }
+
+        public async Task<(string Login, string Company)> GetUserInfo(Guid userId)
+        {
+            var statement = new SimpleStatement(
+                $"SELECT login, company FROM {Constants.ColumnFamily.Users} WHERE id = {userId} ALLOW FILTERING;");
+            var rs = session.Execute(statement);
+
+            var userData = rs.FirstOrDefault();
+
+            return (Login: userData?.GetValue<string>("login"),
+                Company: userData?.GetValue<string>("company"));
         }
 
         public async Task SaveUserInfo(string login, Guid userId, long passwordHash, string company)

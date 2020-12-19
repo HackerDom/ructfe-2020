@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CarpetRadar.Services.DataStorage;
 using NLog;
@@ -23,6 +24,9 @@ namespace CarpetRadar.Services.IdentityServices
 
         public async Task<Guid?> RegisterUser(string login, string password, string companyName)
         {
+            if (!Regex.IsMatch(login, "\\w{3,15}"))
+                return null;
+
             var userId = Guid.NewGuid();
             var passwordHash = password.CalculateHash();
 

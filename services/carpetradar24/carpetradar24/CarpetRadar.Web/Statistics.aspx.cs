@@ -6,14 +6,18 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using CarpetRadar.Services.DataStorage;
 using CarpetRadar.Services.IdentityServices;
+using CarpetRadar.Services.Models;
 using NLog;
 
 namespace CarpetRadar.Web
 {
     public partial class Statistics : Page
     {
+        protected (string Login, string Company) userInfo;
+        protected IEnumerable<Flight> userFlights;
+
         private readonly IAuthenticationService authenticationService;
-        protected readonly IDataStorage dataStorage;
+        private readonly IDataStorage dataStorage;
         private readonly ILogger logger;
 
         public Statistics(IAuthenticationService authenticationService, IDataStorage dataStorage, ILogger logger)
@@ -31,6 +35,9 @@ namespace CarpetRadar.Web
                 Response.Redirect("~/Login.aspx", true);
                 return;
             }
+
+            userInfo = dataStorage.GetUserInfo(userId.Value).GetAwaiter().GetResult();
+            userFlights = dataStorage.GetUserFlights(userId.Value).GetAwaiter().GetResult().ToList();
         }
     }
 }

@@ -43,8 +43,8 @@ namespace CarpetRadar.TrackServer
             for (int i = 0; i < 5; i++)
             {
                 var id = Guid.NewGuid().ToString("N").Substring(0, 5);
-                var login = i + "_" + id;
-                var userId = rs.RegisterUser(login, "password", "company" + i).Result;
+                var login = i + "i" + id;
+                var userId = rs.RegisterUser(login, "password", "company " + id).Result;
 
                 var r = new Random();
                 var flightId = Guid.NewGuid();

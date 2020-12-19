@@ -42,29 +42,27 @@
     </div>
 
 
-    <h3> Now there are <% Response.Write(flights.Count(d => !d.Finished)); %> magic carpets in the air</h3>
+    <h3> Now there are <% Response.Write(positionsData.Count(d => !d.Position.Finished)); %> magic carpets in the air</h3>
     <table>
         <thead>
         <tr>
             <th>Aerial vehicle</th>
-            <th>License</th>
-            <th>Start location</th>
-            <th>Last location</th>
-            <th>Total distance</th>
-            <th>Start time</th>
-            <th>Last time</th>
-            <th>Total travel time</th>
-            <th>Is flight finished</th>
+            <th>Location</th>
+            <th>Last connection time</th>
+            <th>Company</th>
+            <th>Contact address</th>
         </tr>
         </thead>
         <tbody>
         <%
-            foreach (var fl in flights.Where(d => !d.Finished))
+            foreach (var cp in positionsData.Where(d => !d.Position.Finished))
             {
                 string htmlString = "<tr>" +
-                                    $"<td>{fl.Label}</td>" +
-                                    $"<td>{fl.X}</td>" +
-                                    $"<td>{fl.Y}</td>" +
+                                    $"<td>{cp.Position.Label}</td>" +
+                                    $"<td>({cp.Position.X}; {cp.Position.Y})</td>" +
+                                    $"<td>-</td>" +
+                                    $"<td>{cp.Company}</td>" +
+                                    $"<td>{cp.Login}@carpetradar24.ru</td>" +
                                     "<tr/>";
                 Response.Write(htmlString);
             } %>

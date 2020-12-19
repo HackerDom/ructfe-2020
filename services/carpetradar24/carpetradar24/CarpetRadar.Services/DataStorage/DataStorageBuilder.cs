@@ -8,34 +8,38 @@ namespace CarpetRadar.Services.DataStorage
     {
         private static ICluster cluster;
         private static ISession session;
+        private static readonly object Lock = new object();
 
         public static DataStorage GetDefaultStorage(ILogger logger)
         {
-            try
+            lock (Lock)
             {
-                if (cluster != null)
+                try
+                {
+                    if (cluster != null)
+                        return new DataStorage(session, logger);
+
+                    cluster = Cluster.Builder()
+                        .AddContactPoint("localhost")
+                        .WithPort(9042)
+                        .WithLoadBalancingPolicy(new DCAwareRoundRobinPolicy("datacenter1"))
+                        .WithAuthProvider(new PlainTextAuthProvider("cassandra", "cassandra"))
+                        .Build();
+
+                    session = cluster.Connect();
+                    CreateKeySpace();
+                    session.ChangeKeyspace(Constants.KeySpace);
+                    logger.Info("The cluster's name is: " + cluster.Metadata.ClusterName);
+
+                    CreateTables();
+
                     return new DataStorage(session, logger);
-
-                cluster = Cluster.Builder()
-                    .AddContactPoint("localhost")
-                    .WithPort(9042)
-                    .WithLoadBalancingPolicy(new DCAwareRoundRobinPolicy("datacenter1"))
-                    .WithAuthProvider(new PlainTextAuthProvider("cassandra", "cassandra"))
-                    .Build();
-
-                session = cluster.Connect();
-                CreateKeySpace();
-                session.ChangeKeyspace(Constants.KeySpace);
-                logger.Info("The cluster's name is: " + cluster.Metadata.ClusterName);
-
-                CreateTables();
-
-                return new DataStorage(session, logger);
-            }
-            catch (Exception e)
-            {
-                logger.Error(e);
-                throw;
+                }
+                catch (Exception e)
+                {
+                    logger.Error(e);
+                    throw;
+                }
             }
         }
 
@@ -66,8 +70,8 @@ namespace CarpetRadar.Services.DataStorage
                 "PRIMARY KEY(token_));");
 
             var createFlights = new SimpleStatement(
-                $"CREATE COLUMNFAMILY IF NOT EXISTS {Constants.ColumnFamily.CarpetFlights}(" +
-                "id uuid, " +
+                $"CREATE COLUMNFAMILY IF NOT EXISTS {Constants.ColumnFamily.CarpetFlights}" +
+                "(id uuid, " +
                 "user_id uuid, " +
                 "label ascii, " +
                 "license ascii, " +

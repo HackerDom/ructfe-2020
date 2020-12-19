@@ -10,7 +10,7 @@ namespace CarpetRadar.Web
 {
     public partial class _Default : Page
     {
-        protected List<CurrentPosition> flights;
+        protected List<(CurrentPosition Position, string Login, string Company)> positionsData;
 
         private readonly IDataStorage dataStorage;
         private readonly ILogger logger;
@@ -23,8 +23,11 @@ namespace CarpetRadar.Web
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            flights = dataStorage.GetCurrentPositions().GetAwaiter().GetResult().ToList();
-            var users = dataStorage.GetUserInfos();
+            var positions = dataStorage.GetCurrentPositions().GetAwaiter().GetResult().ToList();
+            var users = dataStorage.GetUserInfos().GetAwaiter().GetResult().ToList();
+            positionsData = positions.Select(p => (Pos: p, User: users.FirstOrDefault(u => u.Id == p.UserId)))
+                .Select(item => (item.Pos, item.User.Login, item.User.Company))
+                .ToList();
         }
     }
 }
