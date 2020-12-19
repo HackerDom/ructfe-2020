@@ -49,7 +49,7 @@ void init_storage()
 		if (!bytesRead)
 			break;
 
-		if (bytesRead < sizeof(item) || item.value[31] != '=')
+		if (bytesRead < sizeof(item))
 		{
 			printf("Item %lld is corrupt\n", items_read);
 			break;
@@ -174,8 +174,7 @@ char * store_item(char *key, char *value)
 		return 0;
 	slot item;
 	copy_value(value, item.value);
-	if (!name_flag(key, item.key))
-		return 0;
+	copy_value(key, item.key);
 
 	if (store_item_impl(&item))
 	{
@@ -236,89 +235,5 @@ char * list_items(uint64 skip, uint64 take, char *buffer, uint64 length)
 		strcat(buffer, "\n");
 	}
 
-	return buffer;
-}
-
-char * encode_flag(const char *recipe, char *buffer)
-{
-	if (!recipe || !buffer)
-		return 0;
-
-	buffer[32] = 0;
-	buffer[31] = '=';
-	uint64 i;
-	for (i = 0; i < 31; i++)
-	{
-		buffer[i] = recipe[i];
-	}
-
-	return buffer;
-}
-
-char * name_flag(const char *flag, char *buffer)
-{
-	if (!flag || !buffer)
-		return 0;
-	uint64 length = 0;
-	while (*flag)
-	{
-		char c = *flag;
-		flag++;
-		if (c < 'A' || c > 'Z')
-			continue;
-		*buffer = c;
-		buffer++;
-		length++;
-	}
-
-	if (!length)
-		return 0;
-
-	*buffer = 0;
-
-	return buffer - length;
-}
-
-char * hash_flag(const char *flag, char *buffer)
-{
-	if (!flag || !buffer)
-		return 0;
-
-	char flag_copy[32];
-	uint64 i;
-	for (i = 0; i < 32; i++)
-		flag_copy[i % 2 ? 32 - i : i] = flag[i] > '9' ? flag[i] - 'A' + 10 : flag[i] - '0';
-	
-	const uint64 seed = 0x60d15dead;
-	const uint64 m = 0xc6a4a7935bd1e995;
-	const int32 r = 47;
-
-	uint64 h = seed ^ (32 * m);
-
-	const uint64 *data = (const uint64 *)flag_copy;
-	const uint64 *end = 4 + data;
-
-	while (data != end)
-	{
-		uint64 k = *data++;
-
-		k *= m; 
-		k ^= k >> r; 
-		k *= m; 
-
-		h ^= k;
-		h *= m; 
-	}
-
-	h *= m;
-
-	h ^= h >> r;
-	h *= m;
-	h ^= h >> r;
-
-	if (!(h >> 63))
-		h = ~h;
-
-	sprintf(buffer, "%llx", h);
 	return buffer;
 }
