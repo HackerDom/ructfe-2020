@@ -1,240 +1,38 @@
+#include <sys/epoll.h>
+
 #include "types.h"
-#include "epoll.h"
-#include "num.h"
 #include "vm.h"
 #include "storage.h"
 #include "baz.vm.h"
 #include "face.html.h"
 
-#include <asm/errno.h>
-
 #define PORT 4280u
-
-int64 parse_int(const char *str)
-{
-	const int64 base = 10;
-
-	if (!str)
-		return 0;
-
-	int64 result = 0;
-	while (*str)
-	{
-		result = result * base + (*str - '0');
-		str++;
-	}
-
-	return result;
-}
-
-uint64 parse_int_hex(const char *str)
-{
-	const uint64 base = 16;
-
-	uint64 result = 0;
-	while (*str)
-	{
-		result = result * base + (*str < 'a' ? *str - '0' : *str - 'a' + 10);
-		str++;
-	}
-
-	return result;
-}
-
-bool to_string(int64 value, char *buffer, int64 buffer_length)
-{
-	const int64 base = 10;
-
-	if (value < 0 && buffer_length > 0)
-	{
-		*buffer = '-';
-		return to_string(-value, buffer + 1, buffer_length - 1);
-	}
-
-	int64 i;
-	for (i = 0; i < buffer_length - 1; i++)
-	{
-		buffer[i] = (value % base) + '0';
-		value /= base;
-		if (!value)
-		{
-			buffer[i + 1] = 0;
-			break;
-		}
-	}
-
-	if (i == buffer_length - 1)
-		return false;
-
-	char *end = buffer + i;
-	while (end > buffer)
-	{
-		char temp = *buffer;
-		*buffer = *end;
-		*end = temp;
-		end--;
-		buffer++;
-	}
-
-	return true;
-}
-
-bool to_string_hex(uint64 value, char *buffer, int64 buffer_length)
-{
-	const uint64 base = 16;
-
-	int64 i;
-	for (i = 0; i < buffer_length - 1; i++)
-	{
-		buffer[i] = "0123456789abcdef"[value % base];
-		value /= base;
-		if (!value)
-		{
-			buffer[i + 1] = 0;
-			break;
-		}
-	}
-
-	if (i == buffer_length - 1)
-		return false;
-
-	char *end = buffer + i;
-	while (end > buffer)
-	{
-		char temp = *buffer;
-		*buffer = *end;
-		*end = temp;
-		end--;
-		buffer++;
-	}
-
-	return true;
-}
-
-uint64 strcmp(const char *str1, const char *str2)
-{
-	if (!str1 || !str2)
-		return !str1 && !str2;
-	while (*str1 && (*str1 == *str2))
-	{
-		str1++;
-		str2++;
-	}
-	return *str1 - *str2;
-}
-
-void strcat(char *str1, const char *str2)
-{
-	while (*str1)
-		str1++;
-	while (*str2)
-	{
-		*str1 = *str2;
-		str1++;
-		str2++;
-	}
-	*str1 = 0;
-}
-
-void strncat(char *str1, const char *str2, uint64 n)
-{
-	while (*str1)
-		str1++;
-	while (*str2 && n)
-	{
-		*str1 = *str2;
-		str1++;
-		str2++;
-		n--;
-	}
-	*str1 = 0;
-}
-
-void memzero(void *data, int64 length)
-{
-	int64 *ptr = (int64 *)data;
-	int64 i;
-	for (i = 0; i < length / sizeof(int64); i++)
-	{
-		*ptr = 0L;
-		ptr++;
-	}
-	byte *ptr2 = (byte *)ptr;
-	for (i = 0; i < length % sizeof(int64); i++)
-	{
-		*ptr2 = 0;
-		ptr2++;
-	}
-}
-
-void print(const char *message)
-{
-	if (!message)
-	{
-		print("(null)");
-		return;
-	}
-	write(1, message, strlen(message));
-}
-
-void nprint(int64 n)
-{
-	char buf[32];
-	to_string(n, buf, sizeof(buf));
-	print(buf);
-}
-
-void hprint(uint64 n)
-{
-	char buf[32];
-	to_string_hex(n, buf, sizeof(buf));
-	print(buf);
-}
-
-int32 socket();
-
-int32 reuseaddr(int32 fd);
-
-int32 bind(int32 fd, struct sockaddr *addr, int32 addr_len);
-
-void listen(int32 fd, int32 queue);
-
-int32 accept(int32 fd, struct sockaddr *addr, int32 *addr_len);
-
-void close(int32 fd);
-
-uint32 fcntl(int32 fd, int32 cmd, uint32 arg);
-
-int32 epoll_create1(int32 flags);
-
-int32 epoll_ctl(int32 __epfd, int32 __op, int32 __fd, struct epoll_event *__event);
-
-int32 epoll_wait(int32 __epfd, struct epoll_event *__events, int32 __maxevents, int32 __timeout);
 
 int32 create_listener()
 {
-	int32 sock = socket();
+	int32 sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock < 0)
 	{
-		print("fuck socket\n");
+		perror("fuck socket\n");
 		exit(1);
 	}
 
-	if (reuseaddr(sock) < 0)
+	int enable = 1;
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
     {
-		print("fuck reuseaddr\n");
+		perror("fuck reuseaddr\n");
 		exit(1);
 	}
 
-	struct sockaddr name;
-
-	name.sin_family = 2;
-	name.sin_port = (uint16)(((PORT & 0xff) << 8) | (PORT >> 8));
+	struct sockaddr_in name;
+	bzero(&name, sizeof(name));
+	name.sin_family = AF_INET;
 	name.sin_addr.s_addr = INADDR_ANY;
+	name.sin_port = htons(PORT);
 
-	if (bind(sock, &name, sizeof(name)))
+	if (bind(sock, (struct sockaddr *)&name, sizeof(name)))
 	{
-		print("fuck bind\n");
+		perror("fuck bind\n");
 		exit(1);
 	}
 
@@ -247,14 +45,14 @@ void make_nonblocking(int32 sfd)
 
 	if (flags < 0)
 	{
-		print("fuck fcntl\n");
+		perror("fuck fcntl\n");
 		exit(1);
 	}
 
 	flags |= O_NONBLOCK;
 	if (fcntl(sfd, F_SETFL, flags) < 0)
 	{
-		print("fuck fcntl\n");
+		perror("fuck fcntl\n");
 		exit(1);
 	}
 }
@@ -361,20 +159,20 @@ void process_request(int32 fd, char *request)
 
 	if (handler == handler_list)
 	{
-		params[0] = parse_int((const char *)params[0]);
-		params[1] = parse_int((const char *)params[1]);
+		params[0] = 0;
+		params[1] = 0;
 	}
 
 	run_handler(handler, fd, params);
 }
 
-void main()
+void run()
 {
 	struct epoll_event event;
 	struct epoll_event events[MAXEVENTS];
 
-	memzero(&event, sizeof(event));
-	memzero(events, sizeof(events));
+	bzero(&event, sizeof(event));
+	bzero(events, sizeof(events));
 
 	int32 listener = create_listener();
 
@@ -385,15 +183,15 @@ void main()
 	int32 efd = epoll_create1(0);
 	if (efd < 0)
 	{
-		print("fuck epoll\n");
+		perror("fuck epoll\n");
 		exit(1);
 	}
 
 	event.data.fd = listener;
-	event.events = EPOLLIN | EPOLLET;
+	event.events = EPOLLIN;
 	if (epoll_ctl(efd, EPOLL_CTL_ADD, listener, &event) < 0)
 	{
-		print("fuck epoll_ctl\n");
+		perror("fuck epoll_ctl\n");
 		exit(1);
 	}
 
@@ -408,40 +206,40 @@ void main()
 				(events[i].events & EPOLLHUP) ||
 				(!(events[i].events & EPOLLIN)))
 			{
-				print("epoll error\n");
-				close (events[i].data.fd);
+				printf("epoll error\n");
+				close(events[i].data.fd);
 				continue;
 			}
 			else if (listener == events[i].data.fd)
 			{
 				while (true)
 				{
-					struct sockaddr in_addr;
+					struct sockaddr_in in_addr;
 					int32 in_len = sizeof(in_addr);
+					bzero(&in_addr, in_len);
 					
-					int32 cli = accept(listener, &in_addr, &in_len);
+					int32 cli = accept(listener, (struct sockaddr *)&in_addr, &in_len);
 					if (cli < 0)
 					{
-						if ((cli == -EAGAIN) ||
-							(cli == -EWOULDBLOCK))
+						if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
 						{
 							break;
 						}
 						else
 						{
-							print("accept error\n");
+							printf("accept error: %d\n", errno);
 							break;
 						}
 					}
  
 					make_nonblocking(cli);
 
-					memzero(&event, sizeof(event));
+					bzero(&event, sizeof(event));
 					event.data.fd = cli;
-					event.events = EPOLLIN | EPOLLET;
+					event.events = EPOLLIN;
 					if (epoll_ctl(efd, EPOLL_CTL_ADD, cli, &event) < 0)
 					{
-						print("fuck epoll_ctl\n");
+						perror("fuck epoll_ctl\n");
 						exit(1);
 					}
 				}
@@ -465,59 +263,11 @@ void main()
 	close(listener);
 }
 
-void _start()
+int main()
 {
 	init_storage();
 
-	main();
+	run();
 
-	exit(0);
-}
-
-void test_math()
-{
-	char buf[256];
-	read(0, buf, sizeof(buf));
-
-	uint192 a;
-	uint64 b;
-	char m = buf[0];
-
-	uint64 args[4];
-
-	uint64 i, j;
-	for (i = 1; i < sizeof(buf); i++)
-	{
-		if (buf[i] == ';')
-			buf[i] = 0;
-	}
-	for (i = 1, j = 0; i < sizeof(buf), j < 4; i++)
-	{
-		if (!buf[i])
-		{
-			args[j] = parse_int_hex(&buf[i + 1]);
-			j++;
-		}
-	}
-	a.i0 = args[0];
-	a.i1 = args[1];
-	a.i2 = args[2];
-	b = args[3];
-
-	uint32 r;
-	if (m == '+')
-	{
-		a = add(a, b);
-		hprint(a.i0);print(";");hprint(a.i1);print(";");hprint(a.i2);print("\n");
-	}
-	else if (m == '*')
-	{
-		a = multiply(a, b);
-		hprint(a.i0);print(";");hprint(a.i1);print(";");hprint(a.i2);print("\n");
-	}
-	else if (m == '/')
-	{
-		a = divmod(a, b, &r);
-		hprint(a.i0);print(";");hprint(a.i1);print(";");hprint(a.i2);print(";");hprint(r);print("\n");
-	}
+	return 0;
 }

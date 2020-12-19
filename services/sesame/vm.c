@@ -5,7 +5,7 @@
 void respond(int32 fd, uint64 code, const char *text, const char *content_type)
 {
 	char buf[32];
-	to_string(text ? strlen(text) : 0, buf, sizeof(buf));
+	snprintf(buf, sizeof(buf), "%s", text);
 
 	char response[40960];
 	response[0] = 0;

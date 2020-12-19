@@ -1,4 +1,4 @@
-import urllib2
+import urllib3
 import time
 import random
 import string
@@ -8,13 +8,14 @@ timeacc = 0
 
 import sys
 host = sys.argv[1] if len(sys.argv) > 1 else 'localhost'
+http = urllib3.PoolManager()
 
 while True:
 	ts = time.time()
 
 	url = 'http://' + host + ':4280/memorize?name=' + ''.join([random.choice(string.ascii_uppercase) for _ in range(32)]) + '&what=Water'
 	#print(url)
-	response = urllib2.urlopen(url)
+	response = http.request('GET', url)
 	html = response.read()
 	#if not 'f4ece80d85d714b5' in html:
 	#	print(html)

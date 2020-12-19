@@ -1,5 +1,4 @@
 #include "storage.h"
-#include "num.h"
 
 #define MAXITEMS 4096
 #define MAXNODES 409600
@@ -31,13 +30,13 @@ void init_storage()
 {
 	current_item = 0;
 	current_node = 1;
-	memzero(nodes, sizeof(nodes));
-	memzero(slots, sizeof(slots));
+	bzero(nodes, sizeof(nodes));
+	bzero(slots, sizeof(slots));
 	nodes[0].used = true;
 
-	if ((logfd = openrw("storage")) < 0)
+	if ((logfd = open("storage", O_RDWR | O_CREAT, 0666)) < 0)
 	{
-		print("fuck storage\n");
+		perror("fuck storage\n");
 		exit(1);
 	}
 
@@ -52,7 +51,7 @@ void init_storage()
 
 		if (bytesRead < sizeof(item) || item.value[31] != '=')
 		{
-			print("Item ");nprint(items_read);print(" is corrupt\n");
+			printf("Item %lld is corrupt\n", items_read);
 			break;
 		}
 
@@ -112,7 +111,7 @@ void delete_item(slot *item)
 		key--;
 		uint64 n = *key - 'A';
 
-		memzero(&nodes[current], sizeof(node));
+		bzero(&nodes[current], sizeof(node));
 		current = path[i];
 		nodes[current].trans[n] = 0;
 		deleted++;
@@ -180,7 +179,11 @@ char * store_item(char *key, char *value)
 
 	if (store_item_impl(&item))
 	{
-		write(logfd, &item, sizeof(item));
+		if (write(logfd, &item, sizeof(item)) < 0)
+		{
+			perror("store_item failed to write!");
+			exit(1);
+		}
 		return key;
 	}
 
@@ -236,118 +239,44 @@ char * list_items(uint64 skip, uint64 take, char *buffer, uint64 length)
 	return buffer;
 }
 
-#define CSPIRITS 33
-#define MAXRECIPE 32
-char *spirits[] = {
-"Ale",
-"Porter",
-"Stout",
-"Lager",
-"Cider",
-"Mead",
-"Wine",
-"Port",
-"Sherry",
-"Vermouth",
-"Vinsanto",
-"Sangria",
-"Champagne",
-"Sake",
-"Brandy",
-"Cognac",
-"Armagnac",
-"Schnapps",
-"Gin",
-"Horilka",
-"Metaxa",
-"Rakia",
-"Rum",
-"Shochu",
-"Soju",
-"Tequila",
-"Vodka",
-"Bourbon",
-"Whiskey",
-"Absinthe",
-"Juice",
-"Cola",
-"Water"
-};
-
-uint192 magic = { .i0 = 0xb0b8bad, .i1 = 0xbeefdefec87edfec, .i2 = 0xe5f100deda11dead };
-
 char * encode_flag(const char *recipe, char *buffer)
 {
 	if (!recipe || !buffer)
 		return 0;
-
-	uint192 n = expand(0);
-
-	char buf[64];
-	buf[0] = 0;
-	char *bptr = buf;
-	while (*recipe && bptr < buf + sizeof(buf)) // TODO check recipe length
-	{
-		char c = *recipe;
-		if (c == ',' || !recipe[1])
-		{
-			if (!recipe[1])
-			{
-				*bptr = *recipe;
-				bptr++;
-			}
-			*bptr = 0;
-			uint64 i;
-			for (i = 0; i < CSPIRITS; i++)
-			{
-				if (!strcmp(buf, spirits[i]))
-					break;
-			}
-
-			if (i >= CSPIRITS)
-				return 0;
-
-			n = multiply(n, CSPIRITS);
-			n = add(n, i);
-
-			buf[0] = 0;
-			bptr = buf;
-		}
-		else
-		{
-			*bptr = *recipe;
-			bptr++;
-		}
-		recipe++;
-	}
-
-	//n = not(n);
-	n = xor(n, magic);
-	
-	uint64 length = 0;
-	while (!is_zero(n) && length < sizeof(buf))
-	{
-		uint32 rem;
-		n = divmod(n, 36, &rem);
-		buf[length] = rem > 9 ? 'A' + rem - 10 : '0' + rem;
-		length++;
-	}
-
-	while (length < 31)
-	{
-		buf[length] = '0';
-		length++;
-	}
 
 	buffer[32] = 0;
 	buffer[31] = '=';
 	uint64 i;
 	for (i = 0; i < 31; i++)
 	{
-		buffer[i] = buf[--length];
+		buffer[i] = recipe[i];
 	}
 
 	return buffer;
+}
+
+char * name_flag(const char *flag, char *buffer)
+{
+	if (!flag || !buffer)
+		return 0;
+	uint64 length = 0;
+	while (*flag)
+	{
+		char c = *flag;
+		flag++;
+		if (c < 'A' || c > 'Z')
+			continue;
+		*buffer = c;
+		buffer++;
+		length++;
+	}
+
+	if (!length)
+		return 0;
+
+	*buffer = 0;
+
+	return buffer - length;
 }
 
 char * hash_flag(const char *flag, char *buffer)
@@ -390,30 +319,6 @@ char * hash_flag(const char *flag, char *buffer)
 	if (!(h >> 63))
 		h = ~h;
 
-	to_string_hex(h, buffer, 32);
+	sprintf(buffer, "%llx", h);
 	return buffer;
-}
-
-char * name_flag(const char *flag, char *buffer)
-{
-	if (!flag || !buffer)
-		return 0;
-	uint64 length = 0;
-	while (*flag)
-	{
-		char c = *flag;
-		flag++;
-		if (c < 'A' || c > 'Z')
-			continue;
-		*buffer = c;
-		buffer++;
-		length++;
-	}
-
-	if (!length)
-		return 0;
-
-	*buffer = 0;
-
-	return buffer - length;
 }
