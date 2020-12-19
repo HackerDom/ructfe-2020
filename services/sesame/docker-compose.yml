@@ -1,0 +1,12 @@
+version: '2.3'
+services:
+  baz:
+    build: .
+    volumes:
+      - ./baz:/home/baz/baz
+    restart: on-failure
+    ports:
+      - "4280:4280"
+    mem_limit: 512m
+    mem_reservation: 128m
+  
