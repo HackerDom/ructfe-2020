@@ -7,11 +7,11 @@ import (
 )
 
 func main() {
-	s, err := storage.NewPgUsers()
+	users, err := storage.NewPgUsers()
 	if err != nil {
 		panic(err)
 	}
-	err = server.RunServer(manager.New(s))
+	err = server.RunServer(manager.New(users, nil))
 	if err != nil {
 		panic(err)
 	}

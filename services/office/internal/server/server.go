@@ -4,6 +4,7 @@ import (
 	"github.com/HackerDom/ructfe2020/internal/hashutil"
 	"github.com/HackerDom/ructfe2020/internal/manager"
 	"github.com/HackerDom/ructfe2020/pkg/eval"
+	pb "github.com/HackerDom/ructfe2020/proto"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -48,7 +49,7 @@ func (s *server) handleRand(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) handleEval(w http.ResponseWriter, r *http.Request) {
 	expr := chi.URLParam(r, "expr")
-	res, err := eval.Eval(expr, map[string]string{"secret": "lol_wow"})
+	res, err := eval.Eval(expr, map[string]string{"secret": "lol_wow"}, make([]*pb.User, 0))
 	if err != nil {
 		handleErr(w, err)
 		return

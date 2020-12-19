@@ -15,6 +15,13 @@ type Users interface {
 	Insert(user *pb.User) error
 }
 
+type Documents interface {
+	List() ([]*pb.Document, error)
+	Insert(document *pb.Document) error
+	Delete(docID string) error
+	Get(name string) (*pb.Document, error)
+}
+
 var (
 	dialTimeout    = 2 * time.Second
 	requestTimeout = 10 * time.Second

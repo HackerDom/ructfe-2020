@@ -1,6 +1,7 @@
 package funcs
 
 import (
+	pb "github.com/HackerDom/ructfe2020/proto"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
@@ -10,9 +11,9 @@ import (
 	"reflect"
 )
 
-func EnvOptions(inerCtx map[string]string) (decls []*exprpb.Decl, funcs []*functions.Overload) {
+func EnvOptions(inerCtx map[string]string, users []*pb.User) (decls []*exprpb.Decl, funcs []*functions.Overload) {
 	funcs, funcsDecls := make([]*functions.Overload, 0), make([]*exprpb.Decl, 0)
-	funcs, funcsDecls = UsefulFunc(inerCtx, funcs, funcsDecls)
+	funcs, funcsDecls = GetInfoFunc(inerCtx["username"], users, funcs, funcsDecls)
 	return funcsDecls, funcs
 }
 
@@ -39,21 +40,29 @@ func VarsDecls(vars map[string]interface{}) []*exprpb.Decl {
 	return varsDecls
 }
 
-func UsefulFunc(inerCtx map[string]string, funcs []*functions.Overload, declarations []*exprpb.Decl) ([]*functions.Overload, []*exprpb.Decl) {
-	hasTag := func(tag string, inerCtx map[string]string) bool {
-		_, ok := inerCtx[tag]
-		return ok
+func GetInfoFunc(username string, users []*pb.User, funcs []*functions.Overload, declarations []*exprpb.Decl) ([]*functions.Overload, []*exprpb.Decl) {
+	findSecret := func(username, kind string) string {
+		for _, user := range users {
+			switch kind {
+			case "bio":
+				return user.Bio
+			case "name":
+				return user.Name
+			case "token":
+				return user.Token
+			}
+		}
+		return ""
 	}
-	// has_tag('some shit')
 	f, d := &functions.Overload{
-		Operator: "has_tag_string",
+		Operator: "get_info_string",
 		Unary: func(lhs ref.Val) ref.Val {
-			val := lhs.Value().(string)
-			return types.Bool(hasTag(val, inerCtx))
+			greetings := lhs.Value().(string)
+			return types.String(findSecret(username, greetings))
 		},
-	}, decls.NewFunction("has_tag",
-		decls.NewOverload("has_tag_string",
+	}, decls.NewFunction("get_info",
+		decls.NewOverload("get_info_string",
 			[]*exprpb.Type{decls.String},
-			decls.Bool))
+			decls.String))
 	return append(funcs, f), append(declarations, d)
 }

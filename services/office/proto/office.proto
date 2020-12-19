@@ -1,13 +1,28 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
-
 package officepb;
 option go_package = "pb";
 
 message User {
   string name = 1;
   string token = 2;
+  string bio = 3;
+}
+
+message Document {
+  string name = 1;
+  Ctx context = 2;
+  string content = 3;
+}
+
+message Ctx {
+  map<string, string> vars = 1;
+  repeated Expr exprs = 2;
+}
+
+message Expr {
+  string name = 1;
+  string expr = 2;
 }
 
 message RegisterRequest {

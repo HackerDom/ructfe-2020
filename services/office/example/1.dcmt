@@ -1,0 +1,20 @@
+vars:
+  name: "name"
+exprs:
+  - name: "bio"
+    expr: "get_info('bio')"
+  - name: "token"
+    expr: "get_info('token')"
+---
+<h1>Hi {name}!</h1>
+
+<table>
+  <tr>
+    <td>Bio:</td>
+    <td>'{bio}'</td>
+  </tr>
+  <tr>
+    <td>Token:</td>
+    <td>'{token}'</td>
+  </tr>
+</table>
