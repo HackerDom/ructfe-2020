@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"fmt"
 	pb "github.com/HackerDom/ructfe2020/proto"
 	"time"
 )
@@ -27,3 +28,4 @@ var (
 	requestTimeout = 10 * time.Second
 )
 
+var DocumentNotFoundErr = fmt.Errorf("document not found")

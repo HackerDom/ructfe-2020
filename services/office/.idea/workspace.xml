@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4f2087ba-3f4a-47fa-866b-f7c7b4f98bcd" name="Default Changelist" comment="" />
+    <list default="true" id="4f2087ba-3f4a-47fa-866b-f7c7b4f98bcd" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/internal/storage/docs/inmemory.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/storage/users/inmemory.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/storage/inmemory.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/storage/pg.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/users/pg.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/storage/storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/storage.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main" beforeDir="false" afterPath="$PROJECT_DIR$/main" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/office.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/proto/office.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proto/office.proto" beforeDir="false" afterPath="$PROJECT_DIR$/proto/office.proto" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,6 +50,8 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/internal/storage" />
+      <recent name="$PROJECT_DIR$/internal/storage/users" />
       <recent name="$PROJECT_DIR$/proto" />
     </key>
   </component>

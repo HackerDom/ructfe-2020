@@ -10,9 +10,10 @@ message User {
 }
 
 message Document {
-  string name = 1;
-  Ctx context = 2;
-  string content = 3;
+  string id = 1;
+  string name = 2;
+  Ctx context = 3;
+  string content = 4;
 }
 
 message Ctx {
