@@ -25,7 +25,7 @@ func (s *usersService) Mount(mux *chi.Mux) {
 		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) {
 			return s.Register(ctx, req.(*pb.RegisterRequest))
 		})
-	httprpc.New("POST", "/users").
+	httprpc.New("POST", "/users/list").
 		Mount(mux).
 		WithJSONPbReader(&pb.ListRequest{}).
 		WithJSONPbWriter().

@@ -469,6 +469,295 @@ func (x *ListResponse) GetUsernames() []string {
 	return nil
 }
 
+type CreateDocumentRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Doc *Document `protobuf:"bytes,1,opt,name=doc,proto3" json:"doc,omitempty"`
+}
+
+func (x *CreateDocumentRequest) Reset() {
+	*x = CreateDocumentRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_office_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateDocumentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDocumentRequest) ProtoMessage() {}
+
+func (x *CreateDocumentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_office_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDocumentRequest.ProtoReflect.Descriptor instead.
+func (*CreateDocumentRequest) Descriptor() ([]byte, []int) {
+	return file_proto_office_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *CreateDocumentRequest) GetDoc() *Document {
+	if x != nil {
+		return x.Doc
+	}
+	return nil
+}
+
+type CreateDocumentResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *CreateDocumentResponse) Reset() {
+	*x = CreateDocumentResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_office_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateDocumentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDocumentResponse) ProtoMessage() {}
+
+func (x *CreateDocumentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_office_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDocumentResponse.ProtoReflect.Descriptor instead.
+func (*CreateDocumentResponse) Descriptor() ([]byte, []int) {
+	return file_proto_office_proto_rawDescGZIP(), []int{9}
+}
+
+type ListDocumentsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Offset int32 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit  int32 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+}
+
+func (x *ListDocumentsRequest) Reset() {
+	*x = ListDocumentsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_office_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListDocumentsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDocumentsRequest) ProtoMessage() {}
+
+func (x *ListDocumentsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_office_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDocumentsRequest.ProtoReflect.Descriptor instead.
+func (*ListDocumentsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_office_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ListDocumentsRequest) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+func (x *ListDocumentsRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type ListDocumentsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Docs []*Document `protobuf:"bytes,1,rep,name=docs,proto3" json:"docs,omitempty"`
+}
+
+func (x *ListDocumentsResponse) Reset() {
+	*x = ListDocumentsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_office_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListDocumentsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDocumentsResponse) ProtoMessage() {}
+
+func (x *ListDocumentsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_office_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDocumentsResponse.ProtoReflect.Descriptor instead.
+func (*ListDocumentsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_office_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ListDocumentsResponse) GetDocs() []*Document {
+	if x != nil {
+		return x.Docs
+	}
+	return nil
+}
+
+type ExecuteRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	DocId    string `protobuf:"bytes,2,opt,name=doc_id,json=docId,proto3" json:"doc_id,omitempty"`
+}
+
+func (x *ExecuteRequest) Reset() {
+	*x = ExecuteRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_office_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ExecuteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExecuteRequest) ProtoMessage() {}
+
+func (x *ExecuteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_office_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExecuteRequest.ProtoReflect.Descriptor instead.
+func (*ExecuteRequest) Descriptor() ([]byte, []int) {
+	return file_proto_office_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ExecuteRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *ExecuteRequest) GetDocId() string {
+	if x != nil {
+		return x.DocId
+	}
+	return ""
+}
+
+type ExecuteResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Executed string `protobuf:"bytes,1,opt,name=executed,proto3" json:"executed,omitempty"`
+}
+
+func (x *ExecuteResponse) Reset() {
+	*x = ExecuteResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_office_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ExecuteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExecuteResponse) ProtoMessage() {}
+
+func (x *ExecuteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_office_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExecuteResponse.ProtoReflect.Descriptor instead.
+func (*ExecuteResponse) Descriptor() ([]byte, []int) {
+	return file_proto_office_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ExecuteResponse) GetExecuted() string {
+	if x != nil {
+		return x.Executed
+	}
+	return ""
+}
+
 var File_proto_office_proto protoreflect.FileDescriptor
 
 var file_proto_office_proto_rawDesc = []byte{
@@ -510,16 +799,52 @@ var file_proto_office_proto_rawDesc = []byte{
 	0x6c, 0x69, 0x6d, 0x69, 0x74, 0x22, 0x2c, 0x0a, 0x0c, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73,
 	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
 	0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x09, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61,
-	0x6d, 0x65, 0x73, 0x32, 0x85, 0x01, 0x0a, 0x05, 0x55, 0x73, 0x65, 0x72, 0x73, 0x12, 0x43, 0x0a,
-	0x08, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12, 0x19, 0x2e, 0x6f, 0x66, 0x66, 0x69,
-	0x63, 0x65, 0x70, 0x62, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x6f, 0x66, 0x66, 0x69, 0x63, 0x65, 0x70, 0x62, 0x2e,
-	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x22, 0x00, 0x12, 0x37, 0x0a, 0x04, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x15, 0x2e, 0x6f, 0x66, 0x66,
-	0x69, 0x63, 0x65, 0x70, 0x62, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x16, 0x2e, 0x6f, 0x66, 0x66, 0x69, 0x63, 0x65, 0x70, 0x62, 0x2e, 0x4c, 0x69, 0x73,
-	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x04, 0x5a, 0x02, 0x70,
-	0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6d, 0x65, 0x73, 0x22, 0x3d, 0x0a, 0x15, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x6f, 0x63,
+	0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x24, 0x0a, 0x03,
+	0x64, 0x6f, 0x63, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x6f, 0x66, 0x66, 0x69,
+	0x63, 0x65, 0x70, 0x62, 0x2e, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x03, 0x64,
+	0x6f, 0x63, 0x22, 0x18, 0x0a, 0x16, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x6f, 0x63, 0x75,
+	0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x44, 0x0a, 0x14,
+	0x4c, 0x69, 0x73, 0x74, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x12, 0x14, 0x0a, 0x05,
+	0x6c, 0x69, 0x6d, 0x69, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x6c, 0x69, 0x6d,
+	0x69, 0x74, 0x22, 0x3f, 0x0a, 0x15, 0x4c, 0x69, 0x73, 0x74, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65,
+	0x6e, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x26, 0x0a, 0x04, 0x64,
+	0x6f, 0x63, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x6f, 0x66, 0x66, 0x69,
+	0x63, 0x65, 0x70, 0x62, 0x2e, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x04, 0x64,
+	0x6f, 0x63, 0x73, 0x22, 0x43, 0x0a, 0x0e, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x65, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
+	0x65, 0x12, 0x15, 0x0a, 0x06, 0x64, 0x6f, 0x63, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x05, 0x64, 0x6f, 0x63, 0x49, 0x64, 0x22, 0x2d, 0x0a, 0x0f, 0x45, 0x78, 0x65, 0x63,
+	0x75, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x65,
+	0x78, 0x65, 0x63, 0x75, 0x74, 0x65, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65,
+	0x78, 0x65, 0x63, 0x75, 0x74, 0x65, 0x64, 0x32, 0x85, 0x01, 0x0a, 0x05, 0x55, 0x73, 0x65, 0x72,
+	0x73, 0x12, 0x43, 0x0a, 0x08, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12, 0x19, 0x2e,
+	0x6f, 0x66, 0x66, 0x69, 0x63, 0x65, 0x70, 0x62, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65,
+	0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x6f, 0x66, 0x66, 0x69, 0x63,
+	0x65, 0x70, 0x62, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x37, 0x0a, 0x04, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x15,
+	0x2e, 0x6f, 0x66, 0x66, 0x69, 0x63, 0x65, 0x70, 0x62, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x6f, 0x66, 0x66, 0x69, 0x63, 0x65, 0x70, 0x62,
+	0x2e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x32,
+	0xe7, 0x01, 0x0a, 0x09, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x49, 0x0a,
+	0x04, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x1e, 0x2e, 0x6f, 0x66, 0x66, 0x69, 0x63, 0x65, 0x70, 0x62,
+	0x2e, 0x4c, 0x69, 0x73, 0x74, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x6f, 0x66, 0x66, 0x69, 0x63, 0x65, 0x70, 0x62,
+	0x2e, 0x4c, 0x69, 0x73, 0x74, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4d, 0x0a, 0x06, 0x43, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x12, 0x1f, 0x2e, 0x6f, 0x66, 0x66, 0x69, 0x63, 0x65, 0x70, 0x62, 0x2e, 0x43, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x6f, 0x66, 0x66, 0x69, 0x63, 0x65, 0x70, 0x62, 0x2e, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x40, 0x0a, 0x07, 0x45, 0x78, 0x65, 0x63, 0x75,
+	0x74, 0x65, 0x12, 0x18, 0x2e, 0x6f, 0x66, 0x66, 0x69, 0x63, 0x65, 0x70, 0x62, 0x2e, 0x45, 0x78,
+	0x65, 0x63, 0x75, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x6f,
+	0x66, 0x66, 0x69, 0x63, 0x65, 0x70, 0x62, 0x2e, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x65, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x04, 0x5a, 0x02, 0x70, 0x62, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -534,32 +859,46 @@ func file_proto_office_proto_rawDescGZIP() []byte {
 	return file_proto_office_proto_rawDescData
 }
 
-var file_proto_office_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_proto_office_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_proto_office_proto_goTypes = []interface{}{
-	(*User)(nil),             // 0: officepb.User
-	(*Document)(nil),         // 1: officepb.Document
-	(*Ctx)(nil),              // 2: officepb.Ctx
-	(*Expr)(nil),             // 3: officepb.Expr
-	(*RegisterRequest)(nil),  // 4: officepb.RegisterRequest
-	(*RegisterResponse)(nil), // 5: officepb.RegisterResponse
-	(*ListRequest)(nil),      // 6: officepb.ListRequest
-	(*ListResponse)(nil),     // 7: officepb.ListResponse
-	nil,                      // 8: officepb.Ctx.VarsEntry
+	(*User)(nil),                   // 0: officepb.User
+	(*Document)(nil),               // 1: officepb.Document
+	(*Ctx)(nil),                    // 2: officepb.Ctx
+	(*Expr)(nil),                   // 3: officepb.Expr
+	(*RegisterRequest)(nil),        // 4: officepb.RegisterRequest
+	(*RegisterResponse)(nil),       // 5: officepb.RegisterResponse
+	(*ListRequest)(nil),            // 6: officepb.ListRequest
+	(*ListResponse)(nil),           // 7: officepb.ListResponse
+	(*CreateDocumentRequest)(nil),  // 8: officepb.CreateDocumentRequest
+	(*CreateDocumentResponse)(nil), // 9: officepb.CreateDocumentResponse
+	(*ListDocumentsRequest)(nil),   // 10: officepb.ListDocumentsRequest
+	(*ListDocumentsResponse)(nil),  // 11: officepb.ListDocumentsResponse
+	(*ExecuteRequest)(nil),         // 12: officepb.ExecuteRequest
+	(*ExecuteResponse)(nil),        // 13: officepb.ExecuteResponse
+	nil,                            // 14: officepb.Ctx.VarsEntry
 }
 var file_proto_office_proto_depIdxs = []int32{
-	2, // 0: officepb.Document.context:type_name -> officepb.Ctx
-	8, // 1: officepb.Ctx.vars:type_name -> officepb.Ctx.VarsEntry
-	3, // 2: officepb.Ctx.exprs:type_name -> officepb.Expr
-	0, // 3: officepb.RegisterResponse.user:type_name -> officepb.User
-	4, // 4: officepb.Users.Register:input_type -> officepb.RegisterRequest
-	6, // 5: officepb.Users.List:input_type -> officepb.ListRequest
-	5, // 6: officepb.Users.Register:output_type -> officepb.RegisterResponse
-	7, // 7: officepb.Users.List:output_type -> officepb.ListResponse
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	2,  // 0: officepb.Document.context:type_name -> officepb.Ctx
+	14, // 1: officepb.Ctx.vars:type_name -> officepb.Ctx.VarsEntry
+	3,  // 2: officepb.Ctx.exprs:type_name -> officepb.Expr
+	0,  // 3: officepb.RegisterResponse.user:type_name -> officepb.User
+	1,  // 4: officepb.CreateDocumentRequest.doc:type_name -> officepb.Document
+	1,  // 5: officepb.ListDocumentsResponse.docs:type_name -> officepb.Document
+	4,  // 6: officepb.Users.Register:input_type -> officepb.RegisterRequest
+	6,  // 7: officepb.Users.List:input_type -> officepb.ListRequest
+	10, // 8: officepb.Documents.List:input_type -> officepb.ListDocumentsRequest
+	8,  // 9: officepb.Documents.Create:input_type -> officepb.CreateDocumentRequest
+	12, // 10: officepb.Documents.Execute:input_type -> officepb.ExecuteRequest
+	5,  // 11: officepb.Users.Register:output_type -> officepb.RegisterResponse
+	7,  // 12: officepb.Users.List:output_type -> officepb.ListResponse
+	11, // 13: officepb.Documents.List:output_type -> officepb.ListDocumentsResponse
+	9,  // 14: officepb.Documents.Create:output_type -> officepb.CreateDocumentResponse
+	13, // 15: officepb.Documents.Execute:output_type -> officepb.ExecuteResponse
+	11, // [11:16] is the sub-list for method output_type
+	6,  // [6:11] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_proto_office_proto_init() }
@@ -664,6 +1003,78 @@ func file_proto_office_proto_init() {
 				return nil
 			}
 		}
+		file_proto_office_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateDocumentRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_office_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateDocumentResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_office_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListDocumentsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_office_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListDocumentsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_office_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ExecuteRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_office_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ExecuteResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -671,9 +1082,9 @@ func file_proto_office_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_office_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   15,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_proto_office_proto_goTypes,
 		DependencyIndexes: file_proto_office_proto_depIdxs,
@@ -795,6 +1206,150 @@ var _Users_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "List",
 			Handler:    _Users_List_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/office.proto",
+}
+
+// DocumentsClient is the client API for Documents service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type DocumentsClient interface {
+	List(ctx context.Context, in *ListDocumentsRequest, opts ...grpc.CallOption) (*ListDocumentsResponse, error)
+	Create(ctx context.Context, in *CreateDocumentRequest, opts ...grpc.CallOption) (*CreateDocumentResponse, error)
+	Execute(ctx context.Context, in *ExecuteRequest, opts ...grpc.CallOption) (*ExecuteResponse, error)
+}
+
+type documentsClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewDocumentsClient(cc grpc.ClientConnInterface) DocumentsClient {
+	return &documentsClient{cc}
+}
+
+func (c *documentsClient) List(ctx context.Context, in *ListDocumentsRequest, opts ...grpc.CallOption) (*ListDocumentsResponse, error) {
+	out := new(ListDocumentsResponse)
+	err := c.cc.Invoke(ctx, "/officepb.Documents/List", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *documentsClient) Create(ctx context.Context, in *CreateDocumentRequest, opts ...grpc.CallOption) (*CreateDocumentResponse, error) {
+	out := new(CreateDocumentResponse)
+	err := c.cc.Invoke(ctx, "/officepb.Documents/Create", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *documentsClient) Execute(ctx context.Context, in *ExecuteRequest, opts ...grpc.CallOption) (*ExecuteResponse, error) {
+	out := new(ExecuteResponse)
+	err := c.cc.Invoke(ctx, "/officepb.Documents/Execute", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// DocumentsServer is the server API for Documents service.
+type DocumentsServer interface {
+	List(context.Context, *ListDocumentsRequest) (*ListDocumentsResponse, error)
+	Create(context.Context, *CreateDocumentRequest) (*CreateDocumentResponse, error)
+	Execute(context.Context, *ExecuteRequest) (*ExecuteResponse, error)
+}
+
+// UnimplementedDocumentsServer can be embedded to have forward compatible implementations.
+type UnimplementedDocumentsServer struct {
+}
+
+func (*UnimplementedDocumentsServer) List(context.Context, *ListDocumentsRequest) (*ListDocumentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedDocumentsServer) Create(context.Context, *CreateDocumentRequest) (*CreateDocumentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedDocumentsServer) Execute(context.Context, *ExecuteRequest) (*ExecuteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Execute not implemented")
+}
+
+func RegisterDocumentsServer(s *grpc.Server, srv DocumentsServer) {
+	s.RegisterService(&_Documents_serviceDesc, srv)
+}
+
+func _Documents_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDocumentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DocumentsServer).List(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/officepb.Documents/List",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DocumentsServer).List(ctx, req.(*ListDocumentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Documents_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDocumentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DocumentsServer).Create(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/officepb.Documents/Create",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DocumentsServer).Create(ctx, req.(*CreateDocumentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Documents_Execute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExecuteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DocumentsServer).Execute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/officepb.Documents/Execute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DocumentsServer).Execute(ctx, req.(*ExecuteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Documents_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "officepb.Documents",
+	HandlerType: (*DocumentsServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "List",
+			Handler:    _Documents_List_Handler,
+		},
+		{
+			MethodName: "Create",
+			Handler:    _Documents_Create_Handler,
+		},
+		{
+			MethodName: "Execute",
+			Handler:    _Documents_Execute_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

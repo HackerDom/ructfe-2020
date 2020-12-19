@@ -43,7 +43,38 @@ message ListResponse {
   repeated string usernames = 1;
 }
 
+message CreateDocumentRequest {
+  Document doc = 1;
+}
+
+message CreateDocumentResponse {
+}
+
+message ListDocumentsRequest {
+  int32 offset = 1;
+  int32 limit = 2;
+}
+
+message ListDocumentsResponse {
+  repeated Document docs = 1;
+}
+
+message ExecuteRequest {
+  string username = 1;
+  string doc_id = 2;
+}
+
+message ExecuteResponse {
+  string executed = 1;
+}
+
 service Users {
   rpc Register(RegisterRequest) returns (RegisterResponse) {}
   rpc List(ListRequest) returns (ListResponse) {}
+}
+
+service Documents {
+  rpc List(ListDocumentsRequest) returns (ListDocumentsResponse) {}
+  rpc Create(CreateDocumentRequest) returns (CreateDocumentResponse) {}
+  rpc Execute(ExecuteRequest) returns (ExecuteResponse) {}
 }
