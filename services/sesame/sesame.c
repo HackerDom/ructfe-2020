@@ -1,9 +1,7 @@
 #include <sys/epoll.h>
 
 #include "types.h"
-#include "vm.h"
 #include "storage.h"
-#include "baz.vm.h"
 #include "face.html.h"
 
 #define PORT 4280u
@@ -59,111 +57,45 @@ void make_nonblocking(int32 sfd)
 
 #define MAXEVENTS 64
 
-#define ST_HANDLER 0 
-#define ST_KEY 1
-#define ST_VALUE 2
+void respond(int32 fd, uint64 code, const char *text, const char *content_type)
+{
+	char response[40960];
+	response[0] = 0;
+
+	char * code_msg;
+	switch (code)
+	{
+		case 200:
+			code_msg = "HTTP/1.1 200 OK";
+			break;
+		case 400:
+			code_msg = "HTTP/1.1 400 Bad Request";
+			break;
+		case 404:
+			code_msg = "HTTP/1.1 404 Not Found";
+			break;
+		default:
+			code_msg = "HTTP/1.1 500 Internal Server Error";
+			break;
+	}
+
+	sprintf(response, 
+		"%s\r\n"
+		"Server: sesame\r\n"
+		"Content-Length: %lu\r\n"
+		"Content-Type: %s\r\n"
+		"Connection: close\r\n\r\n"
+		"%s", code_msg, text ? strlen(text) : 0, content_type, text ? text : "");
+
+	if (write(fd, response, strlen(response)) < 0)
+		printf("failed to write response!\n");
+}
 
 void process_request(int32 fd, char *request)
 {
-	char buf[1024];
-	int64 i = -1;
-	uint64 state = ST_HANDLER;
+	printf("Request:\n%s\n", request);
 
-	byte *handler = handler_badrequest;
-	uint64 params[2] = { 0 };
-
-	//print(request);
-
-	while (*request)
-	{
-		if (i >= (int64)sizeof(buf))
-		{
-			handler = handler_badrequest;
-			break;
-		}
-		char c = *request;
-		if (c == '\n')
-			break;
-		if (i >= 0)
-		{
-			if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && c != ',')
-			{
-				buf[i] = 0;
-				if (i > 0)
-				{
-					i = 0;
-					if (state == ST_HANDLER)
-					{
-						state = ST_KEY;
-
-						if (!strcmp(buf, "mix"))
-							handler = handler_mix;
-						else if (!strcmp(buf, "mixnew"))
-							handler = handler_mixnew;
-						else if (!strcmp(buf, "memorize"))
-							handler = handler_memorize;
-						else if (!strcmp(buf, "list"))
-							handler = handler_list;
-						else
-						{
-							respond(fd, 200, face, "text/html");
-							return;
-						}
-					}
-					else if (state == ST_KEY)
-					{
-						state = ST_VALUE;
-
-						if (handler == handler_mix)
-						{
-							if (!strcmp(buf, "name"))
-								params[0] = (uint64)(request + 1);
-						}
-						else if (handler == handler_mixnew)
-						{
-							if (!strcmp(buf, "what"))
-								params[0] = (uint64)(request + 1);
-
-						}
-						else if (handler == handler_memorize)
-						{
-							if (!strcmp(buf, "name"))
-								params[0] = (uint64)(request + 1);
-							if (!strcmp(buf, "what"))
-								params[1] = (uint64)(request + 1);
-						}
-						else if (handler == handler_list)
-						{
-							if (!strcmp(buf, "skip"))
-								params[0] = (uint64)(request + 1);
-							if (!strcmp(buf, "take"))
-								params[1] = (uint64)(request + 1);
-						}
-					}
-					else
-					{
-						state = ST_KEY;
-
-						*request = 0;
-					}
-				}
-			}
-			else
-				buf[i++] = c;
-		}
-		else if (*request == '/')
-			i = 0;
-
-		request++;
-	}
-
-	if (handler == handler_list)
-	{
-		params[0] = 0;
-		params[1] = 0;
-	}
-
-	run_handler(handler, fd, params);
+	respond(fd, 200, face, "text/html");
 }
 
 void run()
