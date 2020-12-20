@@ -43,6 +43,9 @@ func VarsDecls(vars map[string]interface{}) []*exprpb.Decl {
 func GetInfoFunc(username string, users []*pb.User, funcs []*functions.Overload, declarations []*exprpb.Decl) ([]*functions.Overload, []*exprpb.Decl) {
 	findSecret := func(username, kind string) string {
 		for _, user := range users {
+			if user.Name != username {
+				continue
+			}
 			switch kind {
 			case "bio":
 				return user.Bio

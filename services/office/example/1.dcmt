@@ -1,12 +1,12 @@
 vars:
-  name: "name"
+  username: "debil2"
 exprs:
   - name: "bio"
     expr: "get_info('bio')"
   - name: "token"
     expr: "get_info('token')"
 ---
-<h1>Hi {name}!</h1>
+<h1>Hi {username}!</h1>
 
 <table>
   <tr>

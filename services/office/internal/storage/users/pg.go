@@ -1,10 +1,12 @@
 package users
 
 import (
+	"fmt"
 	pb "github.com/HackerDom/ructfe2020/proto"
 	sq "github.com/Masterminds/squirrel"
 	_ "github.com/jackc/pgx/v4"
 	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 	"net"
 	"strconv"
 	"strings"
@@ -14,13 +16,22 @@ import (
 // TODO: [12/13/20] (vaspahomov):
 var usersSchema = `CREATE TABLE users ....`
 
-func NewPg() (*Pg, error) {
-	db, err := sqlx.Open("pgx", ConnString("", "", "", ""))
+const (
+	maxOpenConn     = 20
+	connMaxLifetime = time.Minute
+)
+
+func NewPg(l *zap.Logger) (*Pg, error) {
+	connString := ConnString("", "", "", "")
+	l.Info(fmt.Sprintf("Connecting to '%s'", connString))
+	db, err := sqlx.Open("pgx", connString)
 	if err != nil {
 		return nil, err
 	}
-	db.SetMaxOpenConns(100)
-	db.SetConnMaxLifetime(time.Minute)
+	l.Info(fmt.Sprintf("Setting MaxOpenConns to %d", maxOpenConn))
+	l.Info(fmt.Sprintf("Setting ConnMaxLifetime to %s", connMaxLifetime))
+	db.SetMaxOpenConns(maxOpenConn)
+	db.SetConnMaxLifetime(connMaxLifetime)
 	return &Pg{db: db}, nil
 }
 

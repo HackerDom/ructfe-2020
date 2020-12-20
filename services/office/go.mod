@@ -11,6 +11,7 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/rs/cors v1.7.0
 	github.com/slongfield/pyfmt v0.0.0-20180124071345-020a7cb18bca
+	go.uber.org/zap v1.10.0
 	google.golang.org/genproto v0.0.0-20201211151036-40ec1c210f7a
 	google.golang.org/grpc v1.34.0
 	google.golang.org/protobuf v1.25.0
