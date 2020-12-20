@@ -34,8 +34,6 @@ namespace CarpetRadar.Web
                 return (false, null);
             }
 
-            // Check for invalid passWord.
-            // passWord must not be null and must be between 1 and 25 characters.
             if ((null == passWord) || (0 == passWord.Length) || (passWord.Length > 25))
             {
                 logger.Info("[RegisterUser] Input validation of passWord failed.");
@@ -53,7 +51,8 @@ namespace CarpetRadar.Web
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "[RegisterUser] Exception ");
+                logger.Error(ex);
+                logger.Error("[RegisterUser] Exception ");
             }
 
             // If no password found, return false.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.8
 from requests import Session
 from string import ascii_lowercase
-from random import choices, randint
+import random
 from urllib.parse import urlparse, parse_qs
 from base64 import urlsafe_b64encode
 from hashlib import sha256
@@ -12,53 +12,38 @@ import socket
 import base64
 
 
-def gen_random_string(k=10):
-    return ''.join(choices(ascii_lowercase, k=k))
+def get_flight_state_bytes(token: str, x: int, y: int, flight_id: bytes, label: str, license: str, finished: bool):
+    if len(flight_id) != 16 or len(label) != 15 or len(token) != 32 or len(license) != 32:
+        raise ValueError("Check parameters!!!")
 
-
-def get_creds():
-    return gen_random_string, gen_random_string(), gen_random_string()
-
-
-def get_coordinates_bytes(token: str, x: int, y: int):
-    with open("coords_example.bin", 'rb') as f:
+    with open("flight_state_example.bin", 'rb') as f:
         template = f.readline()
-    template = template.replace(b'xxxx', int.to_bytes(x, 4, 'little'))
-    template = template.replace(b'yyyy', int.to_bytes(y, 4, 'little'))
-    template = template.replace(b'tttttttttttttttttttttttttttttttt', token.encode('ascii'))
+
+    template = template.replace(b'{STRING_32_SYMBOLS_TOKEN}', token.encode('ascii'))
+    template = template.replace(b'{INT_X}', int.to_bytes(x, 4, 'little'))
+    template = template.replace(b'{INT_Y}', int.to_bytes(y, 4, 'little'))
+    template = template.replace(b'{GUID_16_BYTES_FLIGHT_ID}', flight_id)
+    template = template.replace(b'{STRING_15_SYMBOLS_LABEL}', label.encode('ascii'))
+    template = template.replace(b'{STRING_32_SYMBOLS_LICENSE}', license.encode('ascii'))
+    template = template.replace(b'{BOOL_FINISHED}', b'\xff' if finished else b'\0')
     return template
-
-
 
 
 class Client:
     def __init__(self, ip_address, tcp_port, http_port):
-        self.http_address = f"http://{ip_address}:{http_port}"
         self.ip_address = ip_address
         self.tcp_port = tcp_port
         self.http_port = http_port
+        self.http_address = f"http://{ip_address}:{http_port}"
 
-    def send_coordinates(self, token, x: int, y: int):
-        data = get_coordinates_bytes(token, x, y)
+    def send_flight_state(self, token, x: int, y: int, flight_id: bytes, label: str, license: str, finished: bool):
+        data = get_flight_state_bytes(token, x, y, flight_id, label, license, finished)
         return self.send_bytes(data)
 
-    def send_bytes(self, data: bytes):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((self.ip_address, self.tcp_port))
-        s.sendall(data)
-        result = s.recv(1024 * 100)
-        return result
-
-    def send_base64(self, base64_str: str):
-        data = base64.b64decode(base64_str)
-        return self.send_bytes(data)
-
-    def get_auth_token(self):
+    def register_and_get_auth_token(self, login, password):
         s = Session()
-        login, company, password = get_creds()
-        login = "23456s33r"
-        company = "3333333"
-        password = "e4rty"
+        company = random.choice(companies)
+
         res = s.post(f'{self.http_address}/Register',
                      headers={'Content-Type': 'application/x-www-form-urlencoded'},
                      data="__EVENTTARGET="
@@ -75,54 +60,50 @@ class Client:
         if res.status_code != 302:
             print('[-] Registration fail')
             return None
-        print('[+] Registration compile')
-        token = res.headers.get("Set-Cookie")[6:-8]  # token={xxx}; path=/
+        print('[+] Registration success')
+        token = res.headers.get("Set-Cookie")[6:-8]  # "token={xxx}; path=/"
         return token
 
+    def login_and_get_auth_token(self, login, password):
+        s = Session()
 
-host = ""
-def get_token(login, password):
-    newConditions = {"addition": {"login": login, "password": password}}
-    req = urllib.request.Request("http://" + host + "/get_token", data=json.dumps(newConditions).encode('utf-8'),
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]["token"]
+        res = s.post(f'{self.http_address}/Login',
+                     headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                     data="__EVENTTARGET="
+                          "&__EVENTARGUMENT="
+                          "&__VIEWSTATE=FnsS5VBdXN36voLmK%2FvWGRTS4zwdkeC7kGu8KWz9Ws37a2mValPuwUW%2F%2BiKJzBmgrxorH3g3zP418B4h%2Frn4LyEJDcWT7%2Be2YcKbc8nQgl1MLF3B6QRaujaRFEuxH9clRtJXz%2FdF4jkRWT2FNWLHEgyZn3L6zTYaPdZSjStTO8u%2BtU%2BCDpf88DvczOeFXZmU"
+                          "&__VIEWSTATEGENERATOR=C2EE9ABB"
+                          "&__EVENTVALIDATION=ay%2FsBoDqoTzxCeKME4oa6Fxc%2FPZd1EX%2BlvXU0yAVm1TeEWWbBdJGV2AG%2BB9qiGkVC4gx%2FPnPqU5MnyZVXbU1gHs5%2ByzNz1Jztiu7qwOeLNbKWi%2BtGO8Wzk9C%2FOXkQL1mfRV4gW2TMEmO79wTnIr47FkWgrc%2BzbDRp%2FN8nM4is%2F9%2BBRXOGA5NIqqGWyFv4SDk"
+                          f"&ctl00$MainContent$txtUserName={login}"
+                          f"&ctl00$MainContent$txtUserPass={password}"
+                          f"&ctl00$MainContent$cmdLogin=Login",
+                     allow_redirects=False)
 
+        if res.status_code != 302:
+            print('[-] Login fail')
+            return None
+        print('[+] Login success')
+        token = res.headers.get("Set-Cookie")[6:-8]  # "token={xxx}; path=/"
+        return token
 
-def register(login, password, credit_card_credentials, public_key_base64):
-    newConditions = {
-        "addition": {"login": login, "password": password, "credit_card_credentials": credit_card_credentials,
-                     "public_key_base64": public_key_base64}}
-    req = urllib.request.Request("http://" + host + "/register", data=json.dumps(newConditions).encode('utf-8'),
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
+    def send_bytes(self, data: bytes):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((self.ip_address, self.tcp_port))
+        s.sendall(data)
+        result = s.recv(1024 * 100)
+        return result
 
-
-def send_money(token, to, amount, description):
-    newConditions = {"addition": {"token": token, "to": to, "amount": amount, "description": description}}
-    req = urllib.request.Request("http://" + host + "/send_money",
-                                 data=json.dumps(newConditions).encode('utf-8'),
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
-
-
-def get_users():
-    req = urllib.request.Request("http://" + host + "/users_pubkeys",
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
+    def send_base64(self, base64_str: str):
+        data = base64.b64decode(base64_str)
+        return self.send_bytes(data)
 
 
-def get_user_by_token(token):
-    newConditions = {"addition": {"token": token}}
-    req = urllib.request.Request("http://" + host + "/get_user", data=json.dumps(newConditions).encode('utf-8'),
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
-
-
-def get_user_by_login_and_password(login, password):
-    token = get_token(login, password)
-    return get_user_by_token(token)
+companies = [
+    # https://ru.wikipedia.org/wiki/%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D1%8F:%D0%90%D0%B2%D0%B8%D0%B0%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D0%B8_%D0%BF%D0%BE_%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B0%D0%BC
+    "Ural Airlines",
+    "Pobeda",
+    "Flydubai",
+    "Etihad Airways",
+    "Emirates",
+    "Air Arabia",
+]

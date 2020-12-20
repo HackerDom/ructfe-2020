@@ -32,7 +32,7 @@ namespace CarpetRadar.Web
             var userId = authenticationService.ResolveUser(Request.Cookies["token"]).GetAwaiter().GetResult();
             if (userId == null)
             {
-                Response.Redirect("~/Login.aspx", true);
+                Response.Redirect("/Login.aspx?ReturnUrl=Statistics.aspx", true);
                 return;
             }
 

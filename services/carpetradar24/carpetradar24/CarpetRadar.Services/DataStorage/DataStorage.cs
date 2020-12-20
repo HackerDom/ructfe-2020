@@ -95,7 +95,7 @@ namespace CarpetRadar.Services.DataStorage
         public async Task<IEnumerable<Flight>> GetUserFlights(Guid userId)
         {
             var statement = new SimpleStatement(
-                $"SELECT * FROM {Constants.ColumnFamily.CarpetFlights} WHERE user_id = {userId} ALLOW FILTERING;");///
+                $"SELECT * FROM {Constants.ColumnFamily.CarpetFlights} WHERE user_id = {userId} ALLOW FILTERING;"); ///
             statement.SetPageSize(100);
             var rs = session.Execute(statement);
             var coordinates = rs.Select(row =>

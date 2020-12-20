@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarpetRadar.Services", "Car
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarpetRadar.TrackServer", "CarpetRadar.TrackServer\CarpetRadar.TrackServer.csproj", "{B5CFE094-24F7-4BA3-B556-3405DEBF5447}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarpetRadar.Web2", "CarpetRadar.Web2\CarpetRadar.Web2.csproj", "{1ACCF186-0BA6-4153-AEF6-908FAE32880F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B5CFE094-24F7-4BA3-B556-3405DEBF5447}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5CFE094-24F7-4BA3-B556-3405DEBF5447}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5CFE094-24F7-4BA3-B556-3405DEBF5447}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1ACCF186-0BA6-4153-AEF6-908FAE32880F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1ACCF186-0BA6-4153-AEF6-908FAE32880F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1ACCF186-0BA6-4153-AEF6-908FAE32880F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1ACCF186-0BA6-4153-AEF6-908FAE32880F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

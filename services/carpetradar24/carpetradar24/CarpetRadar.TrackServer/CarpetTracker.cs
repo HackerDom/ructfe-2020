@@ -65,6 +65,19 @@ namespace CarpetRadar.TrackServer
                     dataStorage.AddFlightState(c, userId.Value).GetAwaiter().GetResult();
                 }
             }
+
+            var fs = new FlightState
+            {
+                FlightId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                X = 255,
+                Y = 256 * 256 - 1,
+                License = Guid.Empty.ToString("N"),
+                Token = Guid.Empty.ToString("N"),
+                Finished = true,
+                Label = "LABELlabelLABEL",
+            };
+            var bf = new BinaryFormatter();
+            bf.Serialize(new FileStream("flight_state_example1.bin", FileMode.Create), fs);
         }
 
         public void StartListener()

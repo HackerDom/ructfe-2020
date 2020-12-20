@@ -1,19 +1,24 @@
 ﻿using System;
+using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using CarpetRadar.Services.IdentityServices;
+using NLog;
 
 namespace CarpetRadar.Web
 {
     public partial class Login : Page
     {
         private readonly IAuthenticationService authenticationService;
+        private readonly ILogger logger;
 
-        public Login(IAuthenticationService authenticationService)
+        public Login(IAuthenticationService authenticationService, ILogger logger)
         {
             this.authenticationService = authenticationService;
+            this.logger = logger;
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -23,19 +28,15 @@ namespace CarpetRadar.Web
 
         private async Task<(bool IsAuthenticated, string Token)> AuthenticateUser(string userName, string passWord)
         {
-            // Check for invalid userName.
-            // userName must not be null and must be between 1 and 15 characters.
-            if ((null == userName) || (0 == userName.Length) || (userName.Length > 15))
+            if (userName == null || !Regex.IsMatch(userName, "\\w{3,15}"))
             {
-                System.Diagnostics.Trace.WriteLine("[AuthenticateUser] Input validation of userName failed.");
+                logger.Info("[AuthenticateUser] Input validation of userName failed.");
                 return (false, null);
             }
 
-            // Check for invalid passWord.
-            // passWord must not be null and must be between 1 and 25 characters.
             if ((null == passWord) || (0 == passWord.Length) || (passWord.Length > 25))
             {
-                System.Diagnostics.Trace.WriteLine("[AuthenticateUser] Input validation of passWord failed.");
+                logger.Info("[AuthenticateUser] Input validation of passWord failed.");
                 return (false, null);
             }
 
@@ -46,10 +47,9 @@ namespace CarpetRadar.Web
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Trace.WriteLine("[AuthenticateUser] Exception " + ex.Message); /// logger
+                logger.Error(ex, "[AuthenticateUser] Exception ");
             }
 
-            // If no password found, return false.
             if (token == null)
             {
                 // You could write failed login attempts here to event log for additional security.
@@ -77,7 +77,10 @@ namespace CarpetRadar.Web
                 Response.Redirect(strRedirect, true);
             }
             else
+            {
+                Response.StatusCode = (int) HttpStatusCode.Unauthorized;
                 Response.Redirect("login.aspx", true);
+            }
         }
     }
 }

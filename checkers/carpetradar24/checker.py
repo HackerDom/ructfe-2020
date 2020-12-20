@@ -9,10 +9,7 @@ checker = Checker()
 
 @checker.define_check
 def check_service(request: CheckRequest) -> Verdict:
-    login1 = get_random_string(10)
-    password1 = get_random_string(10)
-    login2 = get_random_string(10)
-    password2 = get_random_string(10)
+
     try:
         check_register(login1, password1)
         check_register(login2, password2)
@@ -55,8 +52,9 @@ def check_money_sending(token_from, token_to, amount, description):
         raise ValueError
 
 
-def get_random_string(length):
-    letters = string.ascii_lowercase
-    result_str = ''.join(random.choice(letters) for i in range(length))
-    return result_str
+def get_random_string(k=10):
+    return ''.join(random.choices(string.ascii_lowercase, k=k))
 
+
+def get_creds():
+    return get_random_string, get_random_string(), get_random_string()

@@ -1,0 +1,63 @@
+2020-12-20 00:53:04.9471|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 16:22:51.5077|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 16:39:49.1176|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 16:45:30.0709|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 16:48:01.8841|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 16:52:00.5618|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 16:58:52.1402|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 17:03:01.8945|ERROR|CarpetRadar.Web.Global|Cassandra.SyntaxError: line 1:110 mismatched input 'Ural' expecting K_WHERE (...= 6225566065901718879, company = '['[Ural]...)
+   в System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   в Cassandra.Tasks.TaskHelper.WaitToComplete(Task task, Int32 timeout)
+   в Cassandra.Tasks.TaskHelper.WaitToCompleteWithMetrics(IMetricsManager manager, Task task, Int32 timeout)
+   в Cassandra.Session.Execute(IStatement statement, String executionProfileName)
+   в Cassandra.Session.Execute(IStatement statement)
+   в CarpetRadar.Services.DataStorage.DataStorage.<SaveUserInfo>d__8.MoveNext() в D:\Светлана\source\ructfe-2020\ructfe-2020\services\carpetradar24\carpetradar24\CarpetRadar.Services\DataStorage\DataStorage.cs:строка 148
+--- Конец трассировка стека из предыдущего расположения, где возникло исключение ---
+   в System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   в System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   в System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   в CarpetRadar.Services.IdentityServices.RegistrationService.<RegisterUser>d__3.MoveNext() в D:\Светлана\source\ructfe-2020\ructfe-2020\services\carpetradar24\carpetradar24\CarpetRadar.Services\IdentityServices\RegistrationService.cs:строка 35
+2020-12-20 17:07:12.5157|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 17:08:04.7193|ERROR|CarpetRadar.Web.Global|Cassandra.SyntaxError: line 1:110 mismatched input 'Pobeda' expecting K_WHERE (...= 6225566065901718879, company = '['[Pobeda]...)
+   в System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   в Cassandra.Tasks.TaskHelper.WaitToComplete(Task task, Int32 timeout)
+   в Cassandra.Tasks.TaskHelper.WaitToCompleteWithMetrics(IMetricsManager manager, Task task, Int32 timeout)
+   в Cassandra.Session.Execute(IStatement statement, String executionProfileName)
+   в Cassandra.Session.Execute(IStatement statement)
+   в CarpetRadar.Services.DataStorage.DataStorage.<SaveUserInfo>d__8.MoveNext() в D:\Светлана\source\ructfe-2020\ructfe-2020\services\carpetradar24\carpetradar24\CarpetRadar.Services\DataStorage\DataStorage.cs:строка 148
+--- Конец трассировка стека из предыдущего расположения, где возникло исключение ---
+   в System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   в System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   в System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   в CarpetRadar.Services.IdentityServices.RegistrationService.<RegisterUser>d__3.MoveNext() в D:\Светлана\source\ructfe-2020\ructfe-2020\services\carpetradar24\carpetradar24\CarpetRadar.Services\IdentityServices\RegistrationService.cs:строка 35
+2020-12-20 18:29:37.8659|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 18:33:46.8587|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 18:39:06.2434|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 18:41:00.3973|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 18:42:53.3549|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 19:55:59.0989|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 22:33:40.5071|ERROR|CarpetRadar.Web.Global|Cassandra.NoHostAvailableException: All hosts tried for query failed (tried [::1]:9042: SocketException 'Запрос на отправку или получение данных  (when sending on a datagram socket using a sendto call) no address was supplied'; 127.0.0.1:9042: SocketException 'Запрос на отправку или получение данных  (when sending on a datagram socket using a sendto call) no address was supplied')
+   в Cassandra.Connections.Control.ControlConnection.<Connect>d__42.MoveNext()
+--- Конец трассировка стека из предыдущего расположения, где возникло исключение ---
+   в System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   в System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   в Cassandra.Connections.Control.ControlConnection.<InitAsync>d__33.MoveNext()
+--- Конец трассировка стека из предыдущего расположения, где возникло исключение ---
+   в System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   в System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   в Cassandra.Tasks.TaskHelper.<WaitToCompleteAsync>d__10.MoveNext()
+--- Конец трассировка стека из предыдущего расположения, где возникло исключение ---
+   в System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   в System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   в System.Runtime.CompilerServices.TaskAwaiter.ValidateEnd(Task task)
+   в Cassandra.Cluster.<Init>d__37.MoveNext()
+--- Конец трассировка стека из предыдущего расположения, где возникло исключение ---
+   в System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   в System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   в Cassandra.Cluster.<ConnectAsync>d__45.MoveNext()
+--- Конец трассировка стека из предыдущего расположения, где возникло исключение ---
+   в System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   в Cassandra.Tasks.TaskHelper.WaitToComplete(Task task, Int32 timeout)
+   в Cassandra.Cluster.Connect()
+   в CarpetRadar.Services.DataStorage.DataStorageBuilder.GetDefaultStorage(ILogger logger) в D:\Светлана\source\ructfe-2020\ructfe-2020\services\carpetradar24\carpetradar24\CarpetRadar.Services\DataStorage\DataStorageBuilder.cs:строка 29
+2020-12-20 22:51:53.6528|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
