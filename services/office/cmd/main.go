@@ -3,8 +3,7 @@ package main
 import (
 	"github.com/HackerDom/ructfe2020/internal/manager"
 	"github.com/HackerDom/ructfe2020/internal/server"
-	"github.com/HackerDom/ructfe2020/internal/storage/docs"
-	"github.com/HackerDom/ructfe2020/internal/storage/users"
+	"github.com/HackerDom/ructfe2020/internal/storage"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"time"
@@ -12,9 +11,11 @@ import (
 
 func main() {
 	l, _ := createLog().Build()
-	usersStorage, _ := users.NewPg(l)
-	docsStorage := docs.NewInMemory()
-	err := server.RunServer(manager.New(usersStorage, docsStorage))
+	docsStorage, usersStorage, err := storage.Init(l)
+	if err != nil {
+		panic(err)
+	}
+	err = server.RunServer(manager.New(usersStorage, docsStorage))
 	if err != nil {
 		panic(err)
 	}

@@ -2,13 +2,14 @@ package manager
 
 import (
 	"github.com/HackerDom/ructfe2020/internal/document"
-	"github.com/HackerDom/ructfe2020/internal/storage"
+	"github.com/HackerDom/ructfe2020/internal/storage/docs"
+	userstorage "github.com/HackerDom/ructfe2020/internal/storage/users"
 	pb "github.com/HackerDom/ructfe2020/proto"
 )
 
 type documents struct {
-	s     storage.Documents
-	users storage.Users
+	s     docs.Documents
+	users userstorage.Users
 }
 
 func (d *documents) Create(document *pb.Document) error {

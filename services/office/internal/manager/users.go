@@ -2,12 +2,12 @@ package manager
 
 import (
 	"github.com/HackerDom/ructfe2020/internal/hashutil"
-	"github.com/HackerDom/ructfe2020/internal/storage"
+	userstorage "github.com/HackerDom/ructfe2020/internal/storage/users"
 	pb "github.com/HackerDom/ructfe2020/proto"
 )
 
 type users struct {
-	s storage.Users
+	s userstorage.Users
 }
 
 func (m *users) GetUsers() ([]*pb.User, error) {

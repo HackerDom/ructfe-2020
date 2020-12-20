@@ -1,9 +1,11 @@
 package docs
 
 import (
-	"github.com/HackerDom/ructfe2020/internal/storage"
+	"fmt"
 	pb "github.com/HackerDom/ructfe2020/proto"
 )
+
+var DocumentNotFoundErr = fmt.Errorf("document not found")
 
 func NewInMemory() *InMemory {
 	return &InMemory{docs: make([]*pb.Document, 0)}
@@ -40,5 +42,5 @@ func (s *InMemory) Get(docID string) (*pb.Document, error) {
 			return doc, nil
 		}
 	}
-	return nil, storage.DocumentNotFoundErr
+	return nil, DocumentNotFoundErr
 }
