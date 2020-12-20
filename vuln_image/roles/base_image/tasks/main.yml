@@ -44,6 +44,12 @@
     - 91-release-upgrade
     - 95-hwe-eol
 
+- name: Copy banner
+  copy:
+    src: ructfe-banner.txt
+    dest: /ructfe-banner.txt
+    mode: 0644
+
 - name: Copy MOTD
   copy:
     src: "{{ item.src }}"
