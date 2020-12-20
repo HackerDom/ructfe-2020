@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <StartupObject>CarpetRadar.Web2.Program</StartupObject>
   </PropertyGroup>
 
 

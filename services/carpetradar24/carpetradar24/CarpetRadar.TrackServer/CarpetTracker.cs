@@ -157,11 +157,11 @@ namespace CarpetRadar.TrackServer
                     return;
                 }
 
-                var currentPositions = await dataStorage.GetCurrentPositions();
+                var currentPositions = await dataStorage.GetCurrentPositions().ToArray();
 
                 using (var ms = new MemoryStream())
                 {
-                    bf.Serialize(ms, currentPositions.ToArray());
+                    bf.Serialize(ms, currentPositions);
                     var array = ms.ToArray();
                     stream.Write(array, 0, array.Length);
                 }
