@@ -39,7 +39,7 @@ void init_storage()
 	bzero(slots, sizeof(slots));
 	nodes[0].trans_count = HAS_VALUE;
 
-	if ((logfd = open("storage", O_RDWR | O_CREAT, 0666)) < 0)
+	if ((logfd = open("data/storage", O_RDWR | O_CREAT, 0666)) < 0)
 	{
 		perror("fuck storage\n");
 		exit(1);
