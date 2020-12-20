@@ -2,7 +2,8 @@ package server
 
 import (
 	"context"
-	"fmt"
+	"github.com/HackerDom/ructfe2020/internal/document"
+	"github.com/HackerDom/ructfe2020/internal/hashutil"
 	"github.com/HackerDom/ructfe2020/internal/manager"
 	httprpc "github.com/HackerDom/ructfe2020/pkg/httprtc"
 	pb "github.com/HackerDom/ructfe2020/proto"
@@ -35,23 +36,37 @@ func (s *documentsService) Mount(mux *chi.Mux) {
 		})
 	httprpc.New("POST", "/docs/execute").
 		Mount(mux).
-		WithJSONPbReader(&pb.ListDocumentsRequest{}).
+		WithJSONPbReader(&pb.ExecuteRequest{}).
 		WithJSONPbWriter().
 		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) {
-			return s.List(ctx, req.(*pb.ListDocumentsRequest))
+			return s.Execute(ctx, req.(*pb.ExecuteRequest))
 		})
 }
 
 func (s *documentsService) List(ctx context.Context, req *pb.ListDocumentsRequest) (*pb.ListDocumentsResponse, error) {
-	return nil, fmt.Errorf("not implemented")
-}
-
-func (s *documentsService) Create(ctx context.Context, req *pb.CreateDocumentRequest) (*pb.CreateDocumentResponse, error) {
-	err := s.m.Create(req.Doc)
+	// TODO: [12/20/20] (vaspahomov): pagination
+	docs, err := s.m.List()
 	if err != nil {
 		return nil, err
 	}
-	return &pb.CreateDocumentResponse{}, nil
+	return &pb.ListDocumentsResponse{Docs: docs}, nil
+}
+
+func (s *documentsService) Create(ctx context.Context, req *pb.CreateDocumentRequest) (*pb.CreateDocumentResponse, error) {
+	d, err := document.Parse(req.Name, []byte(req.Doc))
+	if err != nil {
+		return nil, err
+	}
+	p := d.Proto()
+	p.Token = hashutil.RandDigest(req.Name)
+	id, err := s.m.Create(p)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.CreateDocumentResponse{
+		Id:    id,
+		Token: p.Token,
+	}, nil
 }
 
 func (s *documentsService) Execute(ctx context.Context, req *pb.ExecuteRequest) (*pb.ExecuteResponse, error) {

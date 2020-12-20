@@ -37,9 +37,9 @@ func NewPg(db *sqlx.DB, l *zap.Logger) (Users, error) {
 }
 
 type userModel struct {
-	name  string `db:"name"`
-	token string `db:"token"`
-	bio   string `db:"bio"`
+	Name  string `db:"name"`
+	Token string `db:"token"`
+	Bio   string `db:"bio"`
 }
 
 type Pg struct {
@@ -61,17 +61,17 @@ func (u *Pg) Insert(user *pb.User) error {
 }
 
 func (u *Pg) List() ([]*pb.User, error) {
-	//u.l.Debug(fmt.Sprintf("Executing '%s': args: '%v'", query, args))
 	var users []userModel
-	err := u.db.Select(&users, "SELECT * FROM users")
+	err := u.db.Select(&users, "SELECT name, token, bio FROM users;")
 	if err != nil {
 		return nil, err
 	}
 	usersProto := make([]*pb.User, len(users))
 	for i, u := range users {
 		usersProto[i] = &pb.User{
-			Name:  u.name,
-			Token: u.token,
+			Name:  u.Name,
+			Token: u.Token,
+			Bio:   u.Bio,
 		}
 	}
 	return usersProto, nil

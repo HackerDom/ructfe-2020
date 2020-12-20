@@ -10,9 +10,9 @@ message User {
 }
 
 message Document {
-  string id = 1;
-  string name = 2;
-  string owner = 3;
+  int64 id = 1;
+  string token = 2;
+  string name = 3;
   Ctx context = 4;
   string content = 5;
 }
@@ -29,9 +29,20 @@ message Expr {
 
 message RegisterRequest {
   string name = 1;
+  string password = 2;
+  string bio = 3;
 }
 
 message RegisterResponse {
+  User user = 1;
+}
+
+message LoginRequest {
+  string name = 1;
+  string password = 2;
+}
+
+message LoginResponse {
   User user = 1;
 }
 
@@ -45,10 +56,13 @@ message ListResponse {
 }
 
 message CreateDocumentRequest {
-  Document doc = 1;
+  string name = 1;
+  string doc = 2;
 }
 
 message CreateDocumentResponse {
+  int64 id = 1;
+  string token = 2;
 }
 
 message ListDocumentsRequest {
@@ -56,13 +70,18 @@ message ListDocumentsRequest {
   int32 limit = 2;
 }
 
+message ShortDocument {
+  int64 id = 1;
+  string name = 3;
+}
+
 message ListDocumentsResponse {
-  repeated Document docs = 1;
+  repeated ShortDocument docs = 1;
 }
 
 message ExecuteRequest {
   string username = 1;
-  string doc_id = 2;
+  int64 doc_id = 2;
 }
 
 message ExecuteResponse {

@@ -13,14 +13,14 @@ import (
 
 func FromPB(document *pb.Document) *Document {
 	return &Document{
-		ctx:   document.Context,
-		tmpl:  document.Content,
-		name:  document.Name,
-		owner: document.Owner,
+		name: document.Name,
+		ctx:  document.Context,
+		tmpl: document.Content,
+		id:   document.Id,
 	}
 }
 
-func Parse(name, owner string, dcmt []byte) (*Document, error) {
+func Parse(name string, dcmt []byte) (*Document, error) {
 	splited := bytes.Split(dcmt, []byte("\n---\n"))
 	if len(splited) != 2 {
 		return nil, fmt.Errorf("'\n---\n' should split doc in 2 parts")
@@ -28,9 +28,8 @@ func Parse(name, owner string, dcmt []byte) (*Document, error) {
 	exprsYAML := splited[0]
 	tmplBytes := splited[1]
 	d := &Document{
-		owner: owner,
-		name:  name,
-		tmpl:  string(tmplBytes),
+		name: name,
+		tmpl: string(tmplBytes),
 	}
 	err := yaml.UnmarshalStrict(exprsYAML, &d.ctx)
 	if err != nil {
@@ -40,11 +39,11 @@ func Parse(name, owner string, dcmt []byte) (*Document, error) {
 }
 
 type Document struct {
-	owner string
-	name  string
-	ctx   *pb.Ctx
-	vars  map[string]string
-	tmpl  string
+	name string
+	ctx  *pb.Ctx
+	vars map[string]string
+	tmpl string
+	id   int64
 }
 
 func (d *Document) Execute(context map[string]string, users []*pb.User) (string, error) {
@@ -76,4 +75,20 @@ func (d *Document) prepareVars(context map[string]string, users []*pb.User) erro
 	}
 	d.vars = templVars
 	return nil
+}
+
+func (d *Document) Proto() *pb.Document {
+	return &pb.Document{
+		Id:      d.id,
+		Name:    d.name,
+		Context: d.ctx,
+		Content: d.tmpl,
+	}
+}
+
+func (d *Document) ShotProto() *pb.ShortDocument {
+	return &pb.ShortDocument{
+		Id:   d.id,
+		Name: d.name,
+	}
 }

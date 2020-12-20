@@ -24,7 +24,7 @@ func (s *InMemory) Insert(document *pb.Document) error {
 	return nil
 }
 
-func (s *InMemory) Delete(docID string) error {
+func (s *InMemory) Delete(docID int64) error {
 	n := make([]*pb.Document, 0, len(s.docs))
 	for _, doc := range s.docs {
 		if doc.Id == docID {
@@ -36,7 +36,7 @@ func (s *InMemory) Delete(docID string) error {
 	return nil
 }
 
-func (s *InMemory) Get(docID string) (*pb.Document, error) {
+func (s *InMemory) Get(docID int64) (*pb.Document, error) {
 	for _, doc := range s.docs {
 		if doc.Id == docID {
 			return doc, nil

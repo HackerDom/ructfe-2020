@@ -12,31 +12,28 @@ type documents struct {
 	users userstorage.Users
 }
 
-func (d *documents) Create(document *pb.Document) error {
+func (d *documents) Create(document *pb.Document) (int64, error) {
 	return d.s.Insert(document)
 }
 
-func (d *documents) Delete(docID string) error {
+func (d *documents) Delete(docID int64) error {
 	return d.s.Delete(docID)
 }
 
-func (d *documents) List(username string) ([]*pb.Document, error) {
-	docs, err := d.s.List()
+func (d *documents) List() ([]*pb.ShortDocument, error) {
+	ds, err := d.s.List()
 	if err != nil {
 		return nil, err
 	}
-	own := make([]*pb.Document, 0)
-	for _, doc := range docs {
-		if doc.Owner != username {
-			continue
-		}
-		own = append(own, doc)
+	shorts := make([]*pb.ShortDocument, len(ds))
+	for i, p := range ds {
+		shorts[i] = document.FromPB(p).ShotProto()
 	}
-	return own, nil
+	return shorts, nil
 }
 
-func (d *documents) ExecForUser(name, username string) (string, error) {
-	docPB, err := d.s.Get(name)
+func (d *documents) ExecForUser(id int64, username string) (string, error) {
+	docPB, err := d.s.Get(id)
 	if err != nil {
 		return "", err
 	}

@@ -38,7 +38,7 @@ func Init(l *zap.Logger) (docs.Documents, users.Users, error) {
 		return nil, nil, err
 	}
 
-	docksdb, err := docs.NewPg(conn)
+	docksdb, err := docs.NewPg(conn, l)
 	if err != nil {
 		return nil, nil, err
 	}
