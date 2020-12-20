@@ -19,6 +19,21 @@ func (d *documents) Delete(docID string) error {
 	return d.s.Delete(docID)
 }
 
+func (d *documents) List(username string) ([]*pb.Document, error) {
+	docs, err := d.s.List()
+	if err != nil {
+		return nil, err
+	}
+	own := make([]*pb.Document, 0)
+	for _, doc := range docs {
+		if doc.Owner != username {
+			continue
+		}
+		own = append(own, doc)
+	}
+	return own, nil
+}
+
 func (d *documents) ExecForUser(name, username string) (string, error) {
 	docPB, err := d.s.Get(name)
 	if err != nil {

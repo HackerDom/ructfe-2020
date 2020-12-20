@@ -13,13 +13,14 @@ import (
 
 func FromPB(document *pb.Document) *Document {
 	return &Document{
-		ctx:  document.Context,
-		tmpl: document.Content,
-		name: document.Name,
+		ctx:   document.Context,
+		tmpl:  document.Content,
+		name:  document.Name,
+		owner: document.Owner,
 	}
 }
 
-func Parse(name string, dcmt []byte) (*Document, error) {
+func Parse(name, owner string, dcmt []byte) (*Document, error) {
 	splited := bytes.Split(dcmt, []byte("\n---\n"))
 	if len(splited) != 2 {
 		return nil, fmt.Errorf("'\n---\n' should split doc in 2 parts")
@@ -27,8 +28,9 @@ func Parse(name string, dcmt []byte) (*Document, error) {
 	exprsYAML := splited[0]
 	tmplBytes := splited[1]
 	d := &Document{
-		name: name,
-		tmpl: string(tmplBytes),
+		owner: owner,
+		name:  name,
+		tmpl:  string(tmplBytes),
 	}
 	err := yaml.UnmarshalStrict(exprsYAML, &d.ctx)
 	if err != nil {
@@ -38,10 +40,11 @@ func Parse(name string, dcmt []byte) (*Document, error) {
 }
 
 type Document struct {
-	name string
-	ctx  *pb.Ctx
-	vars map[string]string
-	tmpl string
+	owner string
+	name  string
+	ctx   *pb.Ctx
+	vars  map[string]string
+	tmpl  string
 }
 
 func (d *Document) Execute(context map[string]string, users []*pb.User) (string, error) {
