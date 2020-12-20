@@ -1,8 +1,8 @@
 #include "http.h"
-#include "face.html.h"
+#include "resources.h"
 #include "storage.h"
 
-void respond(char *response, uint64 code, const char *text, const char *content_type)
+void respond_bytes(char *response, uint64 *response_length, uint64 code, const char *text, uint64 length, const char *content_type)
 {
 	char * code_msg;
 	switch (code)
@@ -21,18 +21,26 @@ void respond(char *response, uint64 code, const char *text, const char *content_
 			break;
 	}
 
-	sprintf(response, 
+	uint64 pos = sprintf(response, 
 		"%s\r\n"
 		"Server: sesame\r\n"
-		"Content-Length: %lu\r\n"
+		"Content-Length: %llu\r\n"
 		"Content-Type: %s\r\n"
-		"Connection: close\r\n\r\n"
-		"%s", code_msg, text ? strlen(text) : 0, content_type, text ? text : "");
+		"Connection: close\r\n\r\n", 
+		code_msg, length, content_type);
+	if (text)
+		memcpy(response + pos, text, length);
+	*response_length = pos + length;
 }
 
-void redirect(char *response, const char *location)
+void respond(char *response, uint64 *response_length, uint64 code, const char *text, const char *content_type)
 {
-	sprintf(response, 
+	respond_bytes(response, response_length, code, text, text ? strlen(text) : 0, content_type);
+}
+
+void redirect(char *response, uint64 *response_length, const char *location)
+{
+	*response_length = sprintf(response, 
 		"HTTP/1.1 303 See Other\r\n"
 		"Location: /%s\r\n"
 		"Connection: close\r\n\r\n", location);
@@ -144,7 +152,17 @@ bool read_body(char *request, uint64 content_length, struct strbuf *secret)
 	return true;
 }
 
-bool process_request(char *request, char *response)
+bool try_send_resource(const char *name, char *response, uint64 *response_length)
+{
+	if (!strcmp("A", name))
+	{
+		respond_bytes(response, response_length, 200, res_bg, size_bg, "image/png");
+		return true;
+	}
+	return false;
+}
+
+bool process_request(char *request, char *response, uint64 *response_length)
 {
 	// printf("Request:\n%s\n", request);
 
@@ -157,13 +175,15 @@ bool process_request(char *request, char *response)
 	if (!read_request(&request, &verb, &url))
 		return false;
 
-	char page[1024];
+	char page[MAXSEND];
 	bzero(page, sizeof(page));
 
 	// printf("Verb: %s\nUrl: %s\n\n", verb.data, url.data);
 
 	if (!strcmp("GET", verb.data))
 	{
+		if (try_send_resource(url.data, response, response_length))
+			return true;
 		char * value = 0;
 		if (url.length == 32)
 		{
@@ -172,7 +192,7 @@ bool process_request(char *request, char *response)
 				value = "";
 		}
 		render_page(page, url.data, value);
-		respond(response, 200, page, "text/html");
+		respond(response, response_length, 200, page, "text/html");
 		return true;
 	}
 	
@@ -189,7 +209,7 @@ bool process_request(char *request, char *response)
 		}
 		if (secret.length == 0)
 		{
-			respond(response, 400, 0, "text/html");
+			respond(response, response_length, 400, 0, "text/html");
 			return true;
 		}
 
@@ -209,10 +229,10 @@ bool process_request(char *request, char *response)
 		}
 
 		render_page(page, key, secret.data);
-		redirect(response, key);
+		redirect(response, response_length, key);
 		return true;
 	}
 
-	respond(response, 400, 0, "text/html");
+	respond(response, response_length, 400, 0, "text/html");
 	return true;
 }

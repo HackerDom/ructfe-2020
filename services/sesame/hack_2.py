@@ -18,7 +18,7 @@ for i in range(1000):
 found = set()
 for s in sockets:
 	try:
-		data = s.recv(1024).decode('utf-8')
+		data = s.recv(4096).decode('utf-8')
 		s.close()
 	except:
 		continue

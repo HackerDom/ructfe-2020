@@ -62,8 +62,8 @@ struct epoll_event events[MAXEVENTS];
 
 #define MAXFDS 16 * 1024
 struct client_state {
-	char recvbuf[1024];
-	char sendbuf[1024];
+	char recvbuf[MAXRECV];
+	char sendbuf[MAXSEND];
 	uint64 transferred;
 	uint32 connected_at;
 	uint64 to_send;
@@ -177,11 +177,8 @@ void run()
 					clients[cli].transferred += read(cli, 
 						clients[cli].recvbuf + clients[cli].transferred, 
 						sizeof(clients[cli].recvbuf) - clients[cli].transferred - 1);
-					if (process_request(clients[cli].recvbuf, clients[cli].sendbuf))
-					{
-						clients[cli].to_send = strlen(clients[cli].sendbuf);
+					if (process_request(clients[cli].recvbuf, clients[cli].sendbuf, &clients[cli].to_send))
 						clients[cli].transferred = 0;
-					}
 				}
 				else if (clients[cli].to_send > 0)
 				{
