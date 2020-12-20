@@ -2,7 +2,7 @@
 #include "face.html.h"
 #include "storage.h"
 
-void respond(int32 fd, uint64 code, const char *text, const char *content_type)
+void respond(char *response, uint64 code, const char *text, const char *content_type)
 {
 	char * code_msg;
 	switch (code)
@@ -21,7 +21,6 @@ void respond(int32 fd, uint64 code, const char *text, const char *content_type)
 			break;
 	}
 
-	char response[1024];
 	sprintf(response, 
 		"%s\r\n"
 		"Server: sesame\r\n"
@@ -29,21 +28,14 @@ void respond(int32 fd, uint64 code, const char *text, const char *content_type)
 		"Content-Type: %s\r\n"
 		"Connection: close\r\n\r\n"
 		"%s", code_msg, text ? strlen(text) : 0, content_type, text ? text : "");
-
-	if (write(fd, response, strlen(response)) < 0)
-		printf("failed to write response!\n");
 }
 
-void redirect(int32 fd, const char *location)
+void redirect(char *response, const char *location)
 {
-	char response[256];
 	sprintf(response, 
 		"HTTP/1.1 303 See Other\r\n"
 		"Location: /%s\r\n"
 		"Connection: close\r\n\r\n", location);
-
-	if (write(fd, response, strlen(response)) < 0)
-		printf("failed to write response!\n");
 }
 
 struct strbuf
@@ -133,14 +125,14 @@ bool read_headers(char **request, struct strbuf *cl)
 	return true;
 }
 
-bool read_body(char **request, struct strbuf *secret)
+bool read_body(char *request, uint64 content_length, struct strbuf *secret)
 {
-	char *cl_start = strstr(*request, "secret");
+	char *cl_start = strstr(request, "secret");
 	if (!cl_start)
 		return false;
 
 	char *rp;
-	for (rp = cl_start; *rp; rp++)
+	for (rp = cl_start; rp < request + content_length; rp++)
 	{
 		char c = *rp;
 		if ((c < 'A' || c > 'Z') && (c < '0' || c > '9'))
@@ -152,9 +144,9 @@ bool read_body(char **request, struct strbuf *secret)
 	return true;
 }
 
-bool process_request(int32 fd, char *request)
+bool process_request(char *request, char *response)
 {
-	printf("Request:\n%s\n", request);
+	// printf("Request:\n%s\n", request);
 
 	struct strbuf verb, url, cl, secret;
 	init_strbuf(&verb, 4);
@@ -168,7 +160,7 @@ bool process_request(int32 fd, char *request)
 	char page[1024];
 	bzero(page, sizeof(page));
 
-	printf("Verb: %s\nUrl: %s\n\n", verb.data, url.data);
+	// printf("Verb: %s\nUrl: %s\n\n", verb.data, url.data);
 
 	if (!strcmp("GET", verb.data))
 	{
@@ -176,12 +168,11 @@ bool process_request(int32 fd, char *request)
 		if (url.length == 32)
 		{
 			value = load_item(url.data, secret.data);
-			fprintf(stderr, "loaded item by key %s: %s!\n", url.data, value);
 			if (!value)
 				value = "";
 		}
 		render_page(page, url.data, value);
-		respond(fd, 200, page, "text/html");
+		respond(response, 200, page, "text/html");
 		return true;
 	}
 	
@@ -194,11 +185,11 @@ bool process_request(int32 fd, char *request)
 			uint64 content_length = atoll(cl.data);
 			if (strlen(request) < content_length)
 				return false;
-			read_body(&request, &secret);
+			read_body(request, content_length, &secret);
 		}
 		if (secret.length == 0)
 		{
-			respond(fd, 400, 0, "text/html");
+			respond(response, 400, 0, "text/html");
 			return true;
 		}
 
@@ -218,10 +209,10 @@ bool process_request(int32 fd, char *request)
 		}
 
 		render_page(page, key, secret.data);
-		redirect(fd, key);
+		redirect(response, key);
 		return true;
 	}
 
-	respond(fd, 400, 0, "text/html");
+	respond(response, 400, 0, "text/html");
 	return true;
 }

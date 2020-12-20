@@ -1,4 +1,5 @@
 #include <sys/epoll.h>
+#include <time.h>
 
 #include "types.h"
 #include "storage.h"
@@ -61,10 +62,28 @@ struct epoll_event events[MAXEVENTS];
 
 #define MAXFDS 16 * 1024
 struct client_state {
-	char buffer[1024];
-	uint64 total_read;
+	char recvbuf[1024];
+	char sendbuf[1024];
+	uint64 transferred;
+	uint32 connected_at;
+	uint64 to_send;
 };
 struct client_state clients[MAXFDS];
+
+void collect_garbage()
+{
+	uint32 now = time(0);
+	for (uint32 i = 0; i < MAXFDS; i++)
+	{
+		if (clients[i].connected_at && now - clients[i].connected_at > 2)
+		{
+			close(i);
+			clients[i].connected_at = 0;
+			clients[i].transferred = 0;
+			clients[i].to_send = 0;
+		}
+	}
+}
 
 void run()
 {
@@ -98,7 +117,7 @@ void run()
 		{
 			if ((events[i].events & EPOLLERR) ||
 				(events[i].events & EPOLLHUP) ||
-				(!(events[i].events & EPOLLIN)))
+				(!(events[i].events & EPOLLIN) && !(events[i].events & EPOLLOUT)))
 			{
 				printf("epoll error\n");
 				close(events[i].data.fd);
@@ -116,13 +135,16 @@ void run()
 					if (cli < 0)
 					{
 						if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
-						{
 							break;
-						}
 						else
 						{
 							printf("accept error: %d\n", errno);
-							break;
+							if (errno == EMFILE)
+							{
+								collect_garbage();
+								break;
+							}
+							exit(1);
 						}
 					}
 					if (cli >= MAXFDS)
@@ -130,29 +152,46 @@ void run()
 						printf("client fd %d is too high!", cli);
 						exit(1);
 					}
- 
+
 					make_nonblocking(cli);
 
 					bzero(&event, sizeof(event));
 					event.data.fd = cli;
-					event.events = EPOLLIN;
+					event.events = EPOLLIN | EPOLLOUT;
 					if (epoll_ctl(efd, EPOLL_CTL_ADD, cli, &event) < 0)
 					{
 						perror("fuck epoll_ctl\n");
 						exit(1);
 					}
 
-					bzero(&clients[cli], sizeof(struct client_state));
+					clients[cli].connected_at = time(0);
+					clients[cli].transferred = 0;
+					clients[cli].to_send = 0;
 				}
 			}
 			else
 			{
 				int cli = events[i].data.fd;
-				clients[cli].total_read += read(cli, 
-					clients[cli].buffer + clients[cli].total_read, 
-					sizeof(clients[cli].buffer) - clients[cli].total_read - 1);
-				if (process_request(cli, clients[cli].buffer))
-					close(events[i].data.fd);
+				if (events[i].events & EPOLLIN)
+				{
+					clients[cli].transferred += read(cli, 
+						clients[cli].recvbuf + clients[cli].transferred, 
+						sizeof(clients[cli].recvbuf) - clients[cli].transferred - 1);
+					if (process_request(clients[cli].recvbuf, clients[cli].sendbuf))
+					{
+						clients[cli].to_send = strlen(clients[cli].sendbuf);
+						clients[cli].transferred = 0;
+					}
+				}
+				else if (clients[cli].to_send > 0)
+				{
+					clients[cli].transferred += write(cli, 
+						clients[cli].sendbuf + clients[cli].transferred, 
+						clients[cli].to_send - clients[cli].transferred);
+					if (clients[cli].transferred >= clients[cli].to_send)
+						close(cli);
+					// printf("Transferring response:\n%s\n", clients[cli].sendbuf);
+				}
 			}
 		}
 	}

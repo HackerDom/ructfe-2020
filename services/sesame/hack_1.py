@@ -9,10 +9,10 @@ def time_id():
 
 def gen_key(rnd, modifier):
 	key = [0] * 32
-	multiplier = rnd
+	multiplier = rnd + 3
 	tid = time_id()
 	for i in range(32):
-		key[i] = (tid * multiplier) % 26
+		key[i] = (tid * multiplier + i * 7) % 26
 		multiplier = (multiplier * 167 + modifier) % 16769023
 	return ''.join(chr(ord('A') + e) for e in key)
 
