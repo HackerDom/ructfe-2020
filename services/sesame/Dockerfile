@@ -4,12 +4,9 @@ RUN set -eux; \
 	groupadd -r sesame --gid=999; \
 	useradd -r -g sesame --uid=999 --home-dir=/app --shell=/bin/bash sesame;
 
-COPY sesame /app/sesame
-COPY data /app/data
+COPY sesame /app/
+COPY run.sh /app/
 
-RUN chown -R sesame:sesame /app
-
-USER sesame
 WORKDIR /app
 
-CMD ["/app/sesame"]
+CMD ["/app/run.sh"]
