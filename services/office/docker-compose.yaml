@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+#  etcd:
+#    image: quay.io/coreos/etcd
+#    command: etcd --initial-cluster-state new --listen-client-urls http://0.0.0.0:2379 --advertise-client-urls http://127.0.0.1:2379
+#    volumes:
+#      - "etcd-data:/default.etcd"
+#    environment:
+#      - ETCDCTL_API=3
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: maindb
+    volumes:
+      - data:/var/lib/postgresql/data/
+volumes:
+  data:
