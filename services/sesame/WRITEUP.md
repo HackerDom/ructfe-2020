@@ -10,7 +10,7 @@ Only the first byte of the uuid is actually used, plus some function of current 
 This is the only input for the code generation. With some math on top it's used to get all 32 letters of the code.
 
 This means that every minute only 256 different codes are generated! Let's just replicate the algorithm and brute-force the one random byte.  
-This is done in [hack_1.py](sesame/hack_1.py)
+This is done in [hack_1.py](hack_1.py)
 
 ## Vuln 2
 
@@ -24,7 +24,7 @@ We'll create a lot of connections to get a good chance of being reassigned a sta
 connections to trigger the response. If we're lucky, we'll get a flag or two.  
 
 The only catch here is not to spoil the original request with the bytes we send, so we have to send a prefix of that request, for instance the string 'GET'. 
-Sploit: [hack_2.py](sesame/hack_2.py)
+Sploit: [hack_2.py](hack_2.py)
 
 ## Vuln 3
 
