@@ -1,10 +1,10 @@
 package storage
 
 import (
-	_ "github.com/jackc/pgx/v4"
 	"fmt"
 	"github.com/HackerDom/ructfe2020/internal/storage/docs"
 	"github.com/HackerDom/ructfe2020/internal/storage/users"
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"net"
@@ -33,7 +33,7 @@ func Init(l *zap.Logger) (docs.Documents, users.Users, error) {
 		return nil, nil, err
 	}
 
-	usersdb, err := users.NewPg(conn)
+	usersdb, err := users.NewPg(conn, l)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -46,8 +46,8 @@ func Init(l *zap.Logger) (docs.Documents, users.Users, error) {
 	return docksdb, usersdb, nil
 }
 
-func CreateConnection(l *zap.Logger) (*sqlx.DB, error){
-	connString := ConnString("postgresql", "maindb", "test", "test")
+func CreateConnection(l *zap.Logger) (*sqlx.DB, error) {
+	connString := ConnString("postgres", "maindb", "test", "test")
 	l.Info(fmt.Sprintf("Connecting to '%s'", connString))
 	db, err := sqlx.Open("pgx", connString)
 	if err != nil {
@@ -84,7 +84,7 @@ func ConnString(addr, dbname, user, password string) string {
 		connParams = append(connParams, "password="+password)
 	}
 
-	connParams = append(connParams, "sslmode="+"require")
+	connParams = append(connParams, "sslmode="+"disable")
 
 	return strings.Join(connParams, " ")
 }

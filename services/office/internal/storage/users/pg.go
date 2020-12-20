@@ -1,17 +1,22 @@
 package users
 
 import (
+	"fmt"
 	pb "github.com/HackerDom/ructfe2020/proto"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
-	"net"
+	"go.uber.org/zap"
 	"strconv"
 	"strings"
 	"time"
 )
 
 // TODO: [12/13/20] (vaspahomov):
-var usersSchema = `CREATE TABLE users ....`
+var usersSchema = `CREATE TABLE IF NOT EXISTS users (
+    name					TEXT PRIMARY KEY,
+	token                   TEXT,
+	bio                     TEXT
+);`
 
 const (
 	maxOpenConn     = 20
@@ -23,26 +28,32 @@ type Users interface {
 	Insert(user *pb.User) error
 }
 
-func NewPg(db *sqlx.DB) (Users, error) {
-
-	return &Pg{db: db}, nil
+func NewPg(db *sqlx.DB, l *zap.Logger) (Users, error) {
+	_, err := db.Exec(usersSchema)
+	if err != nil {
+		return nil, err
+	}
+	return &Pg{db: db, l: l}, nil
 }
 
 type userModel struct {
-	name  string
-	token string
+	name  string `db:"name"`
+	token string `db:"token"`
+	bio   string `db:"bio"`
 }
 
 type Pg struct {
 	db *sqlx.DB
+	l  *zap.Logger
 }
 
 func (u *Pg) Insert(user *pb.User) error {
-	query, args, err := sq.Insert("users").Columns("name", "token").Values(user.Name, user.Token).ToSql()
+	query, args, err := sq.Insert("users").Columns("name", "token", "bio").Values(user.Name, user.Token, user.Bio).ToSql()
 	if err != nil {
 		return err
 	}
-	_, err = u.db.Exec(ReplaceSQL(query, "?"), args)
+	u.l.Debug(fmt.Sprintf("Executing '%s': args: '%v'", query, args))
+	_, err = u.db.Exec(ReplaceSQL(query, "?"), args...)
 	if err != nil {
 		return err
 	}
@@ -50,12 +61,9 @@ func (u *Pg) Insert(user *pb.User) error {
 }
 
 func (u *Pg) List() ([]*pb.User, error) {
-	query, args, err := sq.Select("*").From("users").ToSql()
-	if err != nil {
-		return nil, err
-	}
-	users := make([]*userModel, 0)
-	err = u.db.Select(&users, ReplaceSQL(query, "?"), args)
+	//u.l.Debug(fmt.Sprintf("Executing '%s': args: '%v'", query, args))
+	var users []userModel
+	err := u.db.Select(&users, "SELECT * FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -67,35 +75,6 @@ func (u *Pg) List() ([]*pb.User, error) {
 		}
 	}
 	return usersProto, nil
-}
-
-// ConnString constructs PostgreSQL connection string
-func ConnString(addr, dbname, user, password string) string {
-	var connParams []string
-
-	host, port, err := net.SplitHostPort(addr)
-	if err == nil {
-		connParams = append(connParams, "host="+host)
-		connParams = append(connParams, "port="+port)
-	} else {
-		connParams = append(connParams, "host="+addr)
-	}
-
-	if dbname != "" {
-		connParams = append(connParams, "dbname="+dbname)
-	}
-
-	if user != "" {
-		connParams = append(connParams, "user="+user)
-	}
-
-	if password != "" {
-		connParams = append(connParams, "password="+password)
-	}
-
-	connParams = append(connParams, "sslmode="+"require")
-
-	return strings.Join(connParams, " ")
 }
 
 func ReplaceSQL(old, searchPattern string) string {

@@ -23,7 +23,7 @@ func main() {
 
 func createLog() *zap.Config {
 	return &zap.Config{
-		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
+		Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
 		Development: false,
 		Sampling: &zap.SamplingConfig{
 			Initial:    100,
