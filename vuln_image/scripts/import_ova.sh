@@ -2,14 +2,12 @@
 
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-cd "$BASE_DIR"
-
 if [ -z "$1" ]; then
     echo "USAGE: import_ova.sh $image_file" >&2
     exit 1
 fi
 
-VM_NAME="ructfe2019-base"
+VM_NAME="ructfe2020-base"
 FORWARD_PORT=2222
 IMAGE_FILE="$1"
 

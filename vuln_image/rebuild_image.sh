@@ -3,9 +3,9 @@
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cd "$BASE_DIR"
 
-VM_NAME="ructfe2019-base"
-TEMP_IMAGE="images/.ructfe2019-deploy.ova"
-OUTPUT_IMAGE="images/ructfe2019-deploy.ova"
+VM_NAME="ructfe2020-base"
+TEMP_IMAGE="images/.ructfe2020-deploy.ova"
+OUTPUT_IMAGE="images/ructfe2020-deploy.ova"
 SSH_PORT=2222
 SSH_HOST=127.0.0.1
 
@@ -32,14 +32,14 @@ done
 # Deploy updates
 ansible-playbook -i ansible_hosts --key-file keys/id_rsa image.yml
 
-# for debug
-exit 1
+## for debug
+#exit 1
 
 # Power off VM
 $SSH poweroff || echo 'OK'
 while VBoxManage list runningvms | grep -q "$VM_NAME"; do
     echo "Waiting for vm stop"
-    sleep 2
+    sleep 1.2
 done
 
 echo "Deleting port-forwarding for deploy"
