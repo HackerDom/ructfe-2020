@@ -28,6 +28,7 @@ def put_flag(request: PutRequest) -> Verdict:
         response = requests.post(url, data = { "secret": request.flag[:31] })
         soup = BeautifulSoup(response.text, features="html.parser")
         key = soup.find(id="key").text.strip()
+        print("Saved flag " + request.flag)
         return Verdict.OK(key)
     except:
         traceback.print_exc()

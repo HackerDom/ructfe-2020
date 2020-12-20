@@ -76,75 +76,133 @@ void render_page(char * buffer, const char * key, const char * secret)
 	sprintf(buffer, pg_index, key, secret ? secret : "");
 }
 
-#define ST_VERB 0
-#define ST_URL 1
-#define ST_SECRET 2
-#define ST_DONE 3
-
-void process_request(int32 fd, char *request)
+bool read_request(char **request, struct strbuf *verb, struct strbuf *url)
 {
-	printf("Request:\n%s\n", request);
-
-	int state = ST_VERB;
-	struct strbuf bufs[3];
-	init_strbuf(&bufs[ST_VERB], 4);
-	init_strbuf(&bufs[ST_URL], 32);
-	init_strbuf(&bufs[ST_SECRET], 32);
-
-	for (char *rp = request; *rp && state < ST_SECRET; rp++)
+	struct strbuf *output = verb;
+	char *rp;
+	for (rp = *request; *rp; rp++)
 	{
 		char c = *rp;
 		if (c == ' ')
-			state++;
+		{
+			if (output == verb)
+				output = url;
+			else
+				break;
+		}
 		else if (c == '/')
 			continue;
 		else if (c < 'A' || c > 'Z')
 			break;
-		else if (!try_add_char(&bufs[state], c))
+		else if (!try_add_char(output, c))
+			return false;
+	}
+	for (; *rp; rp++)
+	{
+		if (*rp == '\n')
+		{
+			*request = rp + 1;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool read_headers(char **request, struct strbuf *cl)
+{
+	char *cl_start = strstr(*request, "Content-Length");
+	if (!cl_start)
+		return false;
+
+	char *rp;
+	for (rp = cl_start; *rp; rp++)
+	{
+		char c = *rp;
+		if (c == '\n')
+			break;
+		else if (c < '0' || c > '9')
+			continue;
+		else if (!try_add_char(cl, c))
+			break;
+	}
+	char * headers_end = strstr(rp, "\r\n\r\n");
+	if (!headers_end)
+		return false;
+
+	*request = headers_end + 4;
+	return true;
+}
+
+bool read_body(char **request, struct strbuf *secret)
+{
+	char *cl_start = strstr(*request, "secret");
+	if (!cl_start)
+		return false;
+
+	char *rp;
+	for (rp = cl_start; *rp; rp++)
+	{
+		char c = *rp;
+		if ((c < 'A' || c > 'Z') && (c < '0' || c > '9'))
+			continue;
+		else if (!try_add_char(secret, c))
 			break;
 	}
 
-	if (state != ST_SECRET)
-	{
-		respond(fd, 400, 0, "text/html");
-		return;
-	}
+	return true;
+}
 
-	char *secret_start = strstr(request, "secret");
-	if (secret_start)
-	{
-		for (char *rp = secret_start; *rp; rp++)
-		{
-			char c = *rp;
-			if ((c < 'A' || c > 'Z') && (c < '0' || c > '9'))
-				continue;
-			else if (!try_add_char(&bufs[state], c))
-				break;
-		}
-	}
+bool process_request(int32 fd, char *request)
+{
+	printf("Request:\n%s\n", request);
 
-	printf("Verb: %s\nUrl: %s\nSecret: %s\n\n", 
-		bufs[ST_VERB].data, bufs[ST_URL].data, bufs[ST_SECRET].data);
+	struct strbuf verb, url, cl, secret;
+	init_strbuf(&verb, 4);
+	init_strbuf(&url, 32);
+	init_strbuf(&cl, 8);
+	init_strbuf(&secret, 32);
+
+	if (!read_request(&request, &verb, &url))
+		return false;
 
 	char page[1024];
 	bzero(page, sizeof(page));
 
-	if (!strcmp("GET", bufs[ST_VERB].data))
+	printf("Verb: %s\nUrl: %s\n\n", verb.data, url.data);
+
+	if (!strcmp("GET", verb.data))
 	{
-		char * secret = 0;
-		if (bufs[ST_URL].length == 32)
+		char * value = 0;
+		if (url.length == 32)
 		{
-			secret = load_item(bufs[ST_URL].data, bufs[ST_SECRET].data);
-			if (!secret)
-				secret = "";
+			value = load_item(url.data, secret.data);
+			fprintf(stderr, "loaded item by key %s: %s!\n", url.data, value);
+			if (!value)
+				value = "";
 		}
-		render_page(page, bufs[ST_URL].data, secret);
+		render_page(page, url.data, value);
 		respond(fd, 200, page, "text/html");
-		return;
+		return true;
 	}
 	
-	if (!strcmp("POST", bufs[ST_VERB].data))
+	if (!strcmp("POST", verb.data))
 	{
+		if (!read_headers(&request, &cl))
+			return false;
+		if (cl.length != 0)
+		{
+			uint64 content_length = atoll(cl.data);
+			if (strlen(request) < content_length)
+				return false;
+			read_body(&request, &secret);
+		}
+		if (secret.length == 0)
+		{
+			respond(fd, 400, 0, "text/html");
+			return true;
+		}
+
+		char value[32];
 		char key[64];
 		bzero(key, sizeof(key));
 
@@ -152,14 +210,18 @@ void process_request(int32 fd, char *request)
 		{	
 			gen_key(key, i);
 
-			if (store_item(key, bufs[ST_SECRET].data))
-				break;
+			if (load_item(key, value))
+				continue;
+
+			store_item(key, secret.data);
+			break;
 		}
 
-		render_page(page, key, bufs[ST_SECRET].data);
+		render_page(page, key, secret.data);
 		redirect(fd, key);
-		return;
+		return true;
 	}
 
 	respond(fd, 400, 0, "text/html");
+	return true;
 }

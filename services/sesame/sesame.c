@@ -55,9 +55,16 @@ void make_nonblocking(int32 sfd)
 	}
 }
 
-#define MAXEVENTS 1023
+#define MAXEVENTS 64
 struct epoll_event event;
 struct epoll_event events[MAXEVENTS];
+
+#define MAXFDS 16 * 1024
+struct client_state {
+	char buffer[1024];
+	uint64 total_read;
+};
+struct client_state clients[MAXFDS];
 
 void run()
 {
@@ -118,6 +125,11 @@ void run()
 							break;
 						}
 					}
+					if (cli >= MAXFDS)
+					{
+						printf("client fd %d is too high!", cli);
+						exit(1);
+					}
  
 					make_nonblocking(cli);
 
@@ -129,20 +141,18 @@ void run()
 						perror("fuck epoll_ctl\n");
 						exit(1);
 					}
+
+					bzero(&clients[cli], sizeof(struct client_state));
 				}
 			}
 			else
 			{
-				int64 count;
-				char buf[1024];
-				bzero(buf, sizeof(buf));
-
-				count = read(events[i].data.fd, buf, sizeof(buf));
-
-				if (count > 0)
-					process_request(events[i].data.fd, buf);
-
-				close(events[i].data.fd);
+				int cli = events[i].data.fd;
+				clients[cli].total_read += read(cli, 
+					clients[cli].buffer + clients[cli].total_read, 
+					sizeof(clients[cli].buffer) - clients[cli].total_read - 1);
+				if (process_request(cli, clients[cli].buffer))
+					close(events[i].data.fd);
 			}
 		}
 	}
