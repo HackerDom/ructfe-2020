@@ -1,0 +1,3 @@
+[submodule "checksystem"]
+	path = checksystem
+	url = ../checksystem.git
