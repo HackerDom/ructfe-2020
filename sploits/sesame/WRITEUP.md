@@ -20,12 +20,12 @@ Make any change to the key generation algorithm; should be enough to just patch 
 ## Vuln 2
 
 Let's take a look at that `epoll` server. For each client connection it keeps a state object that consists of receive buffer, send buffer, 
-transferred bytes counter and send buffer length. These objects are tied to file descriptors, so if a client comes with the same FD it'll get the same state object. 
+transferred bytes counter and send buffer length. These objects are tied to file descriptors, so if a client comes with the same fd it'll get the same state object. 
 
 When a new client is connected, the corresponding state is cleared: byte counter, buffer length are set to 0. But the buffers themselves are not zeroed out. 
 So maybe if we get assigned a state that was used to request a flag, we can make the same request handled again! The only catch here is that after reading a bunch of bytes from a client socket the code sets the following byte in the buffer to 0.
 
-To get reassigned a state that the checksystem client used to get a flag, we'll just open a lot of non-blocking connections simultaneously, send our payload to each of them, and then try to get a response from each socket.
+Descriptors are assigned sequentially, so if we connect at the time when no one else is there, we have a good chance of getting the same fd the checksystem just used.
 
 Now, what will we send? We need to somehow skip the zero byte, and all the http parsing code stops reading upon finding a zero.  
 Let's take a close look at the function parsing Content-Length. It runs `start = strstr(request, "Content-Length")` first, and then starts parsing the number from `start + strlen("Content-Length:")`. All we need to do now is to put our zero precisely in place of the colon, and it'll get ignored!

