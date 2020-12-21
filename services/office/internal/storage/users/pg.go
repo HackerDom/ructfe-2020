@@ -8,25 +8,14 @@ import (
 	"go.uber.org/zap"
 	"strconv"
 	"strings"
-	"time"
 )
 
-// TODO: [12/13/20] (vaspahomov):
 var usersSchema = `CREATE TABLE IF NOT EXISTS users (
     name					TEXT PRIMARY KEY,
-	password                   TEXT,
+	password                TEXT,
 	bio                     TEXT
 );`
 
-var tokenToUserSchema = `CREATE TABLE IF NOT EXISTS tokens (
-	token					TEXT PRIMARY KEY,
-	name					TEXT
-);`
-
-const (
-	maxOpenConn     = 20
-	connMaxLifetime = time.Minute
-)
 
 type Users interface {
 	List() ([]*pb.User, error)
@@ -38,17 +27,13 @@ func NewPg(db *sqlx.DB, l *zap.Logger) (Users, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, erro := db.Exec(tokenToUserSchema)
-	if erro != nil {
-		return nil, erro
-	}
 	return &Pg{db: db, l: l}, nil
 }
 
 type userModel struct {
-	Name  string `db:"name"`
-	Token string `db:"token"`
-	Bio   string `db:"bio"`
+	Name     string `db:"name"`
+	Password string `db:"password"`
+	Bio      string `db:"bio"`
 }
 
 type Pg struct {
@@ -57,7 +42,7 @@ type Pg struct {
 }
 
 func (u *Pg) Insert(user *pb.User) error {
-	query, args, err := sq.Insert("users").Columns("name", "token", "bio").Values(user.Name, user.Password, user.Bio).ToSql()
+	query, args, err := sq.Insert("users").Columns("name", "password", "bio").Values(user.Name, user.Password, user.Bio).ToSql()
 	if err != nil {
 		return err
 	}
@@ -78,9 +63,9 @@ func (u *Pg) List() ([]*pb.User, error) {
 	usersProto := make([]*pb.User, len(users))
 	for i, u := range users {
 		usersProto[i] = &pb.User{
-			Name:  u.Name,
-			Password: u.Token,
-			Bio:   u.Bio,
+			Name:     u.Name,
+			Password: u.Password,
+			Bio:      u.Bio,
 		}
 	}
 	return usersProto, nil

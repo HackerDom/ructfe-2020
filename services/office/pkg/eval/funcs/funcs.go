@@ -51,8 +51,6 @@ func GetInfoFunc(username string, users []*pb.User, funcs []*functions.Overload,
 				return user.Bio
 			case "name":
 				return user.Name
-			case "token":
-				return user.Token
 			}
 		}
 		return ""
