@@ -16,4 +16,4 @@
     - bay_cloud_config
     # - nginx
     - { role: service, service_name: office }
-    # - { role: service, service_name: Household }
+    - { role: service, service_name: sesame }
