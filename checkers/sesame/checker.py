@@ -14,13 +14,19 @@ checker = Checker()
 
 @checker.define_check
 def check_service(request: CheckRequest) -> Verdict:
-    flag = ''.join(random.choice(string.ascii_uppercase) for _ in range(31)) + "="
-    put_verdict = put_flag(PutRequest(hostname = request.hostname, flag = flag, flag_id = None, vuln_id = 1))
-    if put_verdict._code != OK:
-        return put_verdict
-    get_verdict = get_flag(GetRequest(hostname = request.hostname, flag = flag, flag_id = put_verdict._public_message, vuln_id = 1))
-
-    return get_verdict
+    rand_key = ''.join(random.choice(string.ascii_uppercase) for _ in range(32))
+    url = "http://" + request.hostname + ":4280/" + rand_key
+    try:
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, features="html.parser")
+        key = soup.find(id="key").text
+        if key == rand_key:
+            return Verdict.OK()
+        print("Expected to find random key " + rand_key + "on the page, but found " + key)
+        return Verdict.MUMBLE("Front page is broken!")
+    except:
+        traceback.print_exc()
+        return Verdict.MUMBLE("Couldn't get a meaningful response!")
 
 
 @checker.define_put(vuln_num=1, vuln_rate=1)
