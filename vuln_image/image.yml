@@ -15,5 +15,5 @@
     - { role: base_image, tags: [base] }
     - bay_cloud_config
     # - nginx
-    - { role: service, service_name: office }
-    - { role: service, service_name: sesame }
+    - { role: service, service_name: office, tags: [office] }
+    - { role: service, service_name: sesame, tags: [sesame] }
