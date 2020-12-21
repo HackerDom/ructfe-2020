@@ -1,0 +1,4 @@
++ /bin
++ /Dockerfile
++ /docker-compose.yaml
+- *
