@@ -1,9 +1,12 @@
 package manager
 
 import (
-	"github.com/HackerDom/ructfe2020/internal/hashutil"
+	"crypto/sha256"
+	"encoding/hex"
+	"errors"
 	userstorage "github.com/HackerDom/ructfe2020/internal/storage/users"
 	pb "github.com/HackerDom/ructfe2020/proto"
+	"regexp"
 )
 
 type users struct {
@@ -30,11 +33,25 @@ func (m *users) GetNames() ([]string, error) {
 	return names, nil
 }
 
-func (m *users) RegisterUser(username string) (*pb.User, error) {
-	d := hashutil.RandDigest(username)
+func (m *users) LoginUser(username, pass string) (*pb.LoginResponse, error) {
+	if ok, _ := regexp.MatchString("^[a-zA-Z0-9].$", username); !ok {
+		return nil, errors.New("invalid login")
+	}
+
+	
+}
+
+func (m *users) RegisterUser(username, pass, bio string) (*pb.User, error) {
+	if ok, _ := regexp.MatchString("^[a-zA-Z0-9].$", username); !ok {
+		return nil, errors.New("invalid login")
+	}
+
+	pass = calcPassHash(pass)
+
 	user := &pb.User{
 		Name:  username,
-		Token: d,
+		Password: pass,
+		Bio: bio,
 	}
 	err := m.s.Insert(user)
 	if err != nil {
@@ -42,6 +59,14 @@ func (m *users) RegisterUser(username string) (*pb.User, error) {
 	}
 	return &pb.User{
 		Name:  username,
-		Token: d,
+		Password: pass,
+		Bio: bio,
 	}, nil
+}
+
+func calcPassHash(pass string) string {
+	hash := sha256.New()
+	hash.Write([]byte(pass))
+	digest := hash.Sum(make([]byte, 0))
+	return hex.EncodeToString(digest)
 }

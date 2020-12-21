@@ -14,8 +14,13 @@ import (
 // TODO: [12/13/20] (vaspahomov):
 var usersSchema = `CREATE TABLE IF NOT EXISTS users (
     name					TEXT PRIMARY KEY,
-	token                   TEXT,
+	password                   TEXT,
 	bio                     TEXT
+);`
+
+var tokenToUserSchema = `CREATE TABLE IF NOT EXISTS tokens (
+	token					TEXT PRIMARY KEY,
+	name					TEXT
 );`
 
 const (
@@ -33,6 +38,10 @@ func NewPg(db *sqlx.DB, l *zap.Logger) (Users, error) {
 	if err != nil {
 		return nil, err
 	}
+	_, erro := db.Exec(tokenToUserSchema)
+	if erro != nil {
+		return nil, erro
+	}
 	return &Pg{db: db, l: l}, nil
 }
 
@@ -48,7 +57,7 @@ type Pg struct {
 }
 
 func (u *Pg) Insert(user *pb.User) error {
-	query, args, err := sq.Insert("users").Columns("name", "token", "bio").Values(user.Name, user.Token, user.Bio).ToSql()
+	query, args, err := sq.Insert("users").Columns("name", "token", "bio").Values(user.Name, user.Password, user.Bio).ToSql()
 	if err != nil {
 		return err
 	}
@@ -70,7 +79,7 @@ func (u *Pg) List() ([]*pb.User, error) {
 	for i, u := range users {
 		usersProto[i] = &pb.User{
 			Name:  u.Name,
-			Token: u.Token,
+			Password: u.Token,
 			Bio:   u.Bio,
 		}
 	}
