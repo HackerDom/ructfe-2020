@@ -186,11 +186,9 @@ bool process_request(char *request, char *response, uint64 *response_length)
 			return true;
 		char * value = 0;
 		if (url.length == 32)
-		{
 			value = load_item(url.data, secret.data);
-			if (!value)
-				value = "";
-		}
+		if (!value)
+			value = "لا شيئ";
 		render_page(page, url.data, value);
 		respond(response, response_length, 200, page, "text/html");
 		return true;
