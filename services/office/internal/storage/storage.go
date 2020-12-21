@@ -19,16 +19,16 @@ const (
 )
 
 const (
-	maxOpenConn     = 20
+	maxOpenConn     = 10
 	connMaxLifetime = time.Minute
 )
 
 // pg conn string params
 const (
 	dbAddr     = "postgres"
-	dbUser     = "test"
-	dbPassword = "test"
-	dbName     = "maindb"
+	dbUser     = "service"
+	dbPassword = "service"
+	dbName     = "service"
 )
 
 func Init(l *zap.Logger) (docs.Documents, users.Users, sessions.Sessions, error) {
@@ -68,7 +68,6 @@ func CreateConnection(l *zap.Logger) (*sqlx.DB, error) {
 // ConnString constructs PostgreSQL connection string
 func ConnString(addr, dbname, user, password string) string {
 	var connParams []string
-
 	host, port, err := net.SplitHostPort(addr)
 	if err == nil {
 		connParams = append(connParams, "host="+host)
@@ -76,20 +75,15 @@ func ConnString(addr, dbname, user, password string) string {
 	} else {
 		connParams = append(connParams, "host="+addr)
 	}
-
 	if dbname != "" {
 		connParams = append(connParams, "dbname="+dbname)
 	}
-
 	if user != "" {
 		connParams = append(connParams, "user="+user)
 	}
-
 	if password != "" {
 		connParams = append(connParams, "password="+password)
 	}
-
 	connParams = append(connParams, "sslmode="+"disable")
-
 	return strings.Join(connParams, " ")
 }

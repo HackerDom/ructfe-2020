@@ -34,17 +34,15 @@ services:
         hard: 12000
 
   postgres:
-    image: postgres:latest
+    image: postgres:13.1-alpine
     restart: always
-    environment:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
-      POSTGRES_DB: maindb
+    env_file:
+      - .pgenv
     volumes:
       - data:/var/lib/postgresql/data/
     # don't forget limits for your database!
     mem_limit: 1G
     memswap_limit: 1G
-    pids_limit: 10
+    pids_limit: 1000
 volumes:
   data:

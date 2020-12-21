@@ -56,7 +56,7 @@ func (u *Pg) Insert(user *pb.User) error {
 
 func (u *Pg) List() ([]*pb.User, error) {
 	var users []userModel
-	err := u.db.Select(&users, "SELECT name, token, bio FROM users;")
+	err := u.db.Select(&users, "SELECT name, password, bio FROM users;")
 	if err != nil {
 		return nil, err
 	}

@@ -24,3 +24,13 @@ class Api:
         d = MessageToJson(req)
         r = self.session.post(f"{self.url}/docs/execute", data=d)
         return r
+
+    def login(self, req: pb.LoginRequest) -> requests.Response:
+        d = MessageToJson(req)
+        r = self.session.post(f"{self.url}/users/login", data=d)
+        return r
+
+    def register(self, req: pb.RegisterRequest) -> requests.Response:
+        d = MessageToJson(req)
+        r = self.session.post(f"{self.url}/users/register", data=d)
+        return r
