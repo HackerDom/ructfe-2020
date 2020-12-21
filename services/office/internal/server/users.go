@@ -44,7 +44,7 @@ func (s *usersService) List(ctx context.Context, req *pb.ListRequest) (*pb.ListR
 }
 
 func (s *usersService) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	u, err := s.m.RegisterUser(req.Name)
+	u, err := s.m.RegisterUser(req.Name, req.Password, req.Bio)
 	if err != nil {
 		return nil, err
 	}
