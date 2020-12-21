@@ -61,3 +61,5 @@
    в Cassandra.Cluster.Connect()
    в CarpetRadar.Services.DataStorage.DataStorageBuilder.GetDefaultStorage(ILogger logger) в D:\Светлана\source\ructfe-2020\ructfe-2020\services\carpetradar24\carpetradar24\CarpetRadar.Services\DataStorage\DataStorageBuilder.cs:строка 29
 2020-12-20 22:51:53.6528|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 23:33:23.3236|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster
+2020-12-20 23:35:56.1604|INFO|CarpetRadar.Web.Global|The cluster's name is: Test Cluster

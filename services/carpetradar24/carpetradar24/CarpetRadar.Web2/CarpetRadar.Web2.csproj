@@ -5,6 +5,20 @@
     <StartupObject>CarpetRadar.Web2.Program</StartupObject>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="kover.png" />
+    <None Remove="kover_na_oblachke.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="NLog" Version="4.7.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CarpetRadar.Services\CarpetRadar.Services.csproj" />
+  </ItemGroup>
+
 
 
 </Project>

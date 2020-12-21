@@ -3,27 +3,26 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CarpetRadar.Web2</title>
+    <title>Carpetradar24: Live Flight Tracker - @ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link href="~/kover_na_oblachke.ico" rel="shortcut icon" type="image/png" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">CarpetRadar.Web2</a>
+                <a class="navbar-brand" asp-area="" asp-page="/Radar">🗺✨Magic Carpets Radar</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-page="/DesktopClient">📟 Desktop Client</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-page="/Statistics">📜Chronicle</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-page="/LoginOrRegister">🎭 Introduce yourself</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-page="/Logout">💫Log out</a></li>
                     </ul>
                 </div>
             </div>
@@ -37,7 +36,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2020 - CarpetRadar.Web2 - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; 2020 - carpetradar24 💎
         </div>
     </footer>
 

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using CarpetRadar.Services.DataStorage;
 using CarpetRadar.Services.IdentityServices;
 using CarpetRadar.Services.Models;

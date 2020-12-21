@@ -1,0 +1,29 @@
+﻿@page
+@model CarpetRadar.Web2.Pages.LoginOrRegisterModel
+@{
+    ViewData["Title"] = "Login or Register";
+}
+
+
+<h1>Login</h1>
+<form method="post">
+    <p>User name: <input type="text" name="userName"></p>
+    <p>Password: <input type="password" name="password"></p>
+    <input type="submit" asp-page-handler="Login">
+    @foreach (var errorMessage in Model.LoginErrors ?? new List<string>())
+    {
+        <p style="color: crimson">@errorMessage</p>
+    }
+</form>
+<h3 align="center">Or</h3>
+<h1>Register</h1>
+<form method="post">
+    <p>User name: <input type="text" name="userName"></p>
+    <p>Company: <input type="text" name="company"></p>
+    <p>Password: <input type="password" name="password"></p>
+    <input type="submit" asp-page-handler="Register">
+    @foreach (var errorMessage in Model.RegisterErrors ?? new List<string>())
+    {
+        <p style="color: crimson">@errorMessage</p>
+    }
+</form>

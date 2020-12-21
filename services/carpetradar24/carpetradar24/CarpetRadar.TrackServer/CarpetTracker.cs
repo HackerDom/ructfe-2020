@@ -39,6 +39,8 @@ namespace CarpetRadar.TrackServer
 
         private void AddSomeTestData()
         {
+            var r = new Random();
+
             var rs = new RegistrationService(dataStorage, logger);
             for (int i = 0; i < 5; i++)
             {
@@ -46,38 +48,40 @@ namespace CarpetRadar.TrackServer
                 var login = i + "i" + id;
                 var userId = rs.RegisterUser(login, "password", "company " + id).Result;
 
-                var r = new Random();
-                var flightId = Guid.NewGuid();
-
-                for (int j = 0; j < 20; j++)
+                for (int f = 0; f < 4; f++)
                 {
-                    int x = r.Next();
-                    int y = r.Next();
-                    var c = new FlightState
+                    var flightId = Guid.NewGuid();
+
+                    for (int j = 0; j < 20; j++)
                     {
-                        FlightId = flightId,
-                        Finished = false,
-                        Label = "label " + id,
-                        License = "license " + id,
-                        X = x,
-                        Y = y
-                    };
-                    dataStorage.AddFlightState(c, userId.Value).GetAwaiter().GetResult();
+                        int x = r.Next();
+                        int y = r.Next();
+                        var c = new FlightState
+                        {
+                            FlightId = flightId,
+                            Finished = false,
+                            Label = "label " + id,
+                            License = "license " + id,
+                            X = x,
+                            Y = y
+                        };
+                        dataStorage.AddFlightState(c, userId.Value).GetAwaiter().GetResult();
+                    }
                 }
             }
 
-            var fs = new FlightState
-            {
-                FlightId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
-                X = 255,
-                Y = 256 * 256 - 1,
-                License = Guid.Empty.ToString("N"),
-                Token = Guid.Empty.ToString("N"),
-                Finished = true,
-                Label = "LABELlabelLABEL",
-            };
-            var bf = new BinaryFormatter();
-            bf.Serialize(new FileStream("flight_state_example1.bin", FileMode.Create), fs);
+            //var fs = new FlightState
+            //{
+            //    FlightId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+            //    X = 255,
+            //    Y = 256 * 256 - 1,
+            //    License = Guid.Empty.ToString("N"),
+            //    Token = Guid.Empty.ToString("N"),
+            //    Finished = true,
+            //    Label = "LABELlabelLABEL",
+            //};
+            //var bf = new BinaryFormatter();
+            //bf.Serialize(new FileStream("flight_state_example1.bin", FileMode.Create), fs);
         }
 
         public void StartListener()
@@ -157,7 +161,7 @@ namespace CarpetRadar.TrackServer
                     return;
                 }
 
-                var currentPositions = await dataStorage.GetCurrentPositions().ToArray();
+                var currentPositions = (await dataStorage.GetCurrentPositions()).ToArray();
 
                 using (var ms = new MemoryStream())
                 {

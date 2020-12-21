@@ -13,7 +13,7 @@
     </asp:PlaceHolder>
 
     <webopt:bundlereference runat="server" path="~/Content/css" />
-    <link href="~/ковер_на_облачке.ico" rel="shortcut icon" type="image/png" />
+    <link href="~/kover_na_oblachke.ico" rel="shortcut icon" type="image/png" />
 
 </head>
 <body>

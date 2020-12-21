@@ -1,0 +1,53 @@
+﻿@page
+@model CarpetRadar.Web2.Pages.StatisticsModel
+@{
+    ViewData["Title"] = "Statistics";
+}
+
+
+@if (!Model.IsAuthenticated)
+{
+    <h3>Your authentication session has expired. Please <a asp-page="/LoginOrRegister">log in</a></h3>
+}
+else
+{
+    <h3>Account information</h3>
+    <p>
+        <b>Login:</b> @Model.UserInfo.Login</p>
+    <p>
+        <b>Company:</b> @Model.UserInfo.Company</p>
+    <h3>Your magic flights</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Aerial vehicle</th>
+            <th>License</th>
+            <th>Start location</th>
+            <th>Last location</th>
+            <th>Total distance</th>
+            <th>Start time</th>
+            <th>Last time</th>
+            <th>Total travel time</th>
+            <th>Is flight finished</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var cp in Model.UserFlights)
+        {
+            var totalDistance = cp.X.Zip(cp.Y, (x, y) => Math.Sqrt((double) x * x + (double) y * y)).Sum();
+            var totalTime = (cp.ReportMoments.Last() - cp.ReportMoments.First());
+            <tr>
+                <td>@cp.Label</td>
+                <td>@cp.License</td>
+                <td>(@cp.X.First(); @cp.Y.First())</td>
+                <td>(@cp.X.Last(); @cp.Y.Last())</td>
+                <td>@totalDistance</td>
+                <td>@cp.ReportMoments.First()</td>
+                <td>@cp.ReportMoments.Last()</td>
+                <td>@totalTime</td>
+                <td>@cp.Finished</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

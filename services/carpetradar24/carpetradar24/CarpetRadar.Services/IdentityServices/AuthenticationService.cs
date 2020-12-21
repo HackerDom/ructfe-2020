@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CarpetRadar.Services.DataStorage;
 
@@ -21,6 +22,12 @@ namespace CarpetRadar.Services.IdentityServices
 
         public async Task<Guid?> ResolveUser(string token)
         {
+            if (string.IsNullOrEmpty(token))
+                return null;
+
+            if (!Regex.IsMatch(token, "^\\w{32}$"))
+                return null;
+
             var (userId, authTime) = await dataStorage.FindUser(token);
 
             if (userId == null || authTime == null)
@@ -38,7 +45,7 @@ namespace CarpetRadar.Services.IdentityServices
 
             var result = await dataStorage.GetUserIdAndPasswordHash(login);
             if (result == null)
-                return null; /// different errors?
+                return null;
 
             var (userId, realPasswordHash) = result.Value;
             if (passwordHash != realPasswordHash)
