@@ -1,10 +1,11 @@
 name: CI
 on:
   push:
-    branches: [ $default-branch ]
+    branches:
+      - main
     paths:
-      - services/**
-      - checkers/**
+      - 'services/**'
+      - 'checkers/**'
   workflow_dispatch: {}
 
 jobs:
@@ -16,6 +17,7 @@ jobs:
         service:
           - sesame
           - office
+      fail-fast: false
 
     steps:
     - name: Checkout repo
@@ -30,7 +32,7 @@ jobs:
         python-version: 3.8.5
 
     - name: Setup checker libraries
-      run: if [ -f checkers/${{ matrix.service }}/requirements.txt]; then python -m pip install -r checkers/${{ matrix.service }}/requirements.txt; fi
+      run: if [ -f checkers/${{ matrix.service }}/requirements.txt ]; then python -m pip install -r checkers/${{ matrix.service }}/requirements.txt; fi
 
     - name: Test checker on service
       run: checkers/${{ matrix.service }}/checker.py TEST 127.0.0.1
