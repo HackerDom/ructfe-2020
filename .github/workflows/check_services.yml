@@ -1,0 +1,22 @@
+name: CI
+on:
+ push:
+  branches: [ $default-branch ]
+
+jobs:
+  check_services:
+    name: Check service ${{ matrix.service }}
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        service:
+          - sesame
+          - office
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Check service ${{ matrix.service }}
+      run: ./check_service.sh ${{ matrix.service }}
+
