@@ -1,3 +1,6 @@
+let uploadFilename = null;
+
+
 $(document).ready(function() {
     main();
 });
@@ -10,19 +13,20 @@ function listFiles() {
         success: function (e) {
             files = e;
         },
-        error: function (e) {
-            console.log(e);
-        },
         async:false
     });
     return files;
 }
 
 
+function buildFileUrl(filename) {
+    return "/files/" + (path.concat([filename])).join("/");
+}
+
 function catFile(filename) {
     let result = null;
     $.get({
-        url: "/files/" + (path.concat([filename])).join("/"),
+        url: buildFileUrl(filename),
         success: function (e) {
             result = e;
         },
@@ -31,7 +35,15 @@ function catFile(filename) {
         },
         async:false
     });
+    if (typeof result !== "string") {
+        return null;
+    }
     return result;
+}
+
+
+function isFile(filename) {
+    return catFile(filename) !== null;
 }
 
 
@@ -58,23 +70,23 @@ function processLS(args, term) {
 
 
 function processCD(args, term) {
-    let newPath = args[0];
-    if (!listFiles().includes(newPath) && newPath !== "..") {
-        term.echo(`No such file or directory: '${newPath}'`);
-    } else {
-        if (newPath === "..") {
+    let newPathParts = args[0].split("/");
+    let oldPath = [...path];
+
+    newPathParts.forEach(function (pathPart) {
+        if (pathPart === "..") {
             if (path.length !== 0) {
                 path.pop();
             }
         } else {
-            path.push(newPath);
+            path.push(pathPart);
             let res = listFiles();
-            if (typeof(res) !== "object") {
-                term.echo(`Incorrect path '${newPath}'`);
-                path.pop();
+            if (res === null || typeof res !== "object") {
+                term.echo(`Incorrect path '${args[0]}'`);
+                path = oldPath;
             }
         }
-    }
+    });
     term.set_prompt(buildPrompt());
 }
 
@@ -83,7 +95,7 @@ function processCAT(args, term) {
     let catPath = args[0];
     let fileContent = catFile(catPath);
     if (fileContent === null) {
-        console.log("!");
+        term.echo(`No such file '${catPath}'`);
     } else {
         term.echo(fileContent);
     }
@@ -95,11 +107,38 @@ function processPWD(args, term) {
 }
 
 
+function processDownload(args, term) {
+    if (args.length === 0 || args[0].length === 0) {
+        term.echo("Pass one argument as filename to download");
+        return;
+    }
+    let filename = args[0];
+    if (!isFile(filename)) {
+        term.echo(`No such file '${filename}'`);
+    } else {
+        let url = `/files/${(path.concat([filename])).join("/")}`;
+        window.open(url, '_blank');
+    }
+}
+
+
+function processUpload(args, term) {
+    if (args.length === 0 || args[0].length === 0) {
+        term.echo("Pass one argument as filename to upload");
+        return;
+    }
+    uploadFilename = args[0];
+    $("#ufile").click();
+}
+
+
 const processors = {
     'ls': processLS,
     'cd': processCD,
     'cat': processCAT,
     'pwd': processPWD,
+    'download': processDownload,
+    'upload': processUpload,
 };
 
 
@@ -128,5 +167,14 @@ function main() {
             prompt: cmd_prompt
             // prompt: 'user@keeper: ~/path '
         });
+    });
+
+    $("#ufile").on("change", function (e) {
+        let file = $("#ufile")[0].files[0];
+        file.name = uploadFilename;
+        let formData = new FormData();
+
+        formData.append("file", file);
+        fetch(buildFileUrl(uploadFilename), {method: "POST", body: formData});
     });
 }

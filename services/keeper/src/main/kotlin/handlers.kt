@@ -15,12 +15,12 @@ fun App.getAuthenticatedUser(ctx: Context): String? {
 }
 
 
-fun App.addMainHandler(): Javalin = javalin.get("/files/*") { ctx ->
+fun App.checkFilesAccess(ctx: Context): File? {
     val authenticatedUser = getAuthenticatedUser(ctx)
 
     if (authenticatedUser == null) {
         ctx.status(403)
-        return@get
+        return null
     }
 
     val authenticatedUserDir = File(STORAGE_PATH).resolve(authenticatedUser)
@@ -30,8 +30,15 @@ fun App.addMainHandler(): Javalin = javalin.get("/files/*") { ctx ->
 
     if (!ctx.path().startsWith(OtherConstants.FILES_PATH)) {
         ctx.status(400)
-        return@get
+        return null
     }
+
+    return authenticatedUserDir
+}
+
+
+fun App.addFilesHandler(): Javalin = javalin.get("/files/*") { ctx ->
+    val authenticatedUserDir = checkFilesAccess(ctx) ?: return@get
 
     val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length)
 
@@ -53,7 +60,23 @@ fun App.addMainHandler(): Javalin = javalin.get("/files/*") { ctx ->
 }
 
 
-fun App.addFilesHandler(): Javalin = javalin.get("/main") { ctx ->
+fun App.addUploadFilesHandler(): Javalin = javalin.post("/files/*") { ctx ->
+    val authenticatedUserDir = checkFilesAccess(ctx) ?: return@post
+    val newFile = ctx.uploadedFile("file") ?: return@post
+
+    val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length)
+
+    val file = authenticatedUserDir.resolve(lastPath)
+    if (file.exists()) {
+        ctx.status(400)
+        return@post
+    }
+
+    file.writeBytes(newFile.content.readAllBytes())
+}
+
+
+fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
     val authenticatedUser = getAuthenticatedUser(ctx)
 
     if (authenticatedUser == null) {
@@ -81,21 +104,23 @@ fun App.addFilesHandler(): Javalin = javalin.get("/main") { ctx ->
             script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
             script(null, "https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.20.1/js/jquery.terminal.min.js") {}
             script(null, "/js/main.js") {}
-            link(href = "https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.20.1/css/jquery.terminal.min.css", rel = "stylesheet")
+            link(
+                href = "https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.20.1/css/jquery.terminal.min.css",
+                rel = "stylesheet"
+            )
             link(href = "/css/main.css", rel = "stylesheet")
         }
         body {
-//                +"$authenticatedUser@keeper: ${File("~").resolve(lastPath)}"
-//                ul {
-//                    for (name in file.list() ?: emptyArray()) {
-//                        li {
-//                            a(File(ctx.path()).resolve(name).toString()) {
-//                                +name
-//                            }
-//                        }
-//                    }
-//                }
             div { id = "term_demo" }
+//            div {
+//                id = "download"
+////                style = "display: none;"
+//                a(href = "/files/file") {
+//                    id = "dlink"
+//                    +"Download"
+//                }
+//            }
+            input(type = InputType.file) { id = "ufile" }
         }
     }
     ctx.contentType("text/html")
@@ -189,4 +214,15 @@ fun App.addRegisterHandler(): Javalin = javalin.post(Endpoints.REGISTER) { ctx -
 
     userStorage.create(login, password)
     authenticate(ctx, login)
+}
+
+fun App.addUploadHandler() {
+    //    app.javalin.post("/upload") { ctx ->
+//        ctx.uploadedFiles("files").forEach { (contentType, content, name, extension) ->
+//            println(contentType)
+//            println(content)
+//            println(name)
+//            println(extension)
+//        }
+//    }
 }
