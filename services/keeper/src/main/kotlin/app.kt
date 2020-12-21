@@ -17,13 +17,14 @@ fun main(args: Array<String>) {
     val sessionManager = SessionManager("mount/sessions")
     val javalin = Javalin.create { config ->
         config.addStaticFiles("src/main/resources/static", Location.EXTERNAL)
-    }.start(8080)
+    }.start(3687)
     val app = App(javalin, userStorage, sessionManager).apply {
         addRegisterPageHandler()
         addLoginPageHandler()
         addLoginHandler()
         addRegisterHandler()
         addMainHandler()
+        addIndexHandler()
         addFilesHandler()
         addUploadFilesHandler()
     }

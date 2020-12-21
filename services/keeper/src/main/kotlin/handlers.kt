@@ -62,7 +62,7 @@ fun App.addFilesHandler(): Javalin = javalin.get("/files/*") { ctx ->
 
 fun App.addUploadFilesHandler(): Javalin = javalin.post("/files/*") { ctx ->
     val authenticatedUserDir = checkFilesAccess(ctx) ?: return@post
-    val newFile = ctx.uploadedFile("file") ?: return@post
+    val newFile = ctx.uploadedFile("file") ?: return@post  // TODO: Use try-catch
 
     val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length)
 
@@ -73,6 +73,11 @@ fun App.addUploadFilesHandler(): Javalin = javalin.post("/files/*") { ctx ->
     }
 
     file.writeBytes(newFile.content.readAllBytes())
+}
+
+
+fun App.addIndexHandler(): Javalin = javalin.get("/") { ctx ->
+    ctx.redirect("/main")
 }
 
 
@@ -199,7 +204,7 @@ fun App.authenticate(ctx: Context, login: String) {
     val secret = sessionManager.create(login)
     ctx.cookie("login", login)
     ctx.cookie("secret", secret)
-    ctx.redirect("/")
+    ctx.redirect("/main")
 }
 
 
