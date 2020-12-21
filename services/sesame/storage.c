@@ -3,7 +3,7 @@
 
 #include "storage.h"
 
-#define MAXITEMS 4096
+#define MAXITEMS 16384
 #define MAXNODES (MAXITEMS * 32 + 1)
 
 #define HAS_VALUE -1
