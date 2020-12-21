@@ -25,6 +25,13 @@ func (s *usersService) Mount(mux *chi.Mux) {
 		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) {
 			return s.Register(ctx, req.(*pb.RegisterRequest))
 		})
+	httprpc.New("POST", "/users/login").
+		Mount(mux).
+		WithJSONPbReader(&pb.RegisterRequest{}).
+		WithJSONPbWriter().
+		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) {
+			return s.Register(ctx, req.(*pb.RegisterRequest))
+		})
 	httprpc.New("POST", "/users/list").
 		Mount(mux).
 		WithJSONPbReader(&pb.ListRequest{}).
@@ -51,4 +58,10 @@ func (s *usersService) Register(ctx context.Context, req *pb.RegisterRequest) (*
 	return &pb.RegisterResponse{
 		User: u,
 	}, nil
+}
+
+func (s *usersService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+	// TODO: [12/21/20] (vaspahomov): 
+	panic("not implemented")
+	return &pb.LoginResponse{}, nil
 }
