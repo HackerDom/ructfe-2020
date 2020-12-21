@@ -43,6 +43,6 @@ services:
     # don't forget limits for your database!
     mem_limit: 1G
     memswap_limit: 1G
-    pids_limit: 1000
+    pids_limit: 100
 volumes:
   data:
