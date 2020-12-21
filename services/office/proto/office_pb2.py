@@ -17,9 +17,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='office.proto',
   package='officepb',
   syntax='proto3',
-  serialized_options=b'Z\010proto/pb',
+  serialized_options=b'Z\005proto',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0coffice.proto\x12\x08officepb\"3\n\x04User\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x0b\n\x03\x62io\x18\x03 \x01(\t\"d\n\x08\x44ocument\x12\n\n\x02id\x18\x01 \x01(\x03\x12\r\n\x05token\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x1e\n\x07\x63ontext\x18\x04 \x01(\x0b\x32\r.officepb.Ctx\x12\x0f\n\x07\x63ontent\x18\x05 \x01(\t\"x\n\x03\x43tx\x12%\n\x04vars\x18\x01 \x03(\x0b\x32\x17.officepb.Ctx.VarsEntry\x12\x1d\n\x05\x65xprs\x18\x02 \x03(\x0b\x32\x0e.officepb.Expr\x1a+\n\tVarsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\"\n\x04\x45xpr\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x65xpr\x18\x02 \x01(\t\">\n\x0fRegisterRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x0b\n\x03\x62io\x18\x03 \x01(\t\"0\n\x10RegisterResponse\x12\x1c\n\x04user\x18\x01 \x01(\x0b\x32\x0e.officepb.User\".\n\x0cLoginRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"-\n\rLoginResponse\x12\x1c\n\x04user\x18\x01 \x01(\x0b\x32\x0e.officepb.User\",\n\x0bListRequest\x12\x0e\n\x06offset\x18\x01 \x01(\x05\x12\r\n\x05limit\x18\x02 \x01(\x05\"!\n\x0cListResponse\x12\x11\n\tusernames\x18\x01 \x03(\t\"2\n\x15\x43reateDocumentRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0b\n\x03\x64oc\x18\x02 \x01(\t\"3\n\x16\x43reateDocumentResponse\x12\n\n\x02id\x18\x01 \x01(\x03\x12\r\n\x05token\x18\x02 \x01(\t\"5\n\x14ListDocumentsRequest\x12\x0e\n\x06offset\x18\x01 \x01(\x05\x12\r\n\x05limit\x18\x02 \x01(\x05\")\n\rShortDocument\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0c\n\x04name\x18\x03 \x01(\t\">\n\x15ListDocumentsResponse\x12%\n\x04\x64ocs\x18\x01 \x03(\x0b\x32\x17.officepb.ShortDocument\"2\n\x0e\x45xecuteRequest\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x0e\n\x06\x64oc_id\x18\x02 \x01(\x03\"#\n\x0f\x45xecuteResponse\x12\x10\n\x08\x65xecuted\x18\x01 \x01(\t2\x85\x01\n\x05Users\x12\x43\n\x08Register\x12\x19.officepb.RegisterRequest\x1a\x1a.officepb.RegisterResponse\"\x00\x12\x37\n\x04List\x12\x15.officepb.ListRequest\x1a\x16.officepb.ListResponse\"\x00\x32\xe7\x01\n\tDocuments\x12I\n\x04List\x12\x1e.officepb.ListDocumentsRequest\x1a\x1f.officepb.ListDocumentsResponse\"\x00\x12M\n\x06\x43reate\x12\x1f.officepb.CreateDocumentRequest\x1a .officepb.CreateDocumentResponse\"\x00\x12@\n\x07\x45xecute\x12\x18.officepb.ExecuteRequest\x1a\x19.officepb.ExecuteResponse\"\x00\x42\nZ\x08proto/pbb\x06proto3'
+  serialized_pb=b'\n\x0coffice.proto\x12\x08officepb\"3\n\x04User\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x0b\n\x03\x62io\x18\x03 \x01(\t\"d\n\x08\x44ocument\x12\n\n\x02id\x18\x01 \x01(\x03\x12\r\n\x05token\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x1e\n\x07\x63ontext\x18\x04 \x01(\x0b\x32\r.officepb.Ctx\x12\x0f\n\x07\x63ontent\x18\x05 \x01(\t\"x\n\x03\x43tx\x12%\n\x04vars\x18\x01 \x03(\x0b\x32\x17.officepb.Ctx.VarsEntry\x12\x1d\n\x05\x65xprs\x18\x02 \x03(\x0b\x32\x0e.officepb.Expr\x1a+\n\tVarsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\"\n\x04\x45xpr\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x65xpr\x18\x02 \x01(\t\">\n\x0fRegisterRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x0b\n\x03\x62io\x18\x03 \x01(\t\"0\n\x10RegisterResponse\x12\x1c\n\x04user\x18\x01 \x01(\x0b\x32\x0e.officepb.User\".\n\x0cLoginRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\" \n\rLoginResponse\x12\x0f\n\x07session\x18\x01 \x01(\t\",\n\x0bListRequest\x12\x0e\n\x06offset\x18\x01 \x01(\x05\x12\r\n\x05limit\x18\x02 \x01(\x05\"!\n\x0cListResponse\x12\x11\n\tusernames\x18\x01 \x03(\t\"2\n\x15\x43reateDocumentRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0b\n\x03\x64oc\x18\x02 \x01(\t\"3\n\x16\x43reateDocumentResponse\x12\n\n\x02id\x18\x01 \x01(\x03\x12\r\n\x05token\x18\x02 \x01(\t\"5\n\x14ListDocumentsRequest\x12\x0e\n\x06offset\x18\x01 \x01(\x05\x12\r\n\x05limit\x18\x02 \x01(\x05\")\n\rShortDocument\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0c\n\x04name\x18\x03 \x01(\t\">\n\x15ListDocumentsResponse\x12%\n\x04\x64ocs\x18\x01 \x03(\x0b\x32\x17.officepb.ShortDocument\"2\n\x0e\x45xecuteRequest\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x0e\n\x06\x64oc_id\x18\x02 \x01(\x03\"#\n\x0f\x45xecuteResponse\x12\x10\n\x08\x65xecuted\x18\x01 \x01(\t2\x85\x01\n\x05Users\x12\x43\n\x08Register\x12\x19.officepb.RegisterRequest\x1a\x1a.officepb.RegisterResponse\"\x00\x12\x37\n\x04List\x12\x15.officepb.ListRequest\x1a\x16.officepb.ListResponse\"\x00\x32\xe7\x01\n\tDocuments\x12I\n\x04List\x12\x1e.officepb.ListDocumentsRequest\x1a\x1f.officepb.ListDocumentsResponse\"\x00\x12M\n\x06\x43reate\x12\x1f.officepb.CreateDocumentRequest\x1a .officepb.CreateDocumentResponse\"\x00\x12@\n\x07\x45xecute\x12\x18.officepb.ExecuteRequest\x1a\x19.officepb.ExecuteResponse\"\x00\x42\x07Z\x05protob\x06proto3'
 )
 
 
@@ -373,9 +373,9 @@ _LOGINRESPONSE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='user', full_name='officepb.LoginResponse.user', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      name='session', full_name='officepb.LoginResponse.session', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -392,7 +392,7 @@ _LOGINRESPONSE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=501,
-  serialized_end=546,
+  serialized_end=533,
 )
 
 
@@ -430,8 +430,8 @@ _LISTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=548,
-  serialized_end=592,
+  serialized_start=535,
+  serialized_end=579,
 )
 
 
@@ -462,8 +462,8 @@ _LISTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=594,
-  serialized_end=627,
+  serialized_start=581,
+  serialized_end=614,
 )
 
 
@@ -501,8 +501,8 @@ _CREATEDOCUMENTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=629,
-  serialized_end=679,
+  serialized_start=616,
+  serialized_end=666,
 )
 
 
@@ -540,8 +540,8 @@ _CREATEDOCUMENTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=681,
-  serialized_end=732,
+  serialized_start=668,
+  serialized_end=719,
 )
 
 
@@ -579,8 +579,8 @@ _LISTDOCUMENTSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=734,
-  serialized_end=787,
+  serialized_start=721,
+  serialized_end=774,
 )
 
 
@@ -618,8 +618,8 @@ _SHORTDOCUMENT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=789,
-  serialized_end=830,
+  serialized_start=776,
+  serialized_end=817,
 )
 
 
@@ -650,8 +650,8 @@ _LISTDOCUMENTSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=832,
-  serialized_end=894,
+  serialized_start=819,
+  serialized_end=881,
 )
 
 
@@ -689,8 +689,8 @@ _EXECUTEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=896,
-  serialized_end=946,
+  serialized_start=883,
+  serialized_end=933,
 )
 
 
@@ -721,8 +721,8 @@ _EXECUTERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=948,
-  serialized_end=983,
+  serialized_start=935,
+  serialized_end=970,
 )
 
 _DOCUMENT.fields_by_name['context'].message_type = _CTX
@@ -730,7 +730,6 @@ _CTX_VARSENTRY.containing_type = _CTX
 _CTX.fields_by_name['vars'].message_type = _CTX_VARSENTRY
 _CTX.fields_by_name['exprs'].message_type = _EXPR
 _REGISTERRESPONSE.fields_by_name['user'].message_type = _USER
-_LOGINRESPONSE.fields_by_name['user'].message_type = _USER
 _LISTDOCUMENTSRESPONSE.fields_by_name['docs'].message_type = _SHORTDOCUMENT
 DESCRIPTOR.message_types_by_name['User'] = _USER
 DESCRIPTOR.message_types_by_name['Document'] = _DOCUMENT
@@ -889,8 +888,8 @@ _USERS = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=986,
-  serialized_end=1119,
+  serialized_start=973,
+  serialized_end=1106,
   methods=[
   _descriptor.MethodDescriptor(
     name='Register',
@@ -925,8 +924,8 @@ _DOCUMENTS = _descriptor.ServiceDescriptor(
   index=1,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1122,
-  serialized_end=1353,
+  serialized_start=1109,
+  serialized_end=1340,
   methods=[
   _descriptor.MethodDescriptor(
     name='List',
