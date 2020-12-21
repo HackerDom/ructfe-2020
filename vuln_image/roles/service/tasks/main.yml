@@ -40,3 +40,7 @@
     chdir: "/home/{{ service_name }}/"
     warn: no
 
+- name: Restart service {{ service_name }}
+  systemd: name={{ service_name }} state=restarted
+  tags: [start_service]
+

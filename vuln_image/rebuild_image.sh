@@ -30,7 +30,7 @@ while ! $SSH echo "SSH CONNECTED"; do
 done
 
 # Deploy updates
-ansible-playbook -i ansible_hosts --key-file keys/id_rsa image.yml
+ansible-playbook -i ansible_hosts --key-file keys/id_rsa --skip-tags "start_service" image.yml
 
 ## for debug
 #exit 1
