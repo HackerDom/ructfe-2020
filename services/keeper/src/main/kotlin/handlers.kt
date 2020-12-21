@@ -2,6 +2,7 @@ import io.javalin.Javalin
 import io.javalin.http.Context
 import kotlinx.html.*
 import java.io.File
+import java.nio.file.Path
 
 
 fun App.getAuthenticatedUser(ctx: Context): String? {
@@ -14,7 +15,45 @@ fun App.getAuthenticatedUser(ctx: Context): String? {
 }
 
 
-fun App.addMainHandler(): Javalin = javalin.get("/*") { ctx ->
+fun App.addMainHandler(): Javalin = javalin.get("/files/*") { ctx ->
+    val authenticatedUser = getAuthenticatedUser(ctx)
+
+    if (authenticatedUser == null) {
+        ctx.status(403)
+        return@get
+    }
+
+    val authenticatedUserDir = File(STORAGE_PATH).resolve(authenticatedUser)
+    if (!authenticatedUserDir.exists()) {
+        authenticatedUserDir.mkdirs()
+    }
+
+    if (!ctx.path().startsWith(OtherConstants.FILES_PATH)) {
+        ctx.status(400)
+        return@get
+    }
+
+    val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length)
+
+    val file = authenticatedUserDir.resolve(lastPath)
+    if (!file.exists()) {
+        ctx.status(400)
+        return@get
+    }
+
+    if (file.isFile) {
+        ctx.result(file.readBytes())
+        return@get
+    }
+
+    if (file.isDirectory) {
+        ctx.json((file.list() ?: emptyArray()) as Array<String>)
+        return@get
+    }
+}
+
+
+fun App.addFilesHandler(): Javalin = javalin.get("/main") { ctx ->
     val authenticatedUser = getAuthenticatedUser(ctx)
 
     if (authenticatedUser == null) {
@@ -30,38 +69,36 @@ fun App.addMainHandler(): Javalin = javalin.get("/*") { ctx ->
         return@get
     }
 
-    val authenticatedUserDir = File(STORAGE_PATH).resolve(authenticatedUser)
-    if (!authenticatedUserDir.exists()) {
-        authenticatedUserDir.mkdirs()
-    }
-
-    val file = authenticatedUserDir.resolve(ctx.path().substring(1))
-    if (!file.exists()) {
-        ctx.result("Not found")
-        return@get
-    }
-
-    if (file.isFile) {
-        ctx.result(file.readBytes())
-        return@get
-    }
-
-    if (file.isDirectory) {
-        ctx.withHtml {
-            body {
-                ul {
-                    for (name in file.list()) {
-                        li {
-                            a(File(ctx.path()).resolve(name).toString()) {
-                                +name
-                            }
-                        }
-                    }
+    ctx.withHtml {
+        head {
+            script {
+                unsafe {
+                    +"let path = [];"
+                    +"let username = \"$authenticatedUser\";"
+                    +"let cmd_prompt = \"$authenticatedUser@keeper:~ \";"
                 }
             }
+            script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
+            script(null, "https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.20.1/js/jquery.terminal.min.js") {}
+            script(null, "/js/main.js") {}
+            link(href = "https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.20.1/css/jquery.terminal.min.css", rel = "stylesheet")
+            link(href = "/css/main.css", rel = "stylesheet")
         }
-        ctx.contentType("text/html")
+        body {
+//                +"$authenticatedUser@keeper: ${File("~").resolve(lastPath)}"
+//                ul {
+//                    for (name in file.list() ?: emptyArray()) {
+//                        li {
+//                            a(File(ctx.path()).resolve(name).toString()) {
+//                                +name
+//                            }
+//                        }
+//                    }
+//                }
+            div { id = "term_demo" }
+        }
     }
+    ctx.contentType("text/html")
 }
 
 

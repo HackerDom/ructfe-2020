@@ -4,3 +4,8 @@ object Endpoints {
     const val LOGIN = "/login"
     const val REGISTER = "/register"
 }
+
+
+object OtherConstants {
+    const val FILES_PATH = "/files/"
+}

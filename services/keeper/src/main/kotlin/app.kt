@@ -1,4 +1,6 @@
 import io.javalin.Javalin
+import io.javalin.http.staticfiles.Location
+import java.io.File
 
 
 const val STORAGE_PATH = "mount/storage"
@@ -15,13 +17,18 @@ fun main(args: Array<String>) {
     val userStorage = UserStorage("mount/users")
     val sessionManager = SessionManager("mount/sessions")
 
-    val javalin = Javalin.create().start(8080)
+    println(File("src/main/resources/static").exists())
+//    return
+    val javalin = Javalin.create { config ->
+        config.addStaticFiles("src/main/resources/static", Location.EXTERNAL)
+    }.start(8080)
     val app = App(javalin, userStorage, sessionManager).apply {
         addRegisterPageHandler()
         addLoginPageHandler()
         addLoginHandler()
-        addMainHandler()
         addRegisterHandler()
+        addFilesHandler()
+        addMainHandler()
     }
 
 //    app.javalin.post("/upload") { ctx ->
