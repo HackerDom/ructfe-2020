@@ -21,3 +21,6 @@ typedef intptr string;
 
 #define false 0
 #define true 1
+
+#define MAXRECV 1024
+#define MAXSEND 4096

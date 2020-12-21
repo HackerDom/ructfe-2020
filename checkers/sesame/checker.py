@@ -25,9 +25,8 @@ def check_service(request: CheckRequest) -> Verdict:
 def put_flag(request: PutRequest) -> Verdict:
     url = "http://" + request.hostname + ":4280/"
     try:
-        response = requests.post(url, data = { "secret": request.flag[:31] })
-        soup = BeautifulSoup(response.text, features="html.parser")
-        key = soup.find(id="key").text.strip()
+        response = requests.post(url, data = { "secret": request.flag[:31] }, allow_redirects = False)
+        key = response.headers['Location'][1:]
         print("Saved flag " + request.flag)
         return Verdict.OK(key)
     except:

@@ -62,8 +62,8 @@ struct epoll_event events[MAXEVENTS];
 
 #define MAXFDS 16 * 1024
 struct client_state {
-	char recvbuf[1024];
-	char sendbuf[1024];
+	char recvbuf[MAXRECV];
+	char sendbuf[MAXSEND];
 	uint64 transferred;
 	uint32 connected_at;
 	uint64 to_send;
@@ -174,23 +174,30 @@ void run()
 				int cli = events[i].data.fd;
 				if (events[i].events & EPOLLIN)
 				{
-					clients[cli].transferred += read(cli, 
+					// printf("Reading from %d\n", cli);
+					uint64 bytes_read = read(cli, 
 						clients[cli].recvbuf + clients[cli].transferred, 
 						sizeof(clients[cli].recvbuf) - clients[cli].transferred - 1);
-					if (process_request(clients[cli].recvbuf, clients[cli].sendbuf))
+					if (bytes_read == 0)
 					{
-						clients[cli].to_send = strlen(clients[cli].sendbuf);
-						clients[cli].transferred = 0;
+						close(cli);
+						continue;
 					}
+					clients[cli].transferred += bytes_read;
+					clients[cli].recvbuf[clients[cli].transferred] = 0;
+					// printf("Request from %d, errno = %d:\n%s\n\n", cli, errno, clients[cli].recvbuf);
+					if (process_request(clients[cli].recvbuf, clients[cli].sendbuf, &clients[cli].to_send))
+						clients[cli].transferred = 0;
 				}
 				else if (clients[cli].to_send > 0)
 				{
-					clients[cli].transferred += write(cli, 
+					uint64 bytes_written = write(cli, 
 						clients[cli].sendbuf + clients[cli].transferred, 
 						clients[cli].to_send - clients[cli].transferred);
-					if (clients[cli].transferred >= clients[cli].to_send)
+					clients[cli].transferred += bytes_written;
+					if (clients[cli].transferred >= clients[cli].to_send || bytes_written == 0)
 						close(cli);
-					// printf("Transferring response:\n%s\n", clients[cli].sendbuf);
+					//printf("Response:\n%s\n\n", clients[cli].sendbuf);
 				}
 			}
 		}
