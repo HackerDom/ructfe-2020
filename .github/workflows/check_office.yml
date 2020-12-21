@@ -1,0 +1,34 @@
+
+name: Check office
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/office/**'
+      - 'checkers/office/**'
+  workflow_dispatch: {}
+
+jobs:
+  check_services:
+    name: Check office
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Setup office
+      run: (cd ./services/office && docker-compose pull && docker-compose build && docker-compose up --build -d)
+
+    - name: Prepare python for checker
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8.5
+
+    - name: Setup checker libraries
+      run: if [ -f checkers/office/requirements.txt ]; then python -m pip install -r checkers/office/requirements.txt; fi
+
+    - name: Test checker on service
+      run: checkers/office/checker.py TEST 127.0.0.1
+

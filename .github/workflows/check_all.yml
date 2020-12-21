@@ -1,11 +1,5 @@
 name: CI
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'services/**'
-      - 'checkers/**'
   workflow_dispatch: {}
 
 jobs:
