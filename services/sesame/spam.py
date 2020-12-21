@@ -15,9 +15,6 @@ while True:
 	url = 'http://' + host + ':4280/' + ''.join([random.choice(string.ascii_uppercase) for _ in range(32)])
 	requests.post(url, data = { "secret": "FOO" })
 
-	url = 'http://' + host + ':4280/' + ''.join([random.choice(string.ascii_uppercase) for _ in range(32)])
-	requests.get(url)
-
 	delta = time.time() - ts
 
 	reqs += 1
