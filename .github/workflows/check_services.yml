@@ -1,7 +1,11 @@
 name: CI
 on:
- push:
-  branches: [ $default-branch ]
+  push:
+    branches: [ $default-branch ]
+    paths:
+      - services/**
+      - checkers/**
+  workflow_dispatch: {}
 
 jobs:
   check_services:
