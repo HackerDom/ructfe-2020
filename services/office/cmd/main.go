@@ -11,7 +11,7 @@ import (
 
 func main() {
 	l, _ := createLog().Build()
-	docsStorage, usersStorage, err := storage.Init(l)
+	docsStorage, usersStorage, _, err := storage.Init(l)
 	if err != nil {
 		panic(err)
 	}

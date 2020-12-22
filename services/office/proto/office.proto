@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package officepb;
-option go_package = "proto/pb";
+option go_package = "proto";
 
 message User {
   string name = 1;
@@ -43,7 +43,7 @@ message LoginRequest {
 }
 
 message LoginResponse {
-  string user = 1;
+  string session = 1;
 }
 
 message ListRequest {

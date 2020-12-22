@@ -1,0 +1,109 @@
+cs_user: cs
+cs_dir:  /home/cs/checksystem
+cs_scoreboard_dir: /home/cs/ctf-scoreboard-client
+
+pg_cs_user: cs
+pg_cs_pass: Phu7zooh9o
+pg_cs_db: cs
+pg_cs_host: 10.10.10.4
+pg_cs_port: 5432
+pg_max_connections: 4096
+pg_shared_buffers: 32GB
+pg_work_mem: 512MB
+
+cs_limit_nofile: 10000
+
+cs_worker_default_jobs: 4
+cs_worker_checkers_jobs: 128
+cs_worker_checkers_queues: -q checker
+cs_worker_instance: 4
+
+cs_hypnotoad_listen: 127.0.0.1:8080
+cs_hypnotoad_flags_listen: 10.10.10.4:8080
+cs_hypnotoad_workers: 32
+cs_hypnotoad_accepts: 65536
+cs_nginx_upstream_keepalive: 128
+cs_nginx_workers: 8
+cs_nginx_listen: 10.10.10.10:80
+cs_static_path: '/home/cs/ctf-scoreboard-client/scoreboard/build'
+
+cs_base_url: https://monitor.ructfe.org/
+cs_admin_auth: root:Weez3ierie
+cs_ctf_name: RuCTFE 2020
+cs_flags_secret: Eigaa7sum4
+cs_round_length: 60
+cs_flag_life_time: 15
+# cs_time: "['2020-12-26 16:00:00', '2020-12-26 23:59:59']"
+cs_time: "['2020-12-20 11:00:00', '2020-12-26 12:00:00']"
+
+teams: |
+  {name => 'SharLike', network => '10.60.3.0/24', host => '10.60.3.2', token => '60_4d9af39c7542929b0af363c020472686', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/sharlike'},
+  {name => 'kks', network => '10.60.4.0/24', host => '10.60.4.2', token => '11_4593dbb8888fc6bec483461e42acba67', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/kks'},
+  {name => '[SPbCTF] fargate', network => '10.60.5.0/24', host => '10.60.5.2', token => '626_18133c9647b31ccd20f679dce7b66680', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/spbctf-fargate'},
+  {name => '0FA', network => '10.60.6.0/24', host => '10.60.6.2', token => '603_e6dd12ef740535dfd6ce7c358c34ae76', country => 'Switzerland', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/0fa'},
+  {name => 'ENOSERVICE', network => '10.60.7.0/24', host => '10.60.7.2', token => '122_05e8ecde39edfd8e170f0a3fccaa8837', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/enoservice'},
+  {name => 'Lunary', network => '10.60.8.0/24', host => '10.60.8.2', token => '167_9d543119815f3aa4fc58b722d901fe26', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/lunary'},
+  {name => 'DH', network => '10.60.9.0/24', host => '10.60.9.2', token => '599_aa07f7b30fbd8a6367c032ca9c45849d', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/dh'},
+  {name => 'WHat', network => '10.60.10.0/24', host => '10.60.10.2', token => '337_3846a328a385bf33c12559069fe2f94f', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/what'},
+  {name => '0x01d5', network => '10.60.11.0/24', host => '10.60.11.2', token => '464_28658cf3873e16c11668e1e918cfe3cd', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/0x01d5'},
+  {name => 'EvilBunnyWrote', network => '10.60.12.0/24', host => '10.60.12.2', token => '654_00651c171e698f107758bd463709a35d', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'ID-10-T', network => '10.60.13.0/24', host => '10.60.13.2', token => '47_dfbb83d4f6ab6fef1327f085bc2dfd73', country => 'Spain', logo => '/data/sprite_1.png'},
+  {name => 'void*', network => '10.60.14.0/24', host => '10.60.14.2', token => '19_4425b7e468c77e1da91f60031fb8357e', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/void'},
+  {name => 'Bulba Hackers', network => '10.60.15.0/24', host => '10.60.15.2', token => '602_a3c0047a58040c961cf175303628a862', country => 'Belarus', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/bulba-hackers'},
+  {name => 'stankc', network => '10.60.16.0/24', host => '10.60.16.2', token => '268_068a70bda5c66be155019e3840b6a3d6', country => 'Croatia', logo => '/data/sprite_1.png'},
+  {name => 'd34dl1n3', network => '10.60.17.0/24', host => '10.60.17.2', token => '116_f7e090600fe84eed8df992e46c8a2e45', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/d34dl1n3'},
+  {name => 'NiceWay', network => '10.60.18.0/24', host => '10.60.18.2', token => '608_8145a1d249079399f3e4213468db5495', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/niceway'},
+  {name => 'Umbr3lla', network => '10.60.19.0/24', host => '10.60.19.2', token => '506_6836361b532c611cd83355dc97cd1790', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'g3tsh3lLso0n', network => '10.60.20.0/24', host => '10.60.20.2', token => '74_24446211b53ec6aaac0484daea3febbc', country => 'Pakistan', logo => '/data/sprite_1.png'},
+  {name => 'Void Apelsin', network => '10.60.21.0/24', host => '10.60.21.2', token => '358_a3eddcca8076b48d6439c99cb7035835', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/void-apelsin'},
+  {name => 'Красные волки', network => '10.60.22.0/24', host => '10.60.22.2', token => '478_25c69293c7e183679e0422ed77864a31', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'fadfadg2wt43tsdv', network => '10.60.23.0/24', host => '10.60.23.2', token => '181_4d6bc4768da5156a0f0a8a86c44facd5', country => 'Albania', logo => '/data/sprite_1.png'},
+  {name => 'Hack\'n Roll', network => '10.60.24.0/24', host => '10.60.24.2', token => '232_ca74e11e0bd18f7d5444361ce50419a2', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/hackn-roll'},
+  {name => 'Omaviat', network => '10.60.25.0/24', host => '10.60.25.2', token => '494_635909869a43b24bc520e379c1aec393', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/omaviat'},
+  {name => 'sundogs', network => '10.60.26.0/24', host => '10.60.26.2', token => '66_b3087ccf55804f892fdc457a8efc3f3b', country => 'China', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/sundogs'},
+  {name => 'Alt-Backdoor', network => '10.60.27.0/24', host => '10.60.27.2', token => '639_d2a1fa36c850381cc785b489f68a4e91', country => 'United Arab Emirates', logo => '/data/sprite_1.png'},
+  {name => 'Ret2NOP', network => '10.60.28.0/24', host => '10.60.28.2', token => '474_22d1a93d8d7c996dccc478aa22839f7c', country => 'Taiwan', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/ret2nop'},
+  {name => 'HgbSec', network => '10.60.29.0/24', host => '10.60.29.2', token => '635_c53e86ac48a7bc443ea612787bfc8710', country => 'Austria', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/hgbsec'},
+  {name => '3k', network => '10.60.30.0/24', host => '10.60.30.2', token => '238_073657386e02a3f6fef9f8a1f809d92d', country => 'Tunisia', logo => '/data/sprite_1.png'},
+  {name => 'DINS', network => '10.60.31.0/24', host => '10.60.31.2', token => '304_2ee1affcc2d3952d007b8e8141f30049', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/dins'},
+  {name => 'nefunguje', network => '10.60.32.0/24', host => '10.60.32.2', token => '211_634f3a8a03a6fd47e5135d50328df67d', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/nefunguje'},
+  {name => 'ZenHack', network => '10.60.33.0/24', host => '10.60.33.2', token => '665_737f539323e7fcac238871f2656879b7', country => 'Italy', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/zenhack'},
+  {name => 'Cornflags', network => '10.60.34.0/24', host => '10.60.34.2', token => '324_25f6b5c22dab365171be5b59dfb68f4e', country => 'Germany', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/cornflags'},
+  {name => 'Unt!tled', network => '10.60.35.0/24', host => '10.60.35.2', token => '470_86ea3ac626105fe31466d222a4b62792', country => 'United States', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/unttled'},
+  {name => 'Magnum', network => '10.60.36.0/24', host => '10.60.36.2', token => '145_5458b37c447964747a31e4dc2b3d4447', country => 'Israel', logo => '/data/sprite_1.png'},
+  {name => 'id0n5k@@wnANYthyang', network => '10.60.37.0/24', host => '10.60.37.2', token => '361_a9917224c1c236876006ce3d85887fc9', country => 'India', logo => '/data/sprite_1.png'},
+  {name => 'Crib_Warrior', network => '10.60.38.0/24', host => '10.60.38.2', token => '15_f0eb57d45c6673cc92eeb60ef9206e85', country => 'Malaysia', logo => '/data/sprite_1.png'},
+  {name => 'SuiCide', network => '10.60.39.0/24', host => '10.60.39.2', token => '479_ceeab8ba0d010419aacda13abad7a487', country => 'Iran', logo => '/data/sprite_1.png'},
+  {name => 'tomato', network => '10.60.40.0/24', host => '10.60.40.2', token => '341_d3c67c232abb884aafe13cd2d3cb2498', country => 'Canada', logo => '/data/sprite_1.png'},
+  {name => 'jojomemes', network => '10.60.41.0/24', host => '10.60.41.2', token => '547_34bc0a1d873fe7e4480e70255cc7a004', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'Keva19', network => '10.60.42.0/24', host => '10.60.42.2', token => '601_00bc99a314acf3039bfd8f4f257ed590', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/keva19'},
+  {name => 'tommaHAWkss', network => '10.60.43.0/24', host => '10.60.43.2', token => '620_d0479ee6d18b02cd3a02246672cc322b', country => 'Germany', logo => '/data/sprite_1.png'},
+  {name => 'ByteForc3', network => '10.60.44.0/24', host => '10.60.44.2', token => '220_29d18b8a3fc0578947173a72d11c877a', country => 'India', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/byteforc3'},
+  {name => 'ducks0ci3ty', network => '10.60.45.0/24', host => '10.60.45.2', token => '555_33abd2a9b711880b542290cabb84c91c', country => 'Portugal', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/ducks0ci3ty'},
+  {name => 'cyberbug', network => '10.60.46.0/24', host => '10.60.46.2', token => '535_b59fc6abc4477112a29cb3c1b6091843', country => 'Canada', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/cyberbug'},
+  {name => 'Seed_Im_Pierre_Dim', network => '10.60.47.0/24', host => '10.60.47.2', token => '382_857345acf74da0b18a1f30330d0d37d5', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/seed_im_pierre_dim'},
+  {name => 'PhoenixIT', network => '10.60.48.0/24', host => '10.60.48.2', token => '563_be55c00fd2c4feb8a87a72eb45f4fca1', country => 'Denmark', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/phoenixit'},
+  {name => 'JonPizza2', network => '10.60.49.0/24', host => '10.60.49.2', token => '38_60b1e2c39f75c2ff88d2986d8a33ed43', country => 'Afghanistan', logo => '/data/sprite_1.png'},
+  {name => 'KXTI_KATA', network => '10.60.50.0/24', host => '10.60.50.2', token => '594_e0de747960225cefd197e612d3ca0230', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'hm2h', network => '10.60.51.0/24', host => '10.60.51.2', token => '162_3bbfb2fe9022d4488e58bb163d7365b1', country => 'United States', logo => '/data/sprite_1.png'},
+  {name => 'andgein', network => '10.60.52.0/24', host => '10.60.52.2', token => '332_ffb3231c5bea994e21f59bd277f05485', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'hxp', network => '10.60.53.0/24', host => '10.60.53.2', token => '619_0a35ad87b64528f17784bdccdb3dd40c', country => 'Austria', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/hxp'},
+  {name => 'yyyyyy', network => '10.60.54.0/24', host => '10.60.54.2', token => '377_d77ac5ce2f042e35cd601ae4ad735e93', country => 'China', logo => '/data/sprite_1.png'},
+  {name => 'saarsec', network => '10.60.55.0/24', host => '10.60.55.2', token => '646_699e4e01324bcceac6a14f5493974497', country => 'Germany', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/saarsec'},
+  {name => 'angrybot', network => '10.60.56.0/24', host => '10.60.56.2', token => '495_4e2fe02b674322e11f6fe34be1be56e4', country => 'India', logo => '/data/sprite_1.png'},
+  {name => '0MN1SC13NT5', network => '10.60.57.0/24', host => '10.60.57.2', token => '56_878b41ccec1a85dd085e3827aa871b8c', country => 'India', logo => '/data/sprite_1.png'},
+  {name => '0xdeadbeef-TNT', network => '10.60.58.0/24', host => '10.60.58.2', token => '70_d2e5f42a0af033d011ae40eec3ec604f', country => 'China', logo => '/data/sprite_1.png'},
+  {name => 'Crack4kek', network => '10.60.59.0/24', host => '10.60.59.2', token => '195_94703c81207c23cfe2e876184abb62e5', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'Mail.ru', network => '10.60.60.0/24', host => '10.60.60.2', token => '156_bf4802c2e5f426e684c43d20d0b34383', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'justCatTheFish', network => '10.60.61.0/24', host => '10.60.61.2', token => '114_da484b6e5661f5c8dc2259847d565d93', country => 'Poland', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/justcatthefish'},
+  {name => 'T3MP0R4RY', network => '10.60.62.0/24', host => '10.60.62.2', token => '618_4677712cb890b68f18c7b593cb326f30', country => 'Algeria', logo => '/data/sprite_1.png'},
+  {name => 'r00tstici', network => '10.60.63.0/24', host => '10.60.63.2', token => '267_5e7ed46a673aeed7c0f5f8c5c8db56e3', country => 'Italy', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/r00tstici'},
+  {name => 'STT', network => '10.60.64.0/24', host => '10.60.64.2', token => '672_82a0625cf388c79c43370b05f652d00c', country => 'Portugal', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/stt'},
+
+services: |
+  {name => 'sesame',        path => 'checkers/sesame/checker.py',        timeout => 30, tcp_port => 4280},
+  {name => 'office',        path => 'checkers/office/checker.py',        timeout => 30, tcp_port => 8080},
+  {name => 'keeper',        path => 'checkers/keeper/checker.py',        timeout => 30, tcp_port => -1},
+  {name => 'crypto',        path => 'checkers/crypto/checker.py',        timeout => 30, tcp_port => -1},
+  {name => 'carpetradar24', path => 'checkers/carpetradar24/checker.py', timeout => 30, tcp_port => 7000},
+  {name => 'mumbler',       path => 'checkers/mumbler/checker.py',       timeout => 30, tcp_port => -1},

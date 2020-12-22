@@ -3,6 +3,7 @@ package storage
 import (
 	"fmt"
 	"github.com/HackerDom/ructfe2020/internal/storage/docs"
+	"github.com/HackerDom/ructfe2020/internal/storage/sessions"
 	"github.com/HackerDom/ructfe2020/internal/storage/users"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
@@ -18,36 +19,40 @@ const (
 )
 
 const (
-	maxOpenConn     = 20
+	maxOpenConn     = 10
 	connMaxLifetime = time.Minute
 )
 
-var (
-	dialTimeout    = 2 * time.Second
-	requestTimeout = 10 * time.Second
+// pg conn string params
+const (
+	dbAddr     = "postgres"
+	dbUser     = "service"
+	dbPassword = "service"
+	dbName     = "service"
 )
 
-func Init(l *zap.Logger) (docs.Documents, users.Users, error) {
+func Init(l *zap.Logger) (docs.Documents, users.Users, sessions.Sessions, error) {
 	conn, err := CreateConnection(l)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-
 	usersdb, err := users.NewPg(conn, l)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-
 	docksdb, err := docs.NewPg(conn, l)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-
-	return docksdb, usersdb, nil
+	sessdb, err := sessions.NewPg(conn, l)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return docksdb, usersdb, sessdb, nil
 }
 
 func CreateConnection(l *zap.Logger) (*sqlx.DB, error) {
-	connString := ConnString("postgres", "maindb", "test", "test")
+	connString := ConnString(dbAddr, dbName, dbUser, dbPassword)
 	l.Info(fmt.Sprintf("Connecting to '%s'", connString))
 	db, err := sqlx.Open("pgx", connString)
 	if err != nil {
@@ -63,7 +68,6 @@ func CreateConnection(l *zap.Logger) (*sqlx.DB, error) {
 // ConnString constructs PostgreSQL connection string
 func ConnString(addr, dbname, user, password string) string {
 	var connParams []string
-
 	host, port, err := net.SplitHostPort(addr)
 	if err == nil {
 		connParams = append(connParams, "host="+host)
@@ -71,20 +75,15 @@ func ConnString(addr, dbname, user, password string) string {
 	} else {
 		connParams = append(connParams, "host="+addr)
 	}
-
 	if dbname != "" {
 		connParams = append(connParams, "dbname="+dbname)
 	}
-
 	if user != "" {
 		connParams = append(connParams, "user="+user)
 	}
-
 	if password != "" {
 		connParams = append(connParams, "password="+password)
 	}
-
 	connParams = append(connParams, "sslmode="+"disable")
-
 	return strings.Join(connParams, " ")
 }

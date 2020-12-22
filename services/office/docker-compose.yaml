@@ -1,13 +1,6 @@
-version: "3.7"
+version: "2.2"
 
 services:
-#  etcd:
-#    image: quay.io/coreos/etcd
-#    command: etcd --initial-cluster-state new --listen-client-urls http://0.0.0.0:2379 --advertise-client-urls http://127.0.0.1:2379
-#    volumes:
-#      - "etcd-data:/default.etcd"
-#    environment:
-#      - ETCDCTL_API=3
   app:
     build: .
     ports:
@@ -15,14 +8,41 @@ services:
     restart: always
     depends_on:
       - postgres
+    # Services should handle SIGTERM, but if service freezed - SIGKILL it after 3 seconds
+    stop_grace_period: 3s
+
+    # memory limit
+    mem_limit: 1G
+    memswap_limit: 1G # we don't use swap, but why not
+
+    # additionaly you may tune cpu limits if you predict that your service may affect others
+    # but i think by default this is not needed, feel free to consult if needed
+    #cpu_count:
+    #cpu_percent:
+    #cpu_shares:
+    #cpu_quota:
+    #cpus:
+    #cpuset:
+
+    # protect yourself from fork-bombs!
+    pids_limit: 10
+
+    # allow 12K open files (for example, connections) at once just in case
+    ulimits:
+      nofile:
+        soft: 12000
+        hard: 12000
+
   postgres:
-    image: postgres:latest
+    image: postgres:13.1-alpine
     restart: always
-    environment:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
-      POSTGRES_DB: maindb
+    env_file:
+      - .pgenv
     volumes:
       - data:/var/lib/postgresql/data/
+    # don't forget limits for your database!
+    mem_limit: 1G
+    memswap_limit: 1G
+    pids_limit: 100
 volumes:
   data:

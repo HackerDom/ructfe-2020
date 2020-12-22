@@ -97,6 +97,10 @@ func (r *RPC) WithJSONPbWriter() *RPC {
 	}
 	return r
 }
+func (r *RPC) WithCustomWriter(wr func(w http.ResponseWriter, respPb proto.Message) error) *RPC {
+	r.w = wr
+	return r
+}
 
 func (r *RPC) Mount(mux *chi.Mux) *RPC {
 	httpHandler := http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
