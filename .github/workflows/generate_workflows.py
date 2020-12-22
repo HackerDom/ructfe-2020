@@ -55,6 +55,9 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v2
 
+    - name: change permission for ssh key
+      run: chmod 0600 ./vuln_image/keys/id_rsa
+
     - name: try to deploy {service}
       run: ./vuln_image/update_first_ten_teams.sh {service}
 
