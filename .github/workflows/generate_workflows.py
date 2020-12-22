@@ -50,7 +50,7 @@ jobs:
 
     steps:
     - name: install ansible
-      run: apt-get install -y ansible
+      run: sudo apt-get install -y ansible
 
     - name: Checkout repo
       uses: actions/checkout@v2
