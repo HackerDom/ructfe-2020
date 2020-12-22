@@ -1,7 +1,6 @@
 FROM gradle:6.7.1-jdk11
 
 COPY . /app
-USER root
 RUN chown -R gradle /app
 WORKDIR /app
 RUN ["./gradlew", "jar"]
