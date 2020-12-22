@@ -20,7 +20,7 @@ namespace CarpetRadar.Services.DataStorage
                         return new DataStorage(session, logger);
 
                     cluster = Cluster.Builder()
-                        .AddContactPoint("localhost")
+                        .AddContactPoint("cassandra")
                         .WithPort(9042)
                         .WithLoadBalancingPolicy(new DCAwareRoundRobinPolicy("datacenter1"))
                         .WithAuthProvider(new PlainTextAuthProvider("cassandra", "cassandra"))
