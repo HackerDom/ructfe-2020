@@ -31,7 +31,7 @@ cs_base_url: https://monitor.ructfe.org/
 cs_admin_auth: root:Weez3ierie
 cs_ctf_name: RuCTFE 2020
 cs_flags_secret: Eigaa7sum4
-cs_round_length: 60
+cs_round_length: 30 # 60
 cs_flag_life_time: 15
 # cs_time: "['2020-12-26 16:00:00', '2020-12-26 23:59:59']"
 cs_time: "['2020-12-20 11:00:00', '2020-12-26 12:00:00']"
@@ -99,11 +99,36 @@ teams: |
   {name => 'T3MP0R4RY', network => '10.60.62.0/24', host => '10.60.62.2', token => '618_4677712cb890b68f18c7b593cb326f30', country => 'Algeria', logo => '/data/sprite_1.png'},
   {name => 'r00tstici', network => '10.60.63.0/24', host => '10.60.63.2', token => '267_5e7ed46a673aeed7c0f5f8c5c8db56e3', country => 'Italy', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/r00tstici'},
   {name => 'STT', network => '10.60.64.0/24', host => '10.60.64.2', token => '672_82a0625cf388c79c43370b05f652d00c', country => 'Portugal', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/stt'},
+  {name => 'hackstreetboys', network => '10.60.65.0/24', host => '10.60.65.2', token => '146_e06c87d5b0572e356a19f7796f85b870', country => 'Philippines', logo => '/data/sprite_1.png'},
+  {name => 'corruptedpwnis', network => '10.60.66.0/24', host => '10.60.66.2', token => '201_996957c870be9604426afc7c0292094b', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/corruptedpwnis'},
+  {name => 'WE_0WN_Y0U', network => '10.60.67.0/24', host => '10.60.67.2', token => '591_bda0bd58a790b612e6170f2654b235fd', country => 'Austria', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/we_0wn_y0u'},
+  {name => 'xtal', network => '10.60.68.0/24', host => '10.60.68.2', token => '153_e9108e589b780ebe3c656944dc3ce88a', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'abstract_byte', network => '10.60.69.0/24', host => '10.60.69.2', token => '306_af3f696e3d45b1306838359bf3dc4279', country => 'United States', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/abstract_byte'},
+  {name => 'cSee', network => '10.60.70.0/24', host => '10.60.70.2', token => '113_4d69e1ae7392a6f04643ff0e2c62c041', country => 'China', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/csee'},
+  {name => 'CatchFM', network => '10.60.71.0/24', host => '10.60.71.2', token => '529_ab90092741f540b1e035ffa3b0679948', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/catchfm'},
+  {name => 'Zyrfex', network => '10.60.72.0/24', host => '10.60.72.2', token => '371_147e0741a48b61d41de0f7ee179bb27c', country => 'France', logo => '/data/sprite_1.png'},
+  {name => 'kanyewest', network => '10.60.73.0/24', host => '10.60.73.2', token => '421_8d0d41ffb944201b4a07e5185c6f131b', country => 'American Samoa', logo => '/data/sprite_1.png'},
+  {name => 'SDSLabs', network => '10.60.74.0/24', host => '10.60.74.2', token => '258_d91189db2a3d422c67e3ab4eb15bba01', country => 'India', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/sdslabs'},
+  {name => 'YaTeR', network => '10.60.75.0/24', host => '10.60.75.2', token => '388_c536ec1a88f6d141d1a29f7f718e09ef', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'f2h', network => '10.60.76.0/24', host => '10.60.76.2', token => '44_b8504d90c125c15342385a0a6d5e6d0d', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'kbsp', network => '10.60.77.0/24', host => '10.60.77.2', token => '90_991c38f46a7c39c74b04b7d4e857acc4', country => 'Russia', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/kbsp'},
+  {name => 'FAUST', network => '10.60.78.0/24', host => '10.60.78.2', token => '650_731677253d5c531164b8eb78fb8b4635', country => 'Germany', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/faust'},
+  {name => 'Mazala', network => '10.60.79.0/24', host => '10.60.79.2', token => '393_874d6d8a7d3eca2ea1b3ea8b35c8647c', country => 'Mongolia', logo => '/data/sprite_1.png'},
+  {name => 'Alladdin', network => '10.60.80.0/24', host => '10.60.80.2', token => '112_48f6a73b77cdae97151a575aa6d05441', country => 'France', logo => '/data/sprite_1.png'},
+  {name => 'vaara', network => '10.60.81.0/24', host => '10.60.81.2', token => '271_cbbdf6ef71eb2ab1802d66a59e816d2b', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'Aquin', network => '10.60.82.0/24', host => '10.60.82.2', token => '484_69c001e7b3ea613134c4d5a36a5b85b3', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'napdc', network => '10.60.83.0/24', host => '10.60.83.2', token => '37_f6404f9ec5270b21108259b94b238dd9', country => 'Germany', logo => '/data/sprite_1.png'},
+  {name => 'mimikatz', network => '10.60.84.0/24', host => '10.60.84.2', token => '310_65194ab16a2833ed9888b9428a3dd0ba', country => 'Russia', logo => '/data/sprite_1.png'},
+  {name => 'tinpardo', network => '10.60.85.0/24', host => '10.60.85.2', token => '365_fd52334679b4695660a8f0ffd8c3de28', country => 'Colombia', logo => '/data/sprite_1.png'},
+  {name => 'cyberwehr', network => '10.60.86.0/24', host => '10.60.86.2', token => '367_e143e084e82a2763e1fa3f8861635dc3', country => 'Austria', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/cyberwehr'},
+  {name => 'glaros', network => '10.60.87.0/24', host => '10.60.87.2', token => '229_3f16995c9c9ade749e48d075a3a087e6', country => 'Greece', logo => '/data/sprite_1.png'},
+  {name => 'NoPwnIntended', network => '10.60.88.0/24', host => '10.60.88.2', token => '417_c7d834fa5cf9b3ccdd2486b26099faf1', country => 'Italy', logo => 'https://ructfe.org/ctf-media/uploads/2020/teams_logo/nopwnintended'},
+  {name => 'kiritoww', network => '10.60.89.0/24', host => '10.60.89.2', token => '308_21054b06f291fd1d0beeabe1d52a08b1', country => 'Afghanistan', logo => '/data/sprite_1.png'},
 
 services: |
   {name => 'sesame',        path => 'checkers/sesame/checker.py',        timeout => 30, tcp_port => 4280},
   {name => 'office',        path => 'checkers/office/checker.py',        timeout => 30, tcp_port => 8080},
-  {name => 'keeper',        path => 'checkers/keeper/checker.py',        timeout => 30, tcp_port => -1},
+  {name => 'keeper',        path => 'checkers/keeper/checker.py',        timeout => 30, tcp_port => 3687},
   {name => 'crypto',        path => 'checkers/crypto/checker.py',        timeout => 30, tcp_port => -1},
   {name => 'carpetradar24', path => 'checkers/carpetradar24/checker.py', timeout => 30, tcp_port => 7000},
   {name => 'mumbler',       path => 'checkers/mumbler/checker.py',       timeout => 30, tcp_port => -1},
