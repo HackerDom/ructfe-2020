@@ -6,5 +6,5 @@ services:
       context: .
       dockerfile: Dockerfile-build
     volumes:
-      - ./bins/TrackServer:/app/CarpetRadar.Web2/bin/Debug/trackserver
-      - ./bins/Web:/app/CarpetRadar.Web2/publish
+      - /bins/TrackServer:/app/CarpetRadar.Web2/bin/Debug/trackserver
+      - /bins/Web:/app/CarpetRadar.Web2/publish
