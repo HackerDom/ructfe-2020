@@ -1,17 +1,30 @@
+from storage import Storage
+
+import re
+import uuid
 import SocketServer
-import threading
+
+allowed_key_name = re.compile(r"^[A-Za-z0-9=-]{1,60}$")
 
 
 class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         data = self.request[0].strip()
-        current_thread = threading.current_thread()
-        print("{}: client: {}, wrote: {}".format(current_thread.name, self.client_address, data))
+        try:
+            result = data.split(":")
+            if len(result) != 2:
+                raise
+            store = Storage()
+            uuid.UUID(result[0].decode())
+            if not re.match(allowed_key_name, result[1].decode().strip("\x00")):
+                raise
+            store.write(result[0], result[1])
+        except:
+            pass
 
 
-class ThreadedUDPServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
+class ThreadedUDPServer(SocketServer.UDPServer, SocketServer.ThreadingMixIn):
     def get_request(self):
-        print u"shit is happening"
-        arr = bytearray()
-        nbytes, client_addr = self.socket.recvfrom_into(arr, self.max_packet_size)
+        arr = bytearray(2 ** 7)
+        _, client_addr = self.socket.recvfrom_into(arr, self.max_packet_size)
         return (arr, self.socket), client_addr
