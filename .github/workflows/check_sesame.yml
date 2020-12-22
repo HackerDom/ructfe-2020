@@ -18,6 +18,9 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v2
 
+    - name: Run prebuilt hook
+      run: if [ -f services/sesame/before_image_build.sh ]; then (cd ./services/sesame && ./before_image_build.sh); fi
+
     - name: Setup sesame
       run: (cd ./services/sesame && docker-compose pull && docker-compose build && docker-compose up --build -d)
 
@@ -31,6 +34,7 @@ jobs:
 
     - name: Test checker on service
       run: checkers/sesame/checker.py TEST 127.0.0.1
+
   update_sesame:
     name: Deploy service using ansible to first teams
     needs: check_sesame
@@ -45,6 +49,9 @@ jobs:
 
     - name: change permission for ssh key
       run: chmod 0600 ./vuln_image/keys/id_rsa
+
+    - name: Run prebuilt hook
+      run: if [ -f services/sesame/before_image_build.sh ]; then (cd ./services/sesame && ./before_image_build.sh); fi
 
     - name: try to deploy sesame
       run: ./vuln_image/update_first_ten_teams.sh sesame
