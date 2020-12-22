@@ -22,7 +22,7 @@ on:
   workflow_dispatch: {{}}
 
 jobs:
-  check_services:
+  check_{service}:
     name: Check {service}
     runs-on: ubuntu-18.04
 
@@ -43,6 +43,20 @@ jobs:
 
     - name: Test checker on service
       run: checkers/{service}/checker.py TEST 127.0.0.1
+  update_{service}:
+    name: Deploy service using ansible to first teams
+    needs: check_{service}
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: install ansible
+      run: apt-get install -y ansible
+
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: try to deploy {service}
+      run: ./vuln_image/update_first_ten_teams.sh {service}
 
 '''
 

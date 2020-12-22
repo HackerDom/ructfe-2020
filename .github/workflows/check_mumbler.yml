@@ -10,7 +10,7 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  check_services:
+  check_mumbler:
     name: Check mumbler
     runs-on: ubuntu-18.04
 
@@ -31,4 +31,18 @@ jobs:
 
     - name: Test checker on service
       run: checkers/mumbler/checker.py TEST 127.0.0.1
+  update_mumbler:
+    name: Deploy service using ansible to first teams
+    needs: check_mumbler
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: install ansible
+      run: apt-get install -y ansible
+
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: try to deploy mumbler
+      run: ./vuln_image/update_first_ten_teams.sh mumbler
 
