@@ -5,6 +5,12 @@ class UserStorage(
 ) {
     private val storagePath = File(storagePath)
 
+    init {
+        if (!this.storagePath.exists()) {
+            this.storagePath.mkdirs()
+        }
+    }
+
     fun exists(username: String) = storagePath.resolve(username).exists()
     fun create(username: String, password: String) {
         storagePath.resolve(username).writeBytes(stringHash(password))

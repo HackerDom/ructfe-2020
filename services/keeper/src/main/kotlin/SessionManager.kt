@@ -6,6 +6,12 @@ class SessionManager(
 ) {
     private val storage = File(storage)
 
+    init {
+        if (!this.storage.exists()) {
+            this.storage.mkdirs()
+        }
+    }
+
     fun create(username: String): String {
         val salt = randomString()
         val secret = Base64.getEncoder().encode(stringHash(username + salt))
