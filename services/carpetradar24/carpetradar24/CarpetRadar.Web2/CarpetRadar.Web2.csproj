@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <Reference Include="CarpetRadar.Services">
-      <HintPath>bin\Debug\netcoreapp3.1\CarpetRadar.Services.dll</HintPath>
+      <HintPath>CarpetRadar.Services.dll</HintPath>
     </Reference>
   </ItemGroup>
 
