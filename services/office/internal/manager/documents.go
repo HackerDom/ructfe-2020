@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"context"
 	"github.com/HackerDom/ructfe2020/internal/document"
 	"github.com/HackerDom/ructfe2020/internal/storage/docs"
 	userstorage "github.com/HackerDom/ructfe2020/internal/storage/users"
@@ -12,16 +13,16 @@ type documents struct {
 	users userstorage.Users
 }
 
-func (d *documents) Create(document *pb.Document) (int64, error) {
-	return d.s.Insert(document)
+func (d *documents) Create(ctx context.Context, document *pb.Document) (int64, error) {
+	return d.s.Insert(ctx, document)
 }
 
-func (d *documents) Delete(docID int64) error {
-	return d.s.Delete(docID)
+func (d *documents) Delete(ctx context.Context, docID int64) error {
+	return d.s.Delete(ctx, docID)
 }
 
-func (d *documents) List() ([]*pb.ShortDocument, error) {
-	ds, err := d.s.List()
+func (d *documents) List(ctx context.Context) ([]*pb.ShortDocument, error) {
+	ds, err := d.s.List(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -32,13 +33,13 @@ func (d *documents) List() ([]*pb.ShortDocument, error) {
 	return shorts, nil
 }
 
-func (d *documents) ExecForUser(id int64, username string) (string, error) {
-	docPB, err := d.s.Get(id)
+func (d *documents) ExecForUser(ctx context.Context, id int64, username string) (string, error) {
+	docPB, err := d.s.Get(ctx, id)
 	if err != nil {
 		return "", err
 	}
 	doc := document.FromPB(docPB)
-	users, err := d.users.List()
+	users, err := d.users.List(ctx)
 	if err != nil {
 		return "", err
 	}

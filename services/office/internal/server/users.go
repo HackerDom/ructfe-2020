@@ -51,8 +51,10 @@ func (s *usersService) Mount(mux *chi.Mux) {
 }
 
 func (s *usersService) List(ctx context.Context, req *pb.ListRequest) (*pb.ListResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
+	defer cancel()
 	// TODO: [12/13/20] (vaspahomov): pagination
-	names, err := s.m.GetNames()
+	names, err := s.m.GetNames(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +62,9 @@ func (s *usersService) List(ctx context.Context, req *pb.ListRequest) (*pb.ListR
 }
 
 func (s *usersService) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	u, err := s.m.RegisterUser(req.Name, req.Password, req.Bio)
+	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
+	defer cancel()
+	u, err := s.m.RegisterUser(ctx, req.Name, req.Password, req.Bio)
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +74,8 @@ func (s *usersService) Register(ctx context.Context, req *pb.RegisterRequest) (*
 }
 
 func (s *usersService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
+	defer cancel()
 	// TODO: [12/21/20] (vaspahomov):
 	panic("not implemented")
 	return &pb.LoginResponse{}, nil

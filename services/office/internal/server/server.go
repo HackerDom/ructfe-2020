@@ -4,6 +4,7 @@ import (
 	"github.com/HackerDom/ructfe2020/internal/manager"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"time"
 
 	"fmt"
 	"net/http"
@@ -12,6 +13,8 @@ import (
 const (
 	Port = "8080"
 	Addr = "[::]"
+
+	reqTimeout = 3*time.Second
 )
 
 type server struct {

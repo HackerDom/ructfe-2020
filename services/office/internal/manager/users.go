@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"context"
 	"fmt"
 	"github.com/HackerDom/ructfe2020/internal/hashutil"
 	userstorage "github.com/HackerDom/ructfe2020/internal/storage/users"
@@ -12,16 +13,16 @@ type users struct {
 	s userstorage.Users
 }
 
-func (m *users) GetUsers() ([]*pb.User, error) {
-	users, err := m.s.List()
+func (m *users) GetUsers(ctx context.Context) ([]*pb.User, error) {
+	users, err := m.s.List(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return users, nil
 }
 
-func (m *users) GetNames() ([]string, error) {
-	users, err := m.s.List()
+func (m *users) GetNames(ctx context.Context) ([]string, error) {
+	users, err := m.s.List(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -32,14 +33,14 @@ func (m *users) GetNames() ([]string, error) {
 	return names, nil
 }
 
-func (m *users) LoginUser(username, pass string) (*pb.LoginResponse, error) {
+func (m *users) LoginUser(ctx context.Context, username, pass string) (*pb.LoginResponse, error) {
 	if err := validateUsername(username); err != nil {
 		return nil, err
 	}
 	panic("not implemented")
 }
 
-func (m *users) RegisterUser(username, pass, bio string) (*pb.User, error) {
+func (m *users) RegisterUser(ctx context.Context, username, pass, bio string) (*pb.User, error) {
 	if err := validateUsername(username); err != nil {
 		return nil, err
 	}
@@ -49,7 +50,7 @@ func (m *users) RegisterUser(username, pass, bio string) (*pb.User, error) {
 		Password: pass,
 		Bio:      bio,
 	}
-	err := m.s.Insert(user)
+	err := m.s.Insert(ctx, user)
 	if err != nil {
 		return nil, err
 	}

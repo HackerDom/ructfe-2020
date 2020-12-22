@@ -44,8 +44,10 @@ func (s *documentsService) Mount(mux *chi.Mux) {
 }
 
 func (s *documentsService) List(ctx context.Context, req *pb.ListDocumentsRequest) (*pb.ListDocumentsResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
+	defer cancel()
 	// TODO: [12/20/20] (vaspahomov): pagination
-	docs, err := s.m.List()
+	docs, err := s.m.List(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -53,13 +55,15 @@ func (s *documentsService) List(ctx context.Context, req *pb.ListDocumentsReques
 }
 
 func (s *documentsService) Create(ctx context.Context, req *pb.CreateDocumentRequest) (*pb.CreateDocumentResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
+	defer cancel()
 	d, err := document.Parse(req.Name, []byte(req.Doc))
 	if err != nil {
 		return nil, err
 	}
 	p := d.Proto()
 	p.Token = hashutil.RandDigest(req.Name)
-	id, err := s.m.Create(p)
+	id, err := s.m.Create(ctx, p)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +74,9 @@ func (s *documentsService) Create(ctx context.Context, req *pb.CreateDocumentReq
 }
 
 func (s *documentsService) Execute(ctx context.Context, req *pb.ExecuteRequest) (*pb.ExecuteResponse, error) {
-	executed, err := s.m.ExecForUser(req.DocId, req.Username)
+	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
+	defer cancel()
+	executed, err := s.m.ExecForUser(ctx, req.DocId, req.Username)
 	if err != nil {
 		return nil, err
 	}
