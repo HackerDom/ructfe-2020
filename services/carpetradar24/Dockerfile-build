@@ -1,0 +1,26 @@
+FROM mono:6.12.0.107 as trackserver_build
+
+WORKDIR app
+
+COPY carpetradar24 .
+
+RUN nuget install CarpetRadar.Services/packages.config -OutputDirectory packages && \
+    nuget install CarpetRadar.TrackServer/packages.config -OutputDirectory packages
+
+WORKDIR /app/CarpetRadar.TrackServer
+
+RUN msbuild -t:rebuild
+
+FROM mcr.microsoft.com/dotnet/sdk:3.1
+
+WORKDIR app
+
+COPY carpetradar24 .
+
+WORKDIR CarpetRadar.Web2
+
+COPY --from=trackserver_build /app/CarpetRadar.TrackServer/bin/Debug /trackserver
+
+RUN cp /trackserver/CarpetRadar.Services.dll CarpetRadar.Services.dll
+
+CMD ["bash", "-c", "dotnet restore && dotnet publish -c Debug -o publish && cp -r /trackserver bin/Debug"]
