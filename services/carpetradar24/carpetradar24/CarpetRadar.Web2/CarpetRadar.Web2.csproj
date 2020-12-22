@@ -16,9 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="CarpetRadar.Services">
-      <HintPath>CarpetRadar.Services.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\CarpetRadar.Services\CarpetRadar.Services.csproj" />
   </ItemGroup>
 
 
