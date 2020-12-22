@@ -1,0 +1,7 @@
+FROM mono:6.12.0.107
+
+WORKDIR app
+
+COPY bins/TrackServer .
+
+CMD ["mono", "CarpetRadar.TrackServer.exe"]

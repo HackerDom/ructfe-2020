@@ -1,0 +1,22 @@
+version: '2.4'
+
+services:
+  trackserver:
+    build:
+      context: .
+      dockerfile: Dockerfile-trackserver
+    restart: always
+    ports:
+      - 12345:12345
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile-web
+    restart: always
+    ports:
+      - 7000:7000
+  cassandra:
+    image: cassandra:4.0
+    restart: always
+    volumes:
+      - ./data:/var/lib/cassandra
