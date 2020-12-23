@@ -1,5 +1,7 @@
+#include <stdlib.h>
 #include <stdarg.h>
 #include "curve.h"
+#include "serialization.h"
 
 
 void curve_init(curve_ptr curve) {
@@ -50,7 +52,36 @@ bool curve_is_equal(curve_srcptr curve1, curve_srcptr curve2) {
         && mpz_cmp(curve1->q, curve2->q) == 0;
 }
 
-bool curve_is_correct(curve_srcptr curve) {
+void curve_serialize(size_t *result_size, uint8_t **result, curve_srcptr curve) {
+    mpzs_serialize(result_size, result, 3, curve->a, curve->b, curve->q);
+}
+
+bool curve_deserialize(curve_ptr curve, size_t data_size, const uint8_t *data) {
+    mpz_t *mpzs;
+    size_t mpzs_count;
+    bool result;
+
+    result = false;
+    mpzs_deserialize(&mpzs_count, &mpzs, data_size, data);
+
+    if (mpzs_count == 3) {
+        mpz_set(curve->a, mpzs[0]);
+        mpz_set(curve->b, mpzs[1]);
+        mpz_set(curve->q, mpzs[2]);
+        
+        result = true;
+    }
+
+    for (size_t i = 0; i < mpzs_count; i++) {
+        mpz_clear(mpzs[i]);
+    }
+
+    free(mpzs);
+
+    return result;
+}
+
+bool curve_is_valid(curve_srcptr curve) {
     mpz_t a, b, sum;
     bool result;
 

@@ -1,5 +1,7 @@
+#include <stdlib.h>
 #include <stdarg.h>
 #include "point.h"
+#include "serialization.h"
 
 
 void point_init(point_ptr point) {
@@ -43,12 +45,45 @@ void point_set(point_ptr result, point_srcptr point) {
     mpz_set(result->y, point->y);
 }
 
+bool point_is_equal(point_srcptr point1, point_srcptr point2) {
+    return mpz_cmp(point1->x, point2->x) == 0
+        && mpz_cmp(point1->y, point2->y) == 0;
+}
+
+void point_serialize(size_t *result_size, uint8_t **result, point_srcptr point) {
+    mpzs_serialize(result_size, result, 2, point->x, point->y);
+}
+
+bool point_deserialize(point_ptr point, size_t data_size, const uint8_t *data) {
+    mpz_t *mpzs;
+    size_t mpzs_count;
+    bool result;
+
+    result = false;
+    mpzs_deserialize(&mpzs_count, &mpzs, data_size, data);
+
+    if (mpzs_count == 2) {
+        mpz_set(point->x, mpzs[0]);
+        mpz_set(point->y, mpzs[1]);
+        
+        result = true;
+    }
+
+    for (size_t i = 0; i < mpzs_count; i++) {
+        mpz_clear(mpzs[i]);
+    }
+
+    free(mpzs);
+
+    return result;
+}
+
 void point_set_identity(point_ptr point) {
     mpz_set_ui(point->x, 0);
     mpz_set_ui(point->y, 0);
 }
 
-void point_inverse(point_ptr result, point_srcptr point, const curve_t curve) {
+void point_inverse(point_ptr result, point_srcptr point, curve_srcptr curve) {
     mpz_t x, y;
 
     mpz_inits(x, y, NULL);
@@ -66,7 +101,7 @@ void point_inverse(point_ptr result, point_srcptr point, const curve_t curve) {
     mpz_clears(x, y, NULL);
 }
 
-void point_add(point_ptr result, point_srcptr point1, point_srcptr point2, const curve_t curve) {
+void point_add(point_ptr result, point_srcptr point1, point_srcptr point2, curve_srcptr curve) {
     mpz_t lambda, x, y, t1, t2;
 
     if (point_is_identity(point1)) {
@@ -131,11 +166,11 @@ void point_add(point_ptr result, point_srcptr point1, point_srcptr point2, const
     mpz_clears(lambda, x, y, t1, t2, NULL);
 }
 
-void point_double(point_ptr result, point_srcptr point, const curve_t curve) {
+void point_double(point_ptr result, point_srcptr point, curve_srcptr curve) {
     point_add(result, point, point, curve);
 }
 
-void point_multiply(point_ptr result, point_srcptr point, const mpz_t number, const curve_t curve) {
+void point_multiply(point_ptr result, point_srcptr point, mpz_srcptr number, curve_srcptr curve) {
     size_t size;
     point_t r0, r1;
     mpz_t multiplier;
@@ -170,17 +205,12 @@ void point_multiply(point_ptr result, point_srcptr point, const mpz_t number, co
     point_clears(r0, r1, NULL);
 }
 
-bool point_is_equal(point_srcptr point1, point_srcptr point2) {
-    return mpz_cmp(point1->x, point2->x) == 0
-        && mpz_cmp(point1->y, point2->y) == 0;
-}
-
 bool point_is_identity(point_srcptr point) {
     return mpz_cmp_ui(point->x, 0) == 0
         && mpz_cmp_ui(point->y, 0) == 0;
 }
 
-bool point_is_on_curve(point_srcptr point, const curve_t curve) {
+bool point_is_on_curve(point_srcptr point, curve_srcptr curve) {
     mpz_t y2, x3, x, sum;
     bool result;
 

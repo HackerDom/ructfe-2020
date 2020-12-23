@@ -2,6 +2,7 @@
 #define _CURVE_H
 
 #include <gmp.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 
@@ -22,7 +23,10 @@ void curve_clears(curve_ptr curve1, ...);
 void curve_set(curve_ptr result, curve_srcptr curve);
 bool curve_is_equal(curve_srcptr curve1, curve_srcptr curve2);
 
-bool curve_is_correct(curve_srcptr curve);
+void curve_serialize(size_t *result_size, uint8_t **result, curve_srcptr curve);
+bool curve_deserialize(curve_ptr curve, size_t data_size, const uint8_t *data);
+
+bool curve_is_valid(curve_srcptr curve);
 
 
 #endif
