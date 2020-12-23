@@ -28,8 +28,8 @@ bool point_deserialize(point_ptr point, size_t data_size, const uint8_t *data);
 
 void point_set_identity(point_ptr point);
 void point_inverse(point_ptr result, point_srcptr point, curve_srcptr curve);
-void point_add(point_ptr result, point_srcptr point1, point_srcptr point2, curve_srcptr curve);
 void point_double(point_ptr result, point_srcptr point, curve_srcptr curve);
+void point_add(point_ptr result, point_srcptr point1, point_srcptr point2, curve_srcptr curve);
 void point_multiply(point_ptr result, point_srcptr point, mpz_srcptr number, curve_srcptr curve);
 bool point_is_identity(point_srcptr point);
 bool point_is_on_curve(point_srcptr point, curve_srcptr curve);

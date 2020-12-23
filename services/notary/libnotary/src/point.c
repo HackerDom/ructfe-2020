@@ -101,6 +101,49 @@ void point_inverse(point_ptr result, point_srcptr point, curve_srcptr curve) {
     mpz_clears(x, y, NULL);
 }
 
+void point_double(point_ptr result, point_srcptr point, curve_srcptr curve) {
+    mpz_t lambda, x, y, t1, t2;
+
+    if (point_is_identity(point)) {
+        point_set_identity(result);
+        return;
+    }
+
+    mpz_inits(lambda, x, y, t1, t2, NULL);
+
+    // t1 = (3 * point->x * point->x + curve->a) % curve->q
+    mpz_set_ui(t1, 3);
+    mpz_mul(t1, t1, point->x);
+    mpz_mul(t1, t1, point->x);
+    mpz_add(t1, t1, curve->a);
+    mpz_mod(t1, t1, curve->q);
+
+    // t2 = ((2 * point->y)^-1) % curve->q
+    mpz_set_ui(t2, 2);
+    mpz_mul(t2, t2, point->y);
+    mpz_invert(t2, t2, curve->q);
+
+    // lambda = (t1 * t2) % curve->q
+    mpz_mul(lambda, t1, t2);
+    mpz_mod(lambda, lambda, curve->q);
+
+    // x = (lambda * lambda - 2 * point->x) % curve->q
+    mpz_mul(x, lambda, lambda);
+    mpz_submul_ui(x, point->x, 2);
+    mpz_mod(x, x, curve->q);
+
+    // y = (lambda * (point->x - x) - point->y) % curve->q
+    mpz_sub(y, point->x, x);
+    mpz_mul(y, y, lambda);
+    mpz_sub(y, y, point->y);
+    mpz_mod(y, y, curve->q);
+
+    mpz_set(result->x, x);
+    mpz_set(result->y, y);
+
+    mpz_clears(lambda, x, y, t1, t2, NULL);
+}
+
 void point_add(point_ptr result, point_srcptr point1, point_srcptr point2, curve_srcptr curve) {
     mpz_t lambda, x, y, t1, t2;
 
@@ -119,30 +162,20 @@ void point_add(point_ptr result, point_srcptr point1, point_srcptr point2, curve
         return;
     }
 
+    if (mpz_cmp(point1->x, point2->x) == 0) {
+        point_double(result, point1, curve);
+        return;
+    }
+
     mpz_inits(lambda, x, y, t1, t2, NULL);
 
-    if (mpz_cmp(point1->x, point2->x) == 0) {
-        // t1 = (3 * point1->x * point1->x + curve->a) % curve->q
-        mpz_set_ui(t1, 3);
-        mpz_mul(t1, t1, point1->x);
-        mpz_mul(t1, t1, point1->x);
-        mpz_add(t1, t1, curve->a);
-        mpz_mod(t1, t1, curve->q);
+    // t1 = (point1->y - point2->y) % curve->q
+    mpz_sub(t1, point1->y, point2->y);
+    mpz_mod(t1, t1, curve->q);
 
-        // t2 = ((2 * point1->y)^-1) % curve->q
-        mpz_set_ui(t2, 2);
-        mpz_mul(t2, t2, point1->y);
-        mpz_invert(t2, t2, curve->q);
-    }
-    else {
-        // t1 = (point1->y - point2->y) % curve->q
-        mpz_sub(t1, point1->y, point2->y);
-        mpz_mod(t1, t1, curve->q);
-
-        // t2 = ((point1->x - point2->x)^-1) % curve->q
-        mpz_sub(t2, point1->x, point2->x);
-        mpz_invert(t2, t2, curve->q);
-    }
+    // t2 = ((point1->x - point2->x)^-1) % curve->q
+    mpz_sub(t2, point1->x, point2->x);
+    mpz_invert(t2, t2, curve->q);
 
     // lambda = (t1 * t2) % curve->q
     mpz_mul(lambda, t1, t2);
@@ -164,10 +197,6 @@ void point_add(point_ptr result, point_srcptr point1, point_srcptr point2, curve
     mpz_set(result->y, y);
 
     mpz_clears(lambda, x, y, t1, t2, NULL);
-}
-
-void point_double(point_ptr result, point_srcptr point, curve_srcptr curve) {
-    point_add(result, point, point, curve);
 }
 
 void point_multiply(point_ptr result, point_srcptr point, mpz_srcptr number, curve_srcptr curve) {
