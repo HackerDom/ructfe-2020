@@ -15,7 +15,7 @@ const (
 	Addr = "[::]"
 
 	reqTimeout = 3 * time.Second
-	debug      = false
+	debug      = true
 )
 
 type server struct {
