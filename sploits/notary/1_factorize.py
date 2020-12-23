@@ -81,7 +81,7 @@ def recover_private_key(public_key):
 def main():
     public_key = base64.b64decode(input())
     private_key = recover_private_key(public_key)
-    print(private_key)
+    print(base64.b64encode(private_key))
 
 
 if __name__ == '__main__':
