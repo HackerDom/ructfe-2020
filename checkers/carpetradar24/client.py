@@ -1,15 +1,10 @@
 #!/usr/bin/env python3.8
-from requests import Session
-from string import ascii_lowercase
 import random
-from urllib.parse import urlparse, parse_qs
-from base64 import urlsafe_b64encode
-from hashlib import sha256
-from re import match, compile
-import json
-import urllib.request
+import requests
 import socket
 import base64
+import traceback
+from bs4 import BeautifulSoup
 
 
 def get_flight_state_bytes(token: str,
@@ -32,7 +27,28 @@ def get_flight_state_bytes(token: str,
 
 
 def parse_token(set_cookie_value: str) -> str:
-    return set_cookie_value[len("token="):-len("; expires=Thu, 24 Dec 2020 20:15:05 GMT; path=/")]
+    try:
+        return set_cookie_value[len("token="):-len("; expires=Thu, 24 Dec 2020 20:15:05 GMT; path=/")]
+    except Exception:
+        traceback.print_exc()
+    return None
+
+
+def parse_html_table(content: bytes) -> list:
+    try:
+        data = []
+        soup = BeautifulSoup(content, features="lxml")
+        table_body = soup.find('table').find('tbody')
+        rows = table_body.find_all('tr')
+        for row in rows:
+            cols = row.find_all('td')
+            cols = [element.text.strip() for element in cols]
+            data.append([element for element in cols if element])
+        return data
+    except Exception:
+        traceback.print_exc()
+    return None
+
 
 class Client:
     def __init__(self, ip_address, tcp_port, http_port):
@@ -43,57 +59,70 @@ class Client:
 
     def send_flight_state(self, token, x: int, y: int, flight_id: bytes, label: str, license: str, finished: bool):
         data = get_flight_state_bytes(token, x, y, flight_id, label, license, finished)
-        return self.send_bytes(data)
+        return self.send_tcp_bytes(data)
+
+    def get_main_page_positions(self):
+        res = requests.get(self.http_address)
+
+        if res.status_code != 200:
+            print(f"[-] Get main page failed: {res.status_code}")
+            return None
+
+        print(f"[+] Get main page succeed")
+        data = parse_html_table(res.content)
+        return data
+
+    def get_chronicle(self, token):
+        res = requests.get(f'{self.http_address}/Chronicle',
+                           cookies={"token": token})
+
+        if res.status_code != 200:
+            print(f"[-] Get chronicle failed: {res.status_code}")
+            return None
+
+        print(f"[+] Get chronicle succeed")
+        data = parse_html_table(res.content)
+        return data
 
     def register_and_get_auth_token(self, login, password):
-        s = Session()
         company = random.choice(companies)
-
-        """
-        __RequestVerificationToken: CfDJ8A6N6emswSRMktHB7R3eAIvCd_VIoOZPoNH87-efpUyBqsCUeNMaxP2AuyARCqp4qGk0eNwYW1KeZpWEYjmjOAN0dLKFr2mbIN2qeWM3F_jQ7fQLao3lZrxeFPlIfppA3v34a2WVjithEB8V6iv5BPY
-        """
-        res = s.post(f'{self.http_address}/LoginOrRegister?handler=Register',
-                     headers={'Content-Type': 'application/x-www-form-urlencoded'},
-                     data="__RequestVerificationToken=CfDJ8A6N6emswSRMktHB7R3eAIvCd_VIoOZPoNH87-efpUyBqsCUeNMaxP2AuyARCqp4qGk0eNwYW1KeZpWEYjmjOAN0dLKFr2mbIN2qeWM3F_jQ7fQLao3lZrxeFPlIfppA3v34a2WVjithEB8V6iv5BPY"
-                          f"&userName={login}"
-                          f"&company={company}"
-                          f"&password={password}",
-                     allow_redirects=False)
+        res = requests.post(f'{self.http_address}/LoginOrRegister?handler=Register',
+                            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                            data=f"&userName={login}&company={company}&password={password}",
+                            allow_redirects=False)
 
         if res.status_code != 302:
-            print('[-] Registration fail')
+            print(f"[-] Registration failed: {res.status_code}")
             return None
-        print('[+] Registration success')
+
+        print("[+] Registration succeed")
         token = parse_token(res.headers.get("Set-Cookie"))
         return token
 
     def login_and_get_auth_token(self, login, password):
-        s = Session()
-
-        res = s.post(f'{self.http_address}/LoginOrRegister?handler=Login',
-                     headers={'Content-Type': 'application/x-www-form-urlencoded'},
-                     data="__EVENTTARGET="
-                          f"&userName={login}"
-                          f"&password={password}",
-                     allow_redirects=False)
+        res = requests.post(f'{self.http_address}/LoginOrRegister?handler=Login',
+                            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                            data=f"&userName={login}&password={password}",
+                            allow_redirects=False)
 
         if res.status_code != 302:
-            print('[-] Login fail')
+            print(f"[-] Login failed: {res.status_code}")
             return None
-        print('[+] Login success')
+
+        print("[+] Login succeed")
         token = parse_token(res.headers.get("Set-Cookie"))
         return token
 
-    def send_bytes(self, data: bytes):
+    def send_tcp_bytes(self, data: bytes):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.ip_address, self.tcp_port))
         s.sendall(data)
-        result = s.recv(1024 * 100)
+        result = s.recv(1024 * 1024)
         return result
 
     def send_base64(self, base64_str: str):
         data = base64.b64decode(base64_str)
-        return self.send_bytes(data)
+        return self.send_tcp_bytes(data)
 
 
 companies = [
