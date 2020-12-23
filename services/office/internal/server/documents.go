@@ -43,11 +43,19 @@ func (s *documentsService) Mount(mux *chi.Mux) {
 		})
 }
 
+const (
+	maxLimit  = 100
+	minLimit  = 1
+	minOffset = 0
+)
+
 func (s *documentsService) List(ctx context.Context, req *pb.ListDocumentsRequest) (*pb.ListDocumentsResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
 	defer cancel()
-	// TODO: [12/20/20] (vaspahomov): pagination
-	docs, err := s.m.List(ctx)
+	if err := pagingValid(req.Limit, req.Offset); err != nil {
+		return nil, err
+	}
+	docs, err := s.m.List(ctx, int(req.Limit), int(req.Offset))
 	if err != nil {
 		return nil, err
 	}

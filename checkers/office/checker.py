@@ -127,7 +127,6 @@ async def get(request: GetRequest) -> Verdict:
     try:
         executed = r.executed
     except:
-        err = "invalid resp format"
         return Verdict.MUMBLE(err)
 
     di, err = DocInfo.parse(executed)
