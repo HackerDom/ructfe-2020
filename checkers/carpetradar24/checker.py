@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import uuid
 import client as c
 import random
