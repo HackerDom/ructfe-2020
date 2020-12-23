@@ -3,11 +3,11 @@ import string
 import random
 
 from gornilo import Checker, CheckRequest, PutRequest, GetRequest, Verdict
-import gornilo
 from api import Api
 import proto.office_pb2 as pb
-import json
 import re
+from errs import INVALID_FORMAT_ERR, FAILED_TO_CONNECT
+
 
 checker = Checker()
 
@@ -17,15 +17,21 @@ def get_random_str(length=10):
 
 
 def create_doc():
-    return """
+    a = get_random_str(length=4)
+    b = get_random_str(length=4)
+    return f"""
 vars:
-  b: 'bio'
+  {a}: 'bio'
+  {b}: 'name'
 exprs:
-  - name: "bio"
-    expr: "get_info(b)"
+  - name: {a}
+    expr: "get_info({a})"
+  - name: {b}
+    expr: "get_info({b})"
 ---
-Hi '{username}'!
-Bio: '{bio}'"""
+Hi '{{username}}'!
+Name: '{{{b}}}'
+Bio: '{{{a}}}'"""
 
 
 def create_doc_with_flag(flag: str):
@@ -42,17 +48,17 @@ async def check_service(request: CheckRequest) -> Verdict:
     req = pb.ListDocumentsRequest()
     req.offset = 0
     req.limit = 100
+    # todo: check listing (may be move to get)
     r, err = api.list_doc(req)
     if err != None:
-        print(err)
-        return Verdict.MUMBLE("failed to get response from service")
+        return verdict_from_api_err(err)
     req = pb.ListRequest()
     req.offset = 0
     req.limit = 100
+    # todo: check listing (may be move to get)
     r, err = api.list_users(req)
     if err != None:
-        print(err)
-        return Verdict.MUMBLE("failed to get response from service")
+        return verdict_from_api_err(err)
     return Verdict.OK()
 
 
@@ -61,26 +67,25 @@ async def put(request: PutRequest) -> Verdict:
     api = Api(f'{request.hostname}:8080')
     name = get_random_str()
     password = get_random_str(30)
+
     req = pb.RegisterRequest()
     req.name = name
     req.password = password
     req.bio = request.flag
     r, err = api.register(req)
     if err != None:
-        print(err)
-        return Verdict.MUMBLE("failed to get response from service")
+        return verdict_from_api_err(err)
 
     req = pb.CreateDocumentRequest()
-    req.name = get_random_str()
+    req.name = name
     req.doc = create_doc()
     r, err = api.create_doc(req)
     if err != None:
-        print(err)
-        return Verdict.MUMBLE("failed to get response from service")
+        return verdict_from_api_err(err)
     try:
         user_id = r.id
     except:
-        return Verdict.MUMBLE("failed to get response from service")
+        return Verdict.MUMBLE(INVALID_FORMAT_ERR)
     return Verdict.OK(f"{name}:{password}:{user_id}")
 
 
@@ -95,19 +100,17 @@ async def put_2(request: PutRequest) -> Verdict:
     req.bio = request.flag
     r, err = api.register(req)
     if err != None:
-        print(err)
-        return Verdict.MUMBLE("failed to get response from service")
+        return verdict_from_api_err(err)
     req = pb.CreateDocumentRequest()
     req.name = name
     req.doc = create_doc_with_flag(request.flag)
     r, err = api.create_doc(req)
     if err != None:
-        print(err)
-        return Verdict.MUMBLE("failed to get response from service")
+        return verdict_from_api_err(err)
     try:
         user_id = r.id
     except:
-        return Verdict.MUMBLE("failed to get response from service")
+        return Verdict.MUMBLE(INVALID_FORMAT_ERR)
     return Verdict.OK(f"{name}:{password}:{user_id}")
 
 
@@ -120,8 +123,7 @@ async def get(request: GetRequest) -> Verdict:
     req.username = name
     r, err = api.execute_doc(req)
     if err != None:
-        print(err)
-        return Verdict.MUMBLE("failed to get response from service")
+        return verdict_from_api_err(err)
     try:
         executed = r.executed
     except:
@@ -131,6 +133,8 @@ async def get(request: GetRequest) -> Verdict:
     di, err = DocInfo.parse(executed)
     if err != None:
         return Verdict.MUMBLE(err)
+    if di.name != di.username:
+        return Verdict.MUMBLE(INVALID_FORMAT_ERR)
     if di.bio != request.flag:
         return Verdict.MUMBLE("invalid flag")
     return Verdict.OK()
@@ -145,13 +149,11 @@ async def get_2(request: GetRequest) -> Verdict:
     req.username = name
     r, err = api.execute_doc(req)
     if err != None:
-        print(err)
-        return Verdict.MUMBLE("failed to get response from service")
+        return verdict_from_api_err(err)
     try:
         executed = r.executed
     except:
-        err = "invalid resp format"
-        return Verdict.MUMBLE(err)
+        return Verdict.MUMBLE(INVALID_FORMAT_ERR)
     di, err = DocInfo.parse_static(executed)
     if err != None:
         return Verdict.MUMBLE(err)
@@ -162,43 +164,54 @@ async def get_2(request: GetRequest) -> Verdict:
 
 class DocInfo:
     USERNAME_RE = "Hi '(.*)'!"
+    NAME_RE = "Name: '(.*)'"
     BIO_RE = "Bio: '(.*)'"
     SECRET_RE = "Secret info: '(.*)'!!!"
 
-    def __init__(self, username: str, bio: str, secret_info: str):
+    def __init__(self, username: str, name: str, bio: str, secret_info: str):
         self.username: str = username
+        self.name: str = name
         self.bio: str = bio
         self.secret_info: str = secret_info
 
     @staticmethod
     def parse(content: str) -> (object, str):
         splitted = content.split('\n')
-        if len(splitted) != 2:
-            print(f"invalid lines count was: {len(splitted)} want: 2")
-            return None, "invalid doc format"
+        if len(splitted) != 3:
+            print(f"invalid lines count was: {len(splitted)} want: 3")
+            return None, INVALID_FORMAT_ERR
         try:
             m = re.match(DocInfo.USERNAME_RE, splitted[0])
             username = m.group(1)
-            m = re.search(DocInfo.BIO_RE, splitted[1])
+            m = re.match(DocInfo.NAME_RE, splitted[1])
+            name = m.group(1)
+            m = re.search(DocInfo.BIO_RE, splitted[2])
             bio = m.group(1)
         except Exception as e:
             print(e)
-            return None, "invalid doc format"
-        return DocInfo(username, bio, ""), None
+            return None, INVALID_FORMAT_ERR
+        return DocInfo(username, name, bio, ""), None
 
     @staticmethod
     def parse_static(content: str) -> (object, str):
         splitted = content.split('\n')
         if len(splitted) != 1:
             print(f"invalid lines count was: {len(splitted)} want: 1")
-            return None, "invalid doc format"
+            return None, INVALID_FORMAT_ERR
         try:
             m = re.match(DocInfo.SECRET_RE, splitted[0])
             secret_info = m.group(1)
         except Exception as e:
             print(e)
-            return None, "invalid doc format"
-        return DocInfo("", "", secret_info), None
+            return None, INVALID_FORMAT_ERR
+        return DocInfo("", "", "", secret_info), None
+
+
+def verdict_from_api_err(err: str) -> Verdict:
+    if err == "failed to connect":
+        return Verdict.DOWN(err)
+    else:
+        return Verdict.MUMBLE(err)
 
 
 if __name__ == '__main__':
