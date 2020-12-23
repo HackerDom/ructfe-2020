@@ -19,6 +19,7 @@ namespace CarpetRadar.Services
             }
             catch
             {
+                // ignored
             }
         }
     }

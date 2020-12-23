@@ -8,7 +8,7 @@ namespace CarpetRadar.Services.IdentityServices
 {
     public interface IRegistrationService
     {
-        Task<Guid?> RegisterUser(string login, string password, string companyName); /// возвращать ошибку - например, имя занято
+        Task<Guid?> RegisterUser(string login, string password, string companyName);
     }
 
     public class RegistrationService : IRegistrationService
