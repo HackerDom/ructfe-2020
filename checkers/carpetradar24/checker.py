@@ -4,15 +4,21 @@ import client as c
 import random
 import string
 from functools import wraps
-from gornilo import CheckRequest, Verdict, Checker, PutRequest, GetRequest
+from gornilo import Checker, Verdict, CheckRequest, PutRequest, GetRequest
 import traceback
 
 checker = Checker()
 
-
 TCP_PORT = 12345
 HTTP_PORT = 7000
 
+code = {
+    101: "OK",
+    102: "CORRUPT",
+    103: "MUMBLE",
+    104: "DOWN",
+    110: "CHECKER_ERROR"
+}
 
 def check_exception(func):
     @wraps(func)
@@ -21,10 +27,12 @@ def check_exception(func):
             result = func(request, *args, **kwargs)
         except ConnectionError:
             traceback.print_exc()
-            return Verdict.DOWN("Connection error")
+            result = Verdict.DOWN("Connection error")
         except Exception:
             traceback.print_exc()
-            return Verdict.CHECKER_ERROR("Internal error")
+            result = Verdict.CHECKER_ERROR("Internal error")
+
+        print(f"Return verdict: [{result._code} {code[result._code]}] <{result._public_message}>")
         return result
 
     return inner
@@ -92,7 +100,7 @@ def put_flag(request: PutRequest) -> Verdict:
 def get_flag(request: GetRequest) -> Verdict:
     client = c.Client(request.hostname, TCP_PORT, HTTP_PORT)
 
-    login, password = request.flag_id.split(":")
+    login, password = request.flag_id.strip().split(":")
     token = client.login_and_get_auth_token(login, password)
     if token is None:
         return Verdict.MUMBLE("Can't login or parse auth token")
@@ -121,3 +129,7 @@ def get_creds():
 
 def get_random_int():
     return random.randint(1, 1024 * 1024 * 1024)
+
+
+if __name__ == '__main__':
+    checker.run()
