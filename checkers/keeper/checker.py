@@ -74,7 +74,7 @@ def put_flag(request: PutRequest) -> Verdict:
 
 @checker.define_get(vuln_num=1)
 def get_flag(request: GetRequest) -> Verdict:
-    username, password, filename = request.flag_id.split(":")
+    username, password, filename = request.flag_id.strip().split(":")
     session = login(request.hostname, username, password)
     real_flag = download_file(session, request.hostname, filename)
     if request.flag != real_flag:

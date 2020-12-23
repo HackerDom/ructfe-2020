@@ -1,6 +1,7 @@
 package docs
 
 import (
+	"context"
 	"fmt"
 	pb "github.com/HackerDom/ructfe2020/proto"
 	"github.com/jmoiron/sqlx"
@@ -9,10 +10,10 @@ import (
 )
 
 type Documents interface {
-	List() ([]*pb.Document, error)
-	Insert(document *pb.Document) (int64, error)
-	Delete(docID int64) error
-	Get(name int64) (*pb.Document, error)
+	List(ctx context.Context) ([]*pb.Document, error)
+	Insert(ctx context.Context, document *pb.Document) (int64, error)
+	Delete(ctx context.Context, docID int64) error
+	Get(ctx context.Context, name int64) (*pb.Document, error)
 }
 
 var docsSchema = `CREATE TABLE IF NOT EXISTS documents (
@@ -47,9 +48,9 @@ type pg struct {
 	l  *zap.Logger
 }
 
-func (p *pg) List() ([]*pb.Document, error) {
+func (p *pg) List(ctx context.Context) ([]*pb.Document, error) {
 	ds := make([]doc, 0)
-	err := p.db.Select(&ds, "SELECT id, content FROM documents;")
+	err := p.db.SelectContext(ctx, &ds, "SELECT id, content FROM documents;")
 	if err != nil {
 		return nil, err
 	}
@@ -63,12 +64,12 @@ func (p *pg) List() ([]*pb.Document, error) {
 	return pdocs, nil
 }
 
-func (p *pg) Insert(document *pb.Document) (int64, error) {
+func (p *pg) Insert(ctx context.Context, document *pb.Document) (int64, error) {
 	pr, err := proto.Marshal(document)
 	if err != nil {
 		return 0, err
 	}
-	row, err := p.db.Query("INSERT INTO documents (content) VALUES ($1) RETURNING id;", pr)
+	row, err := p.db.QueryContext(ctx, "INSERT INTO documents (content) VALUES ($1) RETURNING id;", pr)
 	if err != nil {
 		return 0, err
 	}
@@ -80,13 +81,13 @@ func (p *pg) Insert(document *pb.Document) (int64, error) {
 	return id, err
 }
 
-func (p *pg) Delete(docID int64) error {
-	_, err := p.db.Exec("DELETE (id, content) FROM documents WHERE id = $1;", docID)
+func (p *pg) Delete(ctx context.Context, docID int64) error {
+	_, err := p.db.ExecContext(ctx, "DELETE (id, content) FROM documents WHERE id = $1;", docID)
 	return err
 }
 
-func (p *pg) Get(id int64) (*pb.Document, error) {
-	rows, err := p.db.Query("SELECT id, content FROM documents WHERE id = $1;", id)
+func (p *pg) Get(ctx context.Context, id int64) (*pb.Document, error) {
+	rows, err := p.db.QueryContext(ctx, "SELECT id, content FROM documents WHERE id = $1;", id)
 	if err != nil {
 		return nil, err
 	}

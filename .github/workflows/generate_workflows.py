@@ -22,13 +22,16 @@ on:
   workflow_dispatch: {{}}
 
 jobs:
-  check_services:
+  check_{service}:
     name: Check {service}
     runs-on: ubuntu-18.04
 
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
+
+    - name: Run prebuilt hook
+      run: if [ -f services/{service}/before_image_build.sh ]; then (cd ./services/{service} && ./before_image_build.sh); fi
 
     - name: Setup {service}
       run: (cd ./services/{service} && docker-compose pull && docker-compose build && docker-compose up --build -d)
@@ -43,6 +46,27 @@ jobs:
 
     - name: Test checker on service
       run: checkers/{service}/checker.py TEST 127.0.0.1
+
+  update_{service}:
+    name: Deploy service using ansible to first teams
+    needs: check_{service}
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: install ansible
+      run: sudo apt-get install -y ansible
+
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: change permission for ssh key
+      run: chmod 0600 ./vuln_image/keys/id_rsa
+
+    - name: Run prebuilt hook
+      run: if [ -f services/{service}/before_image_build.sh ]; then (cd ./services/{service} && ./before_image_build.sh); fi
+
+    - name: try to deploy {service}
+      run: ./vuln_image/update_first_ten_teams.sh {service}
 
 '''
 

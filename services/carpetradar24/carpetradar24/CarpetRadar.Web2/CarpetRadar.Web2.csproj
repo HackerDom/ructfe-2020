@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <StartupObject>CarpetRadar.Web2.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="kover.png" />
+    <None Remove="kover_na_oblachke.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="NLog" Version="4.7.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="CarpetRadar.Services">
+      <HintPath>CarpetRadar.Services.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+
+
+</Project>

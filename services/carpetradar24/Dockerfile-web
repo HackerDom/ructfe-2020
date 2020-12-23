@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/dotnet/aspnet:3.1-alpine
+
+WORKDIR app
+
+COPY /bins/Web .
+
+CMD ["dotnet", "CarpetRadar.Web2.dll"]

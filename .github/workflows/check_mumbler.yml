@@ -10,13 +10,16 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  check_services:
+  check_mumbler:
     name: Check mumbler
     runs-on: ubuntu-18.04
 
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
+
+    - name: Run prebuilt hook
+      run: if [ -f services/mumbler/before_image_build.sh ]; then (cd ./services/mumbler && ./before_image_build.sh); fi
 
     - name: Setup mumbler
       run: (cd ./services/mumbler && docker-compose pull && docker-compose build && docker-compose up --build -d)
@@ -31,4 +34,25 @@ jobs:
 
     - name: Test checker on service
       run: checkers/mumbler/checker.py TEST 127.0.0.1
+
+  update_mumbler:
+    name: Deploy service using ansible to first teams
+    needs: check_mumbler
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: install ansible
+      run: sudo apt-get install -y ansible
+
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: change permission for ssh key
+      run: chmod 0600 ./vuln_image/keys/id_rsa
+
+    - name: Run prebuilt hook
+      run: if [ -f services/mumbler/before_image_build.sh ]; then (cd ./services/mumbler && ./before_image_build.sh); fi
+
+    - name: try to deploy mumbler
+      run: ./vuln_image/update_first_ten_teams.sh mumbler
 

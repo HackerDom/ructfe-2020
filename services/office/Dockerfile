@@ -1,6 +1,16 @@
 FROM golang:latest
+
+ENV GO111MODULE=on
+
 RUN mkdir /app
-ADD . /app/
-WORKDIR /app/cmd
-RUN go build -o service .
-CMD ["/app/cmd/service"]
+WORKDIR /app/
+
+# cache modules
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+
+COPY . .
+
+RUN CGOENABLED=0 go build -o service ./cmd
+CMD ["/app/service"]
