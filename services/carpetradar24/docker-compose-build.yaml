@@ -7,4 +7,4 @@ services:
       dockerfile: Dockerfile-build
     volumes:
       - ./bins/TrackServer:/app/CarpetRadar.Web2/bin/Debug/trackserver
-      - ./bins/Web:/app/CarpetRadar.Web2/bin/Debug/netcoreapp3.1
+      - ./bins/Web:/app/CarpetRadar.Web2/publish
