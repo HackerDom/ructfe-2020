@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/HackerDom/ructfe2020/internal/hashutil"
 	userstorage "github.com/HackerDom/ructfe2020/internal/storage/users"
+	"github.com/HackerDom/ructfe2020/internal/storage/sessions"
 	pb "github.com/HackerDom/ructfe2020/proto"
 	"regexp"
 )
 
 type users struct {
 	s userstorage.Users
+	sess sessions.Sessions
 }
 
 func (m *users) GetUsers() ([]*pb.User, error) {
