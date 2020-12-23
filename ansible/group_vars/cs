@@ -131,4 +131,4 @@ services: |
   {name => 'keeper',        path => 'checkers/keeper/checker.py',        timeout => 30, tcp_port => 3687},
   {name => 'crypto',        path => 'checkers/crypto/checker.py',        timeout => 30, tcp_port => -1},
   {name => 'carpetradar24', path => 'checkers/carpetradar24/checker.py', timeout => 30, tcp_port => 7000},
-  {name => 'mumbler',       path => 'checkers/mumbler/checker.py',       timeout => 30, tcp_port => -1},
+  {name => 'mumbler',       path => 'checkers/mumbler/checker.py',       timeout => 30, tcp_port => 7124},

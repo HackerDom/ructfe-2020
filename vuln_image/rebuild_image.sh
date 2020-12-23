@@ -15,6 +15,7 @@ vboxmanage snapshot "$VM_NAME" restore "base_image"
 
 # Start vm
 VBoxManage modifyvm "$VM_NAME" --natpf1 "deploy,tcp,127.0.0.1,$SSH_PORT,,22"
+VBoxManage modifyvm "$VM_NAME" --memory 4096
 vboxmanage startvm "$VM_NAME" --type headless
 
 echo "Waiting SSH up"

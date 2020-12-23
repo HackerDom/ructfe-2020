@@ -23,6 +23,7 @@ func (m *users) GetUsers(ctx context.Context) ([]*pb.User, error) {
 
 func (m *users) GetNames(ctx context.Context) ([]string, error) {
 	users, err := m.s.List(ctx)
+	fmt.Println(users)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +64,7 @@ func (m *users) RegisterUser(ctx context.Context, username, pass, bio string) (*
 
 const maxUsernameLen = 20
 const minUsernameLen = 1
-const usernameRegexp = "^[a-zA-Z0-9].$"
+const usernameRegexp = "^[a-zA-Z0-9]*$"
 
 func validateUsername(username string) error {
 	if len(username) > maxUsernameLen {
