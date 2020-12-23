@@ -51,19 +51,16 @@ void sign_clears(sign_ptr sign1, ...) {
 }
 
 void sign_set(sign_ptr result, sign_srcptr sign) {
-    if (sign->data != NULL) {
-        result->length = sign->length;
-        result->data = malloc(result->length * sizeof(uint8_t));
-
-        memcpy(result->data, sign->data, result->length);
+    if (result->data != NULL) {
+        free(result->data);
+        result->data = NULL;
     }
-    else {
-        if (result->data != NULL) {
-            free(result->data);
-        }
 
-        result->data = sign->data;
-        result->length = sign->length;
+    result->length = sign->length;
+    
+    if (sign->data != NULL) {
+        result->data = malloc(result->length);
+        memcpy(result->data, sign->data, result->length);
     }
 }
 
@@ -85,10 +82,10 @@ void __sign_data_to_point(point_ptr point, mpz_srcptr N, size_t data_size, const
     size_t coord_length, value_length;
     uint8_t *value;
 
-    coord_length = (mpz_sizeinbase(N, 2) - 1) / (8 * sizeof(uint8_t));
-    value_length = 2 * coord_length;
+    coord_length = (mpz_sizeinbase(N, 2) - 1) / 8;
+    value_length = 2 * coord_length * sizeof(uint8_t);
 
-    value = malloc(value_length * sizeof(uint8_t));
+    value = malloc(value_length);
     memset(value, 0xFF, value_length);
 
     for (size_t i = 0, j = 0; i < data_size; i++, j++) {

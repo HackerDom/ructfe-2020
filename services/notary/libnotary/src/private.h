@@ -32,7 +32,6 @@ bool private_deserialize(private_ptr private, size_t data_size, const uint8_t *d
 void private_get_public(public_ptr public, private_srcptr private);
 bool private_generate(private_ptr private);
 bool private_is_valid(private_srcptr private);
-bool private_is_public_correct(private_srcptr private, public_srcptr public);
 
 
 #endif

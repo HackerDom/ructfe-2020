@@ -1,10 +1,21 @@
-#define _GNU_SOURCE
-
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 #include "serialization.h"
 
+
+void memfrob(uint8_t *data, size_t size) {
+    uint8_t xor, value;
+
+    xor = 0;
+    value = 1;
+
+    for (size_t i = 0; i < size; i++) {
+        data[size - i - 1] ^= value;
+        xor ^= data[size - i - 1];
+        value = (value * 11) % 251;
+    }
+}
 
 void mpzs_serialize(size_t *data_size, uint8_t **data, size_t mpzs_count, ...) {
     size_t result_data_size, n_size_sum, n_size[mpzs_count];

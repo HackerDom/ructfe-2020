@@ -212,17 +212,3 @@ bool private_is_valid(private_srcptr private) {
 
     return result;
 }
-
-bool private_is_public_correct(private_srcptr private, public_srcptr public) {
-    public_t expected;
-    bool result;
-
-    public_init(expected);
-    private_get_public(expected, private);
-
-    result = public_is_equal(public, expected);
-
-    public_clear(expected);
-
-    return result;
-}
