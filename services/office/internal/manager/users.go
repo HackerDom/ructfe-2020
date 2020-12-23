@@ -8,6 +8,7 @@ import (
 	"github.com/HackerDom/ructfe2020/internal/storage/sessions"
 	pb "github.com/HackerDom/ructfe2020/proto"
 	"regexp"
+	"time"
 )
 
 type users struct {
@@ -40,7 +41,19 @@ func (m *users) LoginUser(ctx context.Context, username, pass string) (*pb.Login
 	if err := validateUsername(username); err != nil {
 		return nil, err
 	}
-	panic("not implemented")
+	pass = hashutil.PersistDigest(pass)
+	user, err := m.s.User(ctx, username, pass)
+	if err != nil {
+		return nil, err
+	}
+	session, err := m.sess.Token(ctx, user.Name)
+	if err != nil {
+		return nil, nil
+	}
+	response := &pb.LoginResponse{
+		Session: session,
+	}
+	return response, nil
 }
 
 func (m *users) RegisterUser(ctx context.Context, username, pass, bio string) (*pb.User, error) {
@@ -54,6 +67,12 @@ func (m *users) RegisterUser(ctx context.Context, username, pass, bio string) (*
 		Bio:      bio,
 	}
 	err := m.s.Insert(ctx, user)
+
+	if err != nil {
+		return nil, fmt.Errorf("user %s already exists", username)
+	}
+	session := hashutil.PersistDigest(username + time.Now().String())
+	err = m.sess.Insert(ctx, username, session)
 	if err != nil {
 		return nil, err
 	}
