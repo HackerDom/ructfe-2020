@@ -10,12 +10,28 @@ import (
 var usersSchema = `CREATE TABLE IF NOT EXISTS users (
     name					TEXT PRIMARY KEY,
 	password                TEXT,
-	bio                     TEXT
-);`
+	bio                     TEXT,
+	ts						timestamp NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS users_ts_index ON users (ts);
+
+CREATE FUNCTION users_delete_old_rows() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  DELETE FROM users WHERE ts < NOW() - INTERVAL '20 minute';
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER users_delete_old_rows_trigger
+    AFTER INSERT ON users
+    EXECUTE PROCEDURE users_delete_old_rows();`
 
 
 type Users interface {
-	List(ctx context.Context) ([]*pb.User, error)
+	List(ctx context.Context, limit, offset int, skipPagination bool) ([]*pb.User, error)
 	Insert(ctx context.Context, user *pb.User) error
 }
 
@@ -46,11 +62,18 @@ func (s *Pg) Insert(ctx context.Context, user *pb.User) error {
 	return err
 }
 
-func (s *Pg) List(ctx context.Context) ([]*pb.User, error) {
+func (s *Pg) List(ctx context.Context, limit, offset int, skipPagination bool) ([]*pb.User, error) {
 	var users []userModel
-	err := s.db.SelectContext(ctx, &users, "SELECT name, password, bio FROM users;")
-	if err != nil {
-		return nil, err
+	if skipPagination {
+		err := s.db.SelectContext(ctx, &users, "SELECT name, password, bio FROM users;")
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err := s.db.SelectContext(ctx, &users, "SELECT name, password, bio FROM users LIMIT $1 OFFSET $2;", limit, offset)
+		if err != nil {
+			return nil, err
+		}
 	}
 	usersProto := make([]*pb.User, len(users))
 	for i, u := range users {

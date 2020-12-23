@@ -21,7 +21,7 @@ if len(sys.argv) == 4:
 else:
     PARALLEL = 10
 WAIT_TIME = 0.3  # sleep time after execution in seconds
-LIMIT = 1000
+LIMIT = 100000
 START_JITTER = 0.1  # in seconds
 
 stop_requested = False

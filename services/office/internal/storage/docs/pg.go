@@ -10,7 +10,7 @@ import (
 )
 
 type Documents interface {
-	List(ctx context.Context) ([]*pb.Document, error)
+	List(ctx context.Context, limit, offset int) ([]*pb.Document, error)
 	Insert(ctx context.Context, document *pb.Document) (int64, error)
 	Delete(ctx context.Context, docID int64) error
 	Get(ctx context.Context, name int64) (*pb.Document, error)
@@ -48,9 +48,9 @@ type pg struct {
 	l  *zap.Logger
 }
 
-func (p *pg) List(ctx context.Context) ([]*pb.Document, error) {
+func (p *pg) List(ctx context.Context, limit, offset int) ([]*pb.Document, error) {
 	ds := make([]doc, 0)
-	err := p.db.SelectContext(ctx, &ds, "SELECT id, content FROM documents;")
+	err := p.db.SelectContext(ctx, &ds, "SELECT id, content FROM documents LIMIT $1 OFFSET $2;", limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,6 @@ func (p *pg) Get(ctx context.Context, id int64) (*pb.Document, error) {
 		return nil, fmt.Errorf("not enougth returning rows")
 	}
 	d := &doc{}
-	fmt.Println()
 	err = rows.Scan(&d.Id, &d.Content)
 	if err != nil {
 		return nil, err

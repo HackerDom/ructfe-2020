@@ -13,17 +13,8 @@ type users struct {
 	s userstorage.Users
 }
 
-func (m *users) GetUsers(ctx context.Context) ([]*pb.User, error) {
-	users, err := m.s.List(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return users, nil
-}
-
-func (m *users) GetNames(ctx context.Context) ([]string, error) {
-	users, err := m.s.List(ctx)
-	fmt.Println(users)
+func (m *users) GetNames(ctx context.Context, limit, offset int) ([]string, error) {
+	users, err := m.s.List(ctx, limit, offset, false)
 	if err != nil {
 		return nil, err
 	}
