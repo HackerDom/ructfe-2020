@@ -14,6 +14,7 @@ checker = Checker()
 @checker.define_check
 def check(request: CheckRequest) -> Verdict:
     api = Api(request.hostname)
+    print(list_users(api))
     try:
         result = api.ping()
         if result and result['status'] == 200:
@@ -68,9 +69,11 @@ def get(request: GetRequest) -> Verdict:
         print(ex)
         return Verdict.MUMBLE("Can't load private key")
 
-    res, err = get_public_key(api, login)
+    res, err = get_user(api, login)
     if err: return err
-    if res != crypter.dump_public().hex():
+    _login, _balance, _pub_key = res
+
+    if _pub_key != crypter.dump_public().hex():
         return Verdict.MUMBLE("Wronf public key")
 
     transactions, err = get_transactions(api, login)
@@ -128,16 +131,18 @@ def get_cookie(api, login, password):
     cookie = result["addition"]["cookie"]
     return cookie, None
 
-def get_public_key(api, login):
-    result = api.get_public_key(login)
+def get_user(api, login):
+    result = api.get_user(login)
     if result is None:
-        return None, Verdict.DOWN("Can't get public key")
+        return None, Verdict.DOWN("Can't get user")
 
-    if "addition" not in result or "pub_key" not in result["addition"]:
-        return None, Verdict.MUMBLE("Wrong public key data")
+    if "addition" not in result or "pub_key" not in result["addition"] or "login" not in result["addition"] or "balance" not in result["addition"]:
+        return None, Verdict.MUMBLE("Wrong user data")
 
+    login = result["addition"]["login"]
+    balance = result["addition"]["balance"]
     pub_key = result["addition"]["pub_key"]
-    return pub_key, None
+    return (login, balance, pub_key), None
 
 def get_transactions(api, login):
     result = api.get_transacions(login)
@@ -149,6 +154,17 @@ def get_transactions(api, login):
 
     transactions = result["addition"]["transactions"]
     return transactions, None
+
+def list_users(api):
+    result = api.list_users()
+    if result is None:
+        return None, Verdict.DOWN("Can't get users")
+
+    if "addition" not in result or "users" not in result["addition"]:
+        return None, Verdict.MUMBLE("Wrong users data")
+
+    users = result["addition"]["users"]
+    return users, None
 
 
 def get_random_string(length):

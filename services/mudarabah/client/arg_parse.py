@@ -1,7 +1,7 @@
 import argparse
 
 def get_parsed_args():
-    parser = argparse.ArgumentParser(description="client for mudaraba service")
+    parser = argparse.ArgumentParser(description="client for mudarabah service")
     parser.add_argument('-r', '--register', dest='register',
                         action='store_true',
                         help="register user")

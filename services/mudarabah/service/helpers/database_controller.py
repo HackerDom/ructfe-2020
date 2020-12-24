@@ -54,7 +54,7 @@ class DatabaseClient:
     
     def get_all_users(self):
         self.cursor.execute('SELECT login FROM public.users')
-        return self.cursor.fetchall()
+        return [x[0] for x in self.cursor.fetchall()]
 
     def get_user_by_login_and_pass(self, username, password):
         print("in select user", flush=True)
