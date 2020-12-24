@@ -34,7 +34,7 @@ CREATE TRIGGER users_delete_old_rows_trigger
 type Users interface {
 	List(ctx context.Context, limit, offset int, skipPagination bool) ([]*pb.User, error)
 	Insert(ctx context.Context, user *pb.User) error
-	User(ctx context.Context, name, pass string) (*pb.User, error)
+	User(ctx context.Context, name string) (*pb.User, error)
 }
 
 func NewPg(db *sqlx.DB, l *zap.Logger) (Users, error) {
@@ -64,20 +64,23 @@ func (s *Pg) Insert(ctx context.Context, user *pb.User) error {
 	return err
 }
 
-
-func (s *Pg) User(ctx context.Context, name string, pass string) (*pb.User, error) {
+func (s *Pg) User(ctx context.Context, name string) (*pb.User, error) {
 	var users []userModel
-	err := s.db.SelectContext(ctx, &users, "SELECT name, password, bio FROM users WHERE name=$1 AND password=$2;", name, pass)
+	err := s.db.SelectContext(ctx, &users, "SELECT name, password, bio FROM users WHERE name=$1;", name)
 	if err != nil {
 		return nil, err
 	}
 	if len(users) == 0 {
 		return nil, fmt.Errorf("no such user exists")
 	}
+	if len(users) > 1 {
+		return nil, fmt.Errorf("mutiple users with same name: %s", users[0].Name)
+	}
+	u := users[0]
 	userProto := &pb.User{
-		Name: users[0].Name,
-		Password: users[0].Password,
-		Bio: users[0].Bio,
+		Name:     u.Name,
+		Password: u.Password,
+		Bio:      u.Bio,
 	}
 	return userProto, err
 }

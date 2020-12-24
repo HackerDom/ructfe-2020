@@ -57,7 +57,6 @@ async def check_service(request: CheckRequest) -> Verdict:
     req.limit = 100
     # todo: check listing (may be move to get)
     r, err = api.list_users(req)
-    print(r)
     if err != None:
         return verdict_from_api_err(err)
     return Verdict.OK()

@@ -33,9 +33,12 @@ func (m *users) LoginUser(ctx context.Context, username, pass string) (*pb.Login
 		return nil, err
 	}
 	pass = hashutil.PersistDigest(pass)
-	user, err := m.s.User(ctx, username, pass)
+	user, err := m.s.User(ctx, username)
 	if err != nil {
 		return nil, err
+	}
+	if user.Password != pass {
+		return nil, fmt.Errorf("user with this credentionals does not exist")
 	}
 	session, err := m.sess.Token(ctx, user.Name)
 	if err != nil {
@@ -58,7 +61,6 @@ func (m *users) RegisterUser(ctx context.Context, username, pass, bio string) (*
 		Bio:      bio,
 	}
 	err := m.s.Insert(ctx, user)
-
 	if err != nil {
 		return nil, fmt.Errorf("user %s already exists", username)
 	}
@@ -74,9 +76,11 @@ func (m *users) RegisterUser(ctx context.Context, username, pass, bio string) (*
 	}, nil
 }
 
-const maxUsernameLen = 20
-const minUsernameLen = 1
-const usernameRegexp = "^[a-zA-Z0-9]*$"
+const (
+	maxUsernameLen = 20
+	minUsernameLen = 1
+	usernameRegexp = "^[a-zA-Z0-9]*$"
+)
 
 func validateUsername(username string) error {
 	if len(username) > maxUsernameLen {
