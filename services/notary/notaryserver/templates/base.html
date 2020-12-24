@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{% block title %}Notary{% endblock title %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        * {
+            word-break: break-all;
+        }
+    </style>
+<!--    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">-->
+</head>
+
+<body>
+
+    {% block navbar %}
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+<!--            <a href="/" class="navbar-brand">-->
+<!--                <img class="card-img-top img-responsive" style="height: 150%;"-->
+<!--                     src="{{ url_for('static', filename='logo_white.png') }}">-->
+<!--            </a>-->
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Recently signed documents</a>
+                </li>
+                <li class="nav-item pl-2">
+                    <a class="nav-link" href="/verify">Verify a signature</a>
+                </li>
+                {% if current_user.is_authenticated %}
+                <li class="nav-item pl-2">
+                    <a class="nav-link" href="/sign">Sign a document</a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav">
+                {% if current_user.is_authenticated %}
+                <li class="nav-item navbar-text mr-3">
+                    <span style="color: #333333">Logged in as {{ current_user.name }}</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">Profile</a>
+                </li>
+                <li class="nav-item pl-2">
+                    <a class="nav-link" href="/logout">Log out</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/signup">Register</a>
+                </li>
+                <li class="nav-item pl-2">
+                    <a class="nav-link" href="/login">Log in</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {%- endblock navbar %}
+
+    {% block content -%}
+    <div class="container">
+        {% block page_content %}
+        {% endblock %}
+
+        {% if error %}
+        <div class="alert alert-danger alert-dismissible mt-3" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-info alert-dismissible mt-3" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {%- endblock content %}
+
+</body>
+</html>

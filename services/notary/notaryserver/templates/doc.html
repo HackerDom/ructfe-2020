@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %} Document #{{ doc.id }} {% endblock %}
+
+{% block page_content %}
+
+<div class="row mb-4">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <h4 class="card-header">
+                <a href="{{ url_for('doc', doc_id=doc.id) }}">{{ doc.title }}</a>
+            </h4>
+            <div class="card-body">
+                <p> {{ doc.text }} </p>
+                <hr/>
+                <p>Signed by <em>{{ doc.author.name }}</em></p>
+                <p>{{ doc.author.name }}'s signature: <code>{{ doc.signature }}</code> </p>
+                <p>{{ doc.author.name }}'s public key: <code>{{ doc.author.pubkey }}</code> </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

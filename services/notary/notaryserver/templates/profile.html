@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %} Profile {% endblock %}
+
+{% block page_content %}
+
+<div class="row mb-4">
+    <div class="col-md-8 pl-5 pt-3">
+        {% if current_user.documents %}
+            Here are your published documents:
+            <ul class="pl-3" style="list-style-type: '—';">
+                {% for doc in current_user.documents %}
+                    <li class="pl-1"><a href="{{ url_for('doc', doc_id=doc.id) }}">{{ doc.title }}</a></li>
+                {% endfor %}
+            </ul>
+            <a href="/sign">Click here</a> to sign and publish a new one.
+        {% else %}
+            You haven't signed any documents. <a href="/sign">Click here</a> to sign and publish your first document.
+        {% endif %}
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <h4 class="card-header">Profile details</h4>
+            <div class="card-body">
+                <div> <strong>Phone</strong>: {{ current_user.phone }} </div>
+                <div> <strong>Address</strong>: {{ current_user.address }} </div>
+                <div> <strong>Public key</strong>: <code>{{ current_user.pubkey }}</code> </div>
+                <div> <strong>Private key</strong>: <code>{{ current_user.privkey }}</code> </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
