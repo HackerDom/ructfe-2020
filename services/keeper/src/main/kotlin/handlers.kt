@@ -120,15 +120,7 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
             link(href = "/css/main.css", rel = "stylesheet")
         }
         body {
-            div { id = "term_demo" }
-//            div {
-//                id = "download"
-////                style = "display: none;"
-//                a(href = "/files/file") {
-//                    id = "dlink"
-//                    +"Download"
-//                }
-//            }
+            div { id = "terminal" }
             input(type = InputType.file) { id = "ufile" }
         }
     }
