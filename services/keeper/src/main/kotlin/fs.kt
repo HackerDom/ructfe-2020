@@ -336,8 +336,8 @@ class MyFS(
 }
 
 
-fun main() {
-    val jedis = Jedis("localhost", 6379)
+fun main(args: Array<String>) {
+    val jedis = Jedis("redis", 6379)
     jedis.connect()
     val mountPath = File("mount").toPath()
     val myFS = MyFS(jedis)
