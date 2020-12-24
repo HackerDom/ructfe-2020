@@ -8,6 +8,10 @@ services:
     restart: always
     ports:
       - 12345:12345
+    pids_limit: 20
+    mem_limit: 1G
+    memswap_limit: 1G
+
   web:
     build:
       context: .
@@ -15,8 +19,15 @@ services:
     restart: always
     ports:
       - 7000:7000
+    pids_limit: 20
+    mem_limit: 1G
+    swap_limit: 1G
+
   cassandra:
     image: cassandra:4.0
     restart: always
     volumes:
       - ./data:/var/lib/cassandra
+    mem_limit: 512M
+    pids_limit: 20
+    memswap_limit: 1G
