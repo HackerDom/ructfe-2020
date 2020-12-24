@@ -36,17 +36,6 @@ def get_users():
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
 
-def get_user_by_token(token):
-    new_conditions = {"addition": {"token": token}}
-    req = urllib.request.Request(HOST+"/get_user", data=json.dumps(new_conditions).encode('utf-8'),
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
-
-def get_user_by_login_and_password(login, password):
-    token = get_token(login, password)
-    return get_user_by_token(token)
-
 def get_transaction(login):
     new_conditions = {"addition": {"login": login}}
     req = urllib.request.Request(HOST+"/transactions", data=json.dumps(new_conditions).encode('utf-8'),
@@ -54,9 +43,9 @@ def get_transaction(login):
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
 
-def get_pubkey(login):
+def get_user(login):
     new_conditions = {"addition": {"login": login}}
-    req = urllib.request.Request(HOST+"/users_pubkey", data=json.dumps(new_conditions).encode('utf-8'),
+    req = urllib.request.Request(HOST+"/get_user", data=json.dumps(new_conditions).encode('utf-8'),
                                  headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
@@ -72,10 +61,8 @@ def main():
         print(send_money(args.cookie, args.login_to, args.amount, args.description, args.priv_key))
     if args.get_transactions:
         print(get_transaction(args.login))
-    if args.get_transactions:
-        print(get_transaction(args.login))
-    if args.get_pubkey:
-        print(get_pubkey(args.login))
+    if args.get_user:
+        print(get_user(args.login))
 
 if __name__ == "__main__":
     main()
