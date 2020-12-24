@@ -8,6 +8,9 @@ jobs:
     runs-on: image-builder
 
     steps:
+    - name: cleanup after docker from previous runs
+      run: sudo rm -rf ructfe-2020
+
     - name: Checkout repo
       uses: actions/checkout@v2
 
