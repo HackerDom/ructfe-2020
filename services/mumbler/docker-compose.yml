@@ -1,7 +1,6 @@
 version: '2.2'
 services:
   mumbler:
-    image: mumbler
     build: .
     mem_limit: 1G
     memswap_limit: 1G
@@ -14,7 +13,7 @@ services:
 
     ports:
      - "7124:7124"
-     - "7125:7125/udp"
+     - "30000-31000:30000-31000/udp"
     volumes:
       - ./storage:/app/storage
     restart: unless-stopped

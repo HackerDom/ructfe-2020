@@ -54,11 +54,18 @@ def rand_string(n=32):
 def check(check_request: CheckRequest) -> Verdict:
     data_check = uuid.uuid4()
     rand_data = rand_string(random.randint(20, 40))
+    rand_ports_range = random.randint(len(str(data_check) + rand_data) + 1, len(str(data_check) + rand_data) + 20)
 
     try:
-        for i in range(random.randint(1, 4)):
+        resp = requests_with_retry().get(
+            f"http://{check_request.hostname}:{TCP_PORT}/open/{rand_ports_range}",
+            headers={"User-Agent": get_user_agent()}
+        )
+        port = int(resp.content)
+
+        for i in range(random.randint(1, 3)):
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-            sock.sendto(bytes(f"{data_check}:{rand_data}", "utf-8"), (check_request.hostname, UDP_PORT))
+            sock.sendto(bytes(f"{data_check}:{rand_data}", "utf-8"), (check_request.hostname, port))
             time.sleep(random.randint(1, 4) * 0.1)
     except Exception as e:
         print(e, print_exc())
@@ -86,11 +93,18 @@ def check(check_request: CheckRequest) -> Verdict:
 def put(put_request: PutRequest) -> Verdict:
     data_check = str(uuid.uuid4())
     rand_data = put_request.flag
+    rand_ports_range = random.randint(len(str(data_check) + rand_data) + 1, len(str(data_check) + rand_data) + 20)
 
     try:
-        for i in range(random.randint(1, 4)):
+        resp = requests_with_retry().get(
+            f"http://{put_request.hostname}:{TCP_PORT}/open/{rand_ports_range}",
+            headers={"User-Agent": get_user_agent()}
+        )
+        port = int(resp.content)
+
+        for i in range(random.randint(1, 1)):
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-            sock.sendto(bytes(f"{data_check}:{rand_data}", "utf-8"), (put_request.hostname, UDP_PORT))
+            sock.sendto(bytes(f"{data_check}:{rand_data}", "utf-8"), (put_request.hostname, port))
             time.sleep(random.randint(1, 4) * 0.1)
         return Verdict.OK(data_check)
     except Exception as e:
@@ -115,7 +129,7 @@ def get(get_request: GetRequest) -> Verdict:
         return Verdict.DOWN("service seems not responding")
     except Exception as e:
         print(e, print_exc())
-        return Verdict.MUMBLE("service mubmbles too hard")
+        return Verdict.CORRUPT("service can't give a flag")
 
 
 if __name__ == "__main__":

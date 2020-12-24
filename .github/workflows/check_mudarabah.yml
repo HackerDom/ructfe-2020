@@ -1,0 +1,58 @@
+
+name: Check mudarabah
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/mudarabah/**'
+      - 'checkers/mudarabah/**'
+  workflow_dispatch: {}
+
+jobs:
+  check_mudarabah:
+    name: Check mudarabah
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Run prebuilt hook
+      run: if [ -f services/mudarabah/before_image_build.sh ]; then (cd ./services/mudarabah && ./before_image_build.sh); fi
+
+    - name: Setup mudarabah
+      run: (cd ./services/mudarabah && docker-compose pull && docker-compose build && docker-compose up --build -d)
+
+    - name: Prepare python for checker
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8.5
+
+    - name: Setup checker libraries
+      run: if [ -f checkers/mudarabah/requirements.txt ]; then python -m pip install -r checkers/mudarabah/requirements.txt; fi
+
+    - name: Test checker on service
+      run: checkers/mudarabah/checker.py TEST 127.0.0.1
+
+  update_mudarabah:
+    name: Deploy service using ansible to first teams
+    needs: check_mudarabah
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: install ansible
+      run: sudo apt-get install -y ansible
+
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: change permission for ssh key
+      run: chmod 0600 ./vuln_image/keys/id_rsa
+
+    - name: Run prebuilt hook
+      run: if [ -f services/mudarabah/before_image_build.sh ]; then (cd ./services/mudarabah && ./before_image_build.sh); fi
+
+    - name: try to deploy mudarabah
+      run: ./vuln_image/update_first_ten_teams.sh mudarabah
+

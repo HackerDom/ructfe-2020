@@ -16,7 +16,7 @@ dependencies {
     compile("br.com.devsrsouza:redissed:1.1.0")
     compile "org.slf4j:slf4j-simple:1.8.0-beta4"
     compile 'io.javalin:javalin:3.11.0'
-    implementation("redis.clients:jedis:3.2.0")
+    compile "redis.clients:jedis:3.2.0"
     compile "com.fasterxml.jackson.core:jackson-databind:2.10.3"
     compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-html-jvm', version: '0.6.10'
 }
@@ -29,4 +29,13 @@ jar {
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
+}
+
+task fsJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example', 'Main-Class': 'FsKt'
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    baseName = "fs"
+    with jar
 }

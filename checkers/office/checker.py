@@ -12,7 +12,9 @@ from errs import INVALID_FORMAT_ERR, FAILED_TO_CONNECT
 checker = Checker()
 
 
-def get_random_str(length=10):
+def get_random_str(length=10, only_chars=True):
+    if only_chars:
+        return "".join(random.choices(string.ascii_letters, k=length))
     return "".join(random.choices(string.ascii_letters + string.digits, k=length))
 
 
@@ -72,7 +74,7 @@ async def put(request: PutRequest) -> Verdict:
     req.name = name
     req.password = password
     req.bio = request.flag
-    r, err = api.register(req)
+    err = api.register(req)
     if err != None:
         return verdict_from_api_err(err)
 
@@ -86,7 +88,7 @@ async def put(request: PutRequest) -> Verdict:
         user_id = r.id
     except:
         return Verdict.MUMBLE(INVALID_FORMAT_ERR)
-    return Verdict.OK(f"{name}:{password}:{user_id}")
+    return Verdict.OK(f"{name}:{password}:{user_id}:{r.token}")
 
 
 @checker.define_put(vuln_num=2, vuln_rate=1)
@@ -98,7 +100,7 @@ async def put_2(request: PutRequest) -> Verdict:
     req.name = name
     req.password = password
     req.bio = request.flag
-    r, err = api.register(req)
+    err = api.register(req)
     if err != None:
         return verdict_from_api_err(err)
     req = pb.CreateDocumentRequest()
@@ -111,24 +113,29 @@ async def put_2(request: PutRequest) -> Verdict:
         user_id = r.id
     except:
         return Verdict.MUMBLE(INVALID_FORMAT_ERR)
-    return Verdict.OK(f"{name}:{password}:{user_id}")
+    return Verdict.OK(f"{name}:{password}:{user_id}:{r.token}")
 
 
 @checker.define_get(vuln_num=1)
 async def get(request: GetRequest) -> Verdict:
     api = Api(f'{request.hostname}:8080')
-    name, password, id = request.flag_id.split(":")
+    name, password, id, token = request.flag_id.strip().split(":")
+    req = pb.LoginRequest()
+    req.name = name
+    req.password = password
+    err = api.login(req)
+    if err != None:
+        return verdict_from_api_err(err)
     req = pb.ExecuteRequest()
     req.doc_id = int(id)
-    req.username = name
+    req.token = token
     r, err = api.execute_doc(req)
     if err != None:
         return verdict_from_api_err(err)
     try:
-        executed = r.executed
+        executed = r["executed"]
     except:
         return Verdict.MUMBLE(err)
-
     di, err = DocInfo.parse(executed)
     if err != None:
         return Verdict.MUMBLE(err)
@@ -142,15 +149,21 @@ async def get(request: GetRequest) -> Verdict:
 @checker.define_get(vuln_num=2)
 async def get_2(request: GetRequest) -> Verdict:
     api = Api(f'{request.hostname}:8080')
-    name, password, id = request.flag_id.split(":")
+    name, password, id, token = request.flag_id.strip().split(":")
+    req = pb.LoginRequest()
+    req.name = name
+    req.password = password
+    err = api.login(req)
+    if err != None:
+        return verdict_from_api_err(err)
     req = pb.ExecuteRequest()
     req.doc_id = int(id)
-    req.username = name
+    req.token = token
     r, err = api.execute_doc(req)
     if err != None:
         return verdict_from_api_err(err)
     try:
-        executed = r.executed
+        executed = r["executed"]
     except:
         return Verdict.MUMBLE(INVALID_FORMAT_ERR)
     di, err = DocInfo.parse_static(executed)

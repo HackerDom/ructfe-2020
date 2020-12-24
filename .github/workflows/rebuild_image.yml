@@ -1,0 +1,27 @@
+name: Rebuild image
+on:
+  workflow_dispatch: {}
+
+jobs:
+  rebuild_image:
+    name: Rebuild VBox image
+    runs-on: image-builder
+
+    steps:
+    - name: cleanup after docker from previous runs
+      run: echo $PWD && ls $PWD && sudo rm -rf ./*
+
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: fix permissions for ssh key
+      run: chmod 0600 ./vuln_image/keys/id_rsa
+
+    - name: link images dir
+      run: ln -s /home/github-runner/images ./vuln_image/images
+
+    - name: Run rebuild image hooks
+      run: ./vuln_image/scripts/run_before_image_built_hooks.sh
+
+    - name: try to rebuild image
+      run: ./vuln_image/rebuild_image.sh

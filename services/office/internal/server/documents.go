@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/HackerDom/ructfe2020/internal/document"
 	"github.com/HackerDom/ructfe2020/internal/hashutil"
 	"github.com/HackerDom/ructfe2020/internal/manager"
@@ -9,6 +10,8 @@ import (
 	pb "github.com/HackerDom/ructfe2020/proto"
 	"github.com/go-chi/chi"
 	"github.com/golang/protobuf/proto"
+	"io/ioutil"
+	"net/http"
 )
 
 func NewDocuments(m *manager.Manager) *documentsService {
@@ -36,11 +39,35 @@ func (s *documentsService) Mount(mux *chi.Mux) {
 		})
 	httprpc.New("POST", "/docs/execute").
 		Mount(mux).
-		WithJSONPbReader(&pb.ExecuteRequest{}).
+		WithRequestReader(ExecuteDocumentsRequestReader).
 		WithJSONPbWriter().
 		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) {
 			return s.Execute(ctx, req.(*pb.ExecuteRequest))
 		})
+}
+
+func ExecuteDocumentsRequestReader(r *http.Request) (proto.Message, error) {
+	body := struct {
+		DocId int    `json:"doc_id"`
+		Token string `json:"token"`
+	}{}
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(bodyBytes, &body)
+	if err != nil {
+		return nil, err
+	}
+	session, err := r.Cookie("session")
+	if err != nil {
+		return nil, err
+	}
+	return &pb.ExecuteRequest{
+		Session: session.Value,
+		DocId:   int64(body.DocId),
+		Token:   body.Token,
+	}, nil
 }
 
 const (
@@ -84,7 +111,11 @@ func (s *documentsService) Create(ctx context.Context, req *pb.CreateDocumentReq
 func (s *documentsService) Execute(ctx context.Context, req *pb.ExecuteRequest) (*pb.ExecuteResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
 	defer cancel()
-	executed, err := s.m.ExecForUser(ctx, req.DocId, req.Username)
+	username, err := s.m.Username(ctx, req.Session)
+	if err != nil {
+		return nil, err
+	}
+	executed, err := s.m.ExecForUser(ctx, req.DocId, username)
 	if err != nil {
 		return nil, err
 	}

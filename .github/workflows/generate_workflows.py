@@ -4,7 +4,7 @@ SERVICES = [
   'sesame',
   'office',
   'keeper',
-  'crypto',
+  'mudarabah',
   'carpetradar24',
   'mumbler'
 ]

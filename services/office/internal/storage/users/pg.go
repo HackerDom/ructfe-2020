@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"fmt"
 	pb "github.com/HackerDom/ructfe2020/proto"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
@@ -15,6 +16,9 @@ var usersSchema = `CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE INDEX IF NOT EXISTS users_ts_index ON users (ts);
+
+DROP TRIGGER IF EXISTS users_delete_old_rows_trigger ON users;
+DROP FUNCTION IF EXISTS users_delete_old_rows;
 
 CREATE FUNCTION users_delete_old_rows() RETURNS trigger
     LANGUAGE plpgsql
@@ -33,6 +37,7 @@ CREATE TRIGGER users_delete_old_rows_trigger
 type Users interface {
 	List(ctx context.Context, limit, offset int, skipPagination bool) ([]*pb.User, error)
 	Insert(ctx context.Context, user *pb.User) error
+	User(ctx context.Context, name string) (*pb.User, error)
 }
 
 func NewPg(db *sqlx.DB, l *zap.Logger) (Users, error) {
@@ -60,6 +65,27 @@ func (s *Pg) Insert(ctx context.Context, user *pb.User) error {
 		return err
 	}
 	return err
+}
+
+func (s *Pg) User(ctx context.Context, name string) (*pb.User, error) {
+	var users []userModel
+	err := s.db.SelectContext(ctx, &users, "SELECT name, password, bio FROM users WHERE name=$1;", name)
+	if err != nil {
+		return nil, err
+	}
+	if len(users) == 0 {
+		return nil, fmt.Errorf("no such user exists")
+	}
+	if len(users) > 1 {
+		return nil, fmt.Errorf("mutiple users with same name: %s", users[0].Name)
+	}
+	u := users[0]
+	userProto := &pb.User{
+		Name:     u.Name,
+		Password: u.Password,
+		Bio:      u.Bio,
+	}
+	return userProto, err
 }
 
 func (s *Pg) List(ctx context.Context, limit, offset int, skipPagination bool) ([]*pb.User, error) {

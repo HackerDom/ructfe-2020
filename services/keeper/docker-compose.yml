@@ -1,17 +1,21 @@
 version: '2.2'
 services:
   keeper:
+    devices:
+      - /dev/fuse:/dev/fuse
+    cap_add:
+      - SYS_ADMIN
     build: .
     restart: "always"
     stop_grace_period: 1s
     mem_limit: 2G
     memswap_limit: 2G
-    pids_limit: 36
+    pids_limit: 80
     ulimits:
       nofile:
         soft: 12000
         hard: 12000
     ports:
       - "3687:3687"
-    volumes:
-      - "./volumes/service/:/app/mount/"
+  redis:
+    image: "redis:alpine"
