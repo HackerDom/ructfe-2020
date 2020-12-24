@@ -7,7 +7,7 @@ if ! [[ $vm =~ ^[a-zA-Z_0-9]+$ ]]; then
   exit 1
 fi
 
-vm_path="/root/${vm}.ova"
+vm_path="/home/${vm}.ova"
 
 if [ ! -f "$vm_path" ]; then
   echo "there is no file ${vm_path}"
