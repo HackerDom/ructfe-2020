@@ -23,12 +23,12 @@ def register(login, password, credit_card_credentials):
 
 def send_money(token, login_to, amount, description, priv_key):
     crypter = Crypter.load_private(bytes.fromhex(priv_key))
-    new_conditions = {"addition": {"cookie":token, "login_to":login_to, "amount":amount, "description":crypter.encrypt(description.encode())}}
+    new_conditions = {"addition": {"cookie":token, "login_to":login_to, "amount":int(amount), "description":crypter.encrypt(description.encode()).hex()}}
     req = urllib.request.Request(HOST+"/send_money",
                                     data=json.dumps(new_conditions).encode('utf-8'),
                                     headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
+    return json.loads(response.read().decode('utf8'))
 
 def get_users():
     req = urllib.request.Request(HOST+"/users_pubkeys", 
@@ -68,7 +68,6 @@ def main():
     if args.get_cookie:
         print(get_token(args.login, args.password))
     if args.send_money:
-        #please check it
         if args.priv_key_filename:
             with open(args.priv_key_filename, "r") as f:
                 key = f.read() # should be hex
