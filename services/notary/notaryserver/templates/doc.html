@@ -35,7 +35,7 @@
                 </form>
                 {% endif %}
                 <hr/>
-                <p>Signed by <a href="{{ url_for('user', user_id=doc.author.id) }}"><em>{{ doc.author.name }}</em></a> </p>
+                <p>Signed by <a href="{{ url_for('user', user_id=doc.author.id) }}">{{ doc.author.name }}</a> </p>
                 {% if visible %}
                 <p>Document signature: <code>{{ doc.signature }}</code> </p>
                 {% endif %}

@@ -21,6 +21,8 @@
         {% elif is_current_user %}
             You haven't signed any documents. <br/>
             <a href="/sign">Click here</a> to sign and publish your first document.
+        {% else %}
+            {{ user.username }} has not published any documents yet.
         {% endif %}
     </div>
     <div class="col-md-6">
@@ -28,8 +30,8 @@
             <h4 class="card-header">Profile details</h4>
             <div class="card-body">
                 <div> <strong>Name</strong>: {{ user.name }} </div>
-                <div> <strong>Phone</strong>: {{ user.phone }} </div>
                 {% if is_current_user %}
+                <div> <strong>Phone</strong>: {{ user.phone }} </div>
                 <div> <strong>Address</strong>: {{ user.address }} </div>
                 {% endif %}
                 <div> <strong>Public key</strong>: <code>{{ user.public_key }}</code> </div>

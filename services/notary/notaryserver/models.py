@@ -84,12 +84,10 @@ class Document(db.Model):
             return False
         
         documents = obj.get('documents')
-
         if documents is None or not isinstance(documents, list):
             return False
 
         return self.id in documents
-        
 
     def __repr__(self):
         return f'<Document #{self.id} by {self.author.username} (author_id={self.author_id})>'

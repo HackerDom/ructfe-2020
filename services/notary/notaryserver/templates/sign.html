@@ -32,11 +32,11 @@
                         {% endif %}
                     </div>
 
-                    <div class="form-group">
-                        <label for="is_public">Public document</label>
-                        <input id="is_public" class="form-control {{' is-invalid' if form.is_public.errors else ''}}"
+                    <div class="form-group form-check">
+                        <input id="is_public" class="form-check-input {{' is-invalid' if form.is_public.errors else ''}}"
                                name="is_public" type="checkbox" 
                                {% if request.form.is_public %} checked {% endif %}/>
+                        <label for="is_public" class="form-check-label">Public document</label>
                         {% if form.is_public.errors %}
                             {% for error in form.is_public.errors %}
                                 <div class="invalid-feedback">{{ error }}</div>

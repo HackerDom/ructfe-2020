@@ -35,7 +35,7 @@
                     <div class="form-group">
                         <label for="phone">Your phone</label>
                         <input id="phone" class="form-control {{' is-invalid' if form.phone.errors else ''}}"
-                               placeholder="Enter phone" name="phone" type="text" value="{{ request.form.phone }}">
+                               name="phone" type="text" value="{{ request.form.phone }}">
                         {% if form.phone.errors %}
                             {% for error in form.phone.errors %}
                                 <div class="invalid-feedback">{{ error }}</div>

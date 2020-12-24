@@ -19,7 +19,7 @@
                     {% else %}
                     <p> <em>Private document</em> </p>
                     {% endif %}
-                    <span class="text-muted">Signed by <a href="{{ url_for('user', user_id=doc.author.id) }}"><em>{{ doc.author.name }}</em></a> </span>
+                    <span class="text-muted">Signed by <a href="{{ url_for('user', user_id=doc.author.id) }}">{{ doc.author.name }}</a> </span>
                 </div>
             </div>
         </div>
