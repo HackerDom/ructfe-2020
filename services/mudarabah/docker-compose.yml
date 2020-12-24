@@ -10,6 +10,8 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: on-failure
+    ports:
+      - "3114:5432"
 
   web:
     build: .
