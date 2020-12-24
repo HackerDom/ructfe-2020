@@ -28,8 +28,16 @@ def get_flight_state_bytes(token: str,
 
 def parse_token(set_cookie_value: str) -> str:
     try:
-        return set_cookie_value[len("token="):-len("; expires=Thu, 24 Dec 2020 20:15:05 GMT; path=/")]
+        token = set_cookie_value[len("token="):-len("; expires=Thu, 24 Dec 2020 20:15:05 GMT; path=/")]
+        print(f"[+] Token was succesfully parsed: '{str(token)}'")
+
+        if token is None or not isinstance(token, str) or len(token) != 32:
+            print("[---] Token is None or not string of 32 symbols")
+            return None
+        return token
+
     except Exception:
+        print("[---] Failed to parse token from cookie")
         traceback.print_exc()
     return None
 
@@ -44,8 +52,11 @@ def parse_html_table(content: bytes) -> list:
             cols = row.find_all('td')
             cols = [element.text.strip() for element in cols]
             data.append([element for element in cols if element])
+
+        print("[+] Parsed html table successfully, will try to analyze it")
         return data
     except Exception:
+        print("[---] Failed to parse html table")
         traceback.print_exc()
     return None
 
@@ -65,10 +76,10 @@ class Client:
         res = requests.get(self.http_address)
 
         if res.status_code != 200:
-            print(f"[-] Get main page failed: {res.status_code}")
+            print(f"[---] Get main page failed: {res.status_code}")
             return None
 
-        print(f"[+] Get main page succeed")
+        print(f"[+] Get main page succeed, will try to parse its html content")
         data = parse_html_table(res.content)
         return data
 
@@ -77,25 +88,24 @@ class Client:
                            cookies={"token": token})
 
         if res.status_code != 200:
-            print(f"[-] Get chronicle failed: {res.status_code}")
+            print(f"[---] Get chronicle failed: {res.status_code}")
             return None
 
-        print(f"[+] Get chronicle succeed")
+        print(f"[+] Get chronicle succeed, will try to parse its html content")
         data = parse_html_table(res.content)
         return data
 
-    def register_and_get_auth_token(self, login, password):
-        company = random.choice(companies)
+    def register_and_get_auth_token(self, login, password, company):
         res = requests.post(f'{self.http_address}/LoginOrRegister?handler=Register',
                             headers={'Content-Type': 'application/x-www-form-urlencoded'},
                             data=f"&userName={login}&company={company}&password={password}",
                             allow_redirects=False)
 
         if res.status_code != 302:
-            print(f"[-] Registration failed: {res.status_code}")
+            print(f"[---] Registration failed: expected 302, but had {res.status_code}")
             return None
-
         print("[+] Registration succeed")
+
         token = parse_token(res.headers.get("Set-Cookie"))
         return token
 
@@ -106,10 +116,10 @@ class Client:
                             allow_redirects=False)
 
         if res.status_code != 302:
-            print(f"[-] Login failed: {res.status_code}")
+            print(f"[---] Login failed: expected 302, but had {res.status_code}")
             return None
-
         print("[+] Login succeed")
+
         token = parse_token(res.headers.get("Set-Cookie"))
         return token
 
@@ -123,14 +133,3 @@ class Client:
     def send_base64(self, base64_str: str):
         data = base64.b64decode(base64_str)
         return self.send_tcp_bytes(data)
-
-
-companies = [
-    # https://ru.wikipedia.org/wiki/%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D1%8F:%D0%90%D0%B2%D0%B8%D0%B0%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D0%B8_%D0%BF%D0%BE_%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B0%D0%BC
-    "Ural Airlines",
-    "Pobeda",
-    "Flydubai",
-    "Etihad Airways",
-    "Emirates",
-    "Air Arabia",
-]

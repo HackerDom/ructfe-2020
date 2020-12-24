@@ -6,6 +6,8 @@ using CarpetRadar.Services.Models;
 using Cassandra;
 using NLog;
 
+#pragma warning disable 1998
+
 namespace CarpetRadar.Services.DataStorage
 {
     public interface IDataStorage
@@ -38,9 +40,6 @@ namespace CarpetRadar.Services.DataStorage
         {
             this.session = session;
             this.logger = logger;
-
-            /// try prepared statements
-            /// try sql injection
         }
 
         public async Task<string> AddFlightState(FlightState flightState, Guid userId)
@@ -74,7 +73,6 @@ namespace CarpetRadar.Services.DataStorage
 
         public async Task<IEnumerable<CurrentPosition>> GetCurrentPositions()
         {
-            /// нужно чистить curPos
             var statement = new SimpleStatement(
                 $"SELECT * FROM {Constants.ColumnFamily.CurrentPositions}");
             statement.SetPageSize(100);
@@ -95,7 +93,7 @@ namespace CarpetRadar.Services.DataStorage
         public async Task<IEnumerable<Flight>> GetUserFlights(Guid userId)
         {
             var statement = new SimpleStatement(
-                $"SELECT * FROM {Constants.ColumnFamily.CarpetFlights} WHERE user_id = {userId} ALLOW FILTERING;"); ///
+                $"SELECT * FROM {Constants.ColumnFamily.CarpetFlights} WHERE user_id = {userId} ALLOW FILTERING;");
             statement.SetPageSize(100);
             var rs = session.Execute(statement);
             var coordinates = rs.Select(row =>

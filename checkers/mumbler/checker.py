@@ -5,7 +5,6 @@ import random
 import time
 import uuid
 import string
-import struct
 from traceback import print_exc
 from user_agent_randomizer import get as get_user_agent
 from requests.exceptions import Timeout
@@ -130,7 +129,7 @@ def get(get_request: GetRequest) -> Verdict:
         return Verdict.DOWN("service seems not responding")
     except Exception as e:
         print(e, print_exc())
-        return Verdict.MUMBLE("service mubmbles too hard")
+        return Verdict.CORRUPT("service can't give a flag")
 
 
 if __name__ == "__main__":

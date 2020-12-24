@@ -29,4 +29,4 @@ def open_receiver(size):
 
 
 if __name__ == '__main__':
-    app.run(u"0.0.0.0", 7124)
+    app.run(u"0.0.0.0", 7124, threaded=True)
