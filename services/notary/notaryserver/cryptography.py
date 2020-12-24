@@ -10,8 +10,8 @@ def serialize_bytes(bs):
 
 def deserialize_bytes(string):
     try:
-        return base64.b64decode(string).decode('utf-8')
-    except binascii.Error as err:
+        return base64.b64decode(string)
+    except ValueError as err:
         raise ValueError('Failed to deserialize bytes') from err
 
 
