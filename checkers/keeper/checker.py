@@ -62,7 +62,7 @@ def download_file(session, hostname, filename):
 
 class NetworkChecker:
     def __init__(self):
-        self.verdict = None
+        self.verdict = Verdict.OK()
 
     def __enter__(self):
         return self
