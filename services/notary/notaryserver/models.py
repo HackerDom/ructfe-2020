@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 
-from cryptography import create_signature, gen_privkey, get_pubkey_from_privkey
+from cryptography import create_signature, gen_privkey, get_pubkey_from_privkey, verify_signature
 
 
 db = SQLAlchemy()
@@ -33,6 +33,12 @@ class User(db.Model):
 
     def get_id(self):
         return self.id
+
+    def generate_password(self):
+        return create_signature(self.privkey, 'user', self.name)
+
+    def verify_password(self, password):
+        return verify_signature(self.pubkey, 'user', self.name, password)
 
     def __repr__(self):
         return f'<User {self.name} (id={self.id})>'
