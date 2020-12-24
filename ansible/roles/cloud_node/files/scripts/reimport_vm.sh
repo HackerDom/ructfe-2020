@@ -7,7 +7,7 @@ if ! [[ $vm =~ ^[a-zA-Z_0-9]+$ ]]; then
   exit 1
 fi
 
-vm_path="/root/${vm}.ova"
+vm_path="/home/${vm}.ova"
 
 if [ ! -f "$vm_path" ]; then
   echo "there is no file ${vm_path}"
@@ -20,5 +20,5 @@ while VBoxManage showvminfo "$vm" &>/dev/null; do
 done
 
 VBoxManage import "$vm_path" --vsys 0 --vmname "$vm"
-VBoxManage modifyvm "$vm" --cpus=2 --memory 4096
+VBoxManage modifyvm "$vm" --cpus=2 --memory 6144
 vboxmanage snapshot "$vm" take initial

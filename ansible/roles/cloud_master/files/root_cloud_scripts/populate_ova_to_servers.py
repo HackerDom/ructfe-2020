@@ -40,7 +40,7 @@ def log_stderr(*params):
 def copy_image(cloud_ip):
     file_from = OVA_NAME
     print("deploying %s:" % cloud_ip)
-    file_to_name = "/root/%s.ova" % VM_NAME
+    file_to_name = "/home/%s.ova" % VM_NAME
     file_to = "%s:%s" % (cloud_ip, file_to_name)
     ssh_arg = ["-e"] + [" ".join(map(shlex.quote, ["ssh"] + SSH_OPTS))]
     code = subprocess.call(["rsync", "--progress"] + ssh_arg +

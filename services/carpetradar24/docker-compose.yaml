@@ -8,7 +8,9 @@ services:
     restart: always
     ports:
       - 12345:12345
-    pids_limit: 20
+    depends_on:
+      - cassandra
+    pids_limit: 100
     mem_limit: 1G
     memswap_limit: 1G
 
@@ -19,15 +21,20 @@ services:
     restart: always
     ports:
       - 7000:7000
-    pids_limit: 20
+    depends_on:
+      - cassandra
+    pids_limit: 100
     mem_limit: 1G
     memswap_limit: 1G
 
   cassandra:
-    image: cassandra:4.0
+    image: cassandra:3.11.9
     restart: always
+    environment:
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=512M
     volumes:
       - ./data:/var/lib/cassandra
-    mem_limit: 512M
-    pids_limit: 20
-    memswap_limit: 1G
+    pids_limit: 200
+    mem_limit: 2G
+    memswap_limit: 2G

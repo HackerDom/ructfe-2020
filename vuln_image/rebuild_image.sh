@@ -4,18 +4,16 @@ BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cd "$BASE_DIR"
 
 VM_NAME="ructfe2020-base"
-TEMP_IMAGE="images/.ructfe2020-deploy.ova"
-OUTPUT_IMAGE="images/ructfe2020-deploy.ova"
+OUTPUT_IMAGE="images/ructfe2020-deploy_$(date +"%Y-%m-%d_%H-%M-%S").ova"
+LATEST_IMAGE="images/ructfe2020-deploy.ova"
 SSH_PORT=2222
 SSH_HOST=127.0.0.1
-
-cd $BASE_DIR
 
 vboxmanage snapshot "$VM_NAME" restore "base_image"
 
 # Start vm
 VBoxManage modifyvm "$VM_NAME" --natpf1 "deploy,tcp,127.0.0.1,$SSH_PORT,,22"
-VBoxManage modifyvm "$VM_NAME" --memory 4096
+VBoxManage modifyvm "$VM_NAME" --memory 6144 --cpus 4
 vboxmanage startvm "$VM_NAME" --type headless
 
 echo "Waiting SSH up"
@@ -43,16 +41,16 @@ while VBoxManage list runningvms | grep -q "$VM_NAME"; do
     sleep 1.2
 done
 
+
 echo "Deleting port-forwarding for deploy"
-VBoxManage modifyvm "$VM_NAME" --natpf1 delete deploy
+# note(@xelez): there is some strange race where virtual machine is locked... so we just retry in 2 seconds)
+VBoxManage modifyvm "$VM_NAME" --natpf1 delete deploy || (sleep 2 && VBoxManage modifyvm "$VM_NAME" --natpf1 delete deploy)
 
-echo "VM stopped, exporting"
-VBoxManage export "$VM_NAME" -o "$TEMP_IMAGE"
 
-echo "Swapping output image"
-if [ -f "$OUTPUT_IMAGE" ]; then
-    mv "$OUTPUT_IMAGE" "$OUTPUT_IMAGE.prev"
-fi
-mv "$TEMP_IMAGE" "$OUTPUT_IMAGE"
+echo "VM stopped, exporting to $OUTPUT_IMAGE"
+VBoxManage export "$VM_NAME" -o "$OUTPUT_IMAGE"
+
+echo "Changing latest symlink"
+ln -f -s $(realpath "$OUTPUT_IMAGE") "$LATEST_IMAGE"
 
 echo "Done"
