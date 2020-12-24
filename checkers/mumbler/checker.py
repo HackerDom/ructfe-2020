@@ -58,7 +58,10 @@ def check(check_request: CheckRequest) -> Verdict:
     rand_ports_range = random.randint(len(str(data_check) + rand_data) + 1, len(str(data_check) + rand_data) + 20)
 
     try:
-        resp = requests_with_retry().get(f"http://{check_request.hostname}:{TCP_PORT}/open/{rand_ports_range}")
+        resp = requests_with_retry().get(
+            f"http://{check_request.hostname}:{TCP_PORT}/open/{rand_ports_range}",
+            headers={"User-Agent": get_user_agent()}
+        )
         port = int(resp.content)
 
         for i in range(random.randint(1, 3)):
@@ -94,7 +97,10 @@ def put(put_request: PutRequest) -> Verdict:
     rand_ports_range = random.randint(len(str(data_check) + rand_data) + 1, len(str(data_check) + rand_data) + 20)
 
     try:
-        resp = requests_with_retry().get(f"http://{put_request.hostname}:{TCP_PORT}/open/{rand_ports_range}")
+        resp = requests_with_retry().get(
+            f"http://{put_request.hostname}:{TCP_PORT}/open/{rand_ports_range}",
+            headers={"User-Agent": get_user_agent()}
+        )
         port = int(resp.content)
 
         for i in range(random.randint(1, 1)):
