@@ -35,10 +35,9 @@
                 </form>
                 {% endif %}
                 <hr/>
-                <p>Signed by <em>{{ doc.author.name }}</em> (registered as {{ doc.author.username }})</p>
+                <p>Signed by <a href="{{ url_for('user', user_id=doc.author.id) }}"><em>{{ doc.author.name }}</em></a> </p>
                 {% if visible %}
-                <p>{{ doc.author.name }}'s signature: <code>{{ doc.signature }}</code> </p>
-                <p>{{ doc.author.name }}'s public key: <code>{{ doc.author.public_key }}</code> </p>
+                <p>Document signature: <code>{{ doc.signature }}</code> </p>
                 {% endif %}
             </div>
         </div>
