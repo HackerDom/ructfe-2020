@@ -1,1 +1,1 @@
-from udp_server import ThreadedUDPServer, ThreadedUDPRequestHandler
+from udp_server import UDPReceiver
