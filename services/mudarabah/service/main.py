@@ -87,16 +87,22 @@ def get_transactions(login=None):
     return jsonify({"status": 200, "addition": {"transactions": transactions}})
 
 
-@app.route('/users_pubkey', methods=["POST"])
+@app.route('/get_user', methods=["POST"])
 @need_args("login")
-def get_users_pubkey(login=None):
+def get_user(login=None):
     with DatabaseClient() as db:
         user = db.get_user_by_login(login)
         if user is None:
             return "Wrong username"
     crypter = Crypter.load_private(user.private_key)
     pub_key = crypter.dump_public()
-    return jsonify({"status": 200, "addition": {"pub_key":pub_key.hex()}})
+    return jsonify({"status": 200, "addition": {"login": user.login, "balance":user.balance, "pub_key":pub_key.hex()}})
+
+@app.route('/list_users')
+def list_users():
+    with DatabaseClient() as db:
+        users = db.get_all_users()
+    return jsonify({"status": 200, "addition": {"users": users}})
 
 @app.route("/ping")
 def ping():
