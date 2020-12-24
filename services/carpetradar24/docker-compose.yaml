@@ -21,7 +21,7 @@ services:
       - 7000:7000
     pids_limit: 20
     mem_limit: 1G
-    swap_limit: 1G
+    memswap_limit: 1G
 
   cassandra:
     image: cassandra:4.0
