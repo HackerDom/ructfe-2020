@@ -2,7 +2,6 @@ import io.javalin.Javalin
 import io.javalin.http.Context
 import kotlinx.html.*
 import java.io.File
-import java.nio.file.Path
 
 
 fun App.getAuthenticatedUser(ctx: Context): String? {
@@ -62,7 +61,12 @@ fun App.addFilesHandler(): Javalin = javalin.get("/files/*") { ctx ->
 
 fun App.addUploadFilesHandler(): Javalin = javalin.post("/files/*") { ctx ->
     val authenticatedUserDir = checkFilesAccess(ctx) ?: return@post
-    val newFile = ctx.uploadedFile("file") ?: return@post  // TODO: Use try-catch
+    val newFile = try {
+        ctx.uploadedFile("file") ?: return@post
+    } catch (e: IllegalStateException) {
+        ctx.status(400)
+        return@post
+    }
 
     val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length)
 
