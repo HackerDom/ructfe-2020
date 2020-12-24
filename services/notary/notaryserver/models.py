@@ -8,14 +8,16 @@ db = SQLAlchemy()
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
-    pubkey = db.Column(db.String, nullable=False)
-    privkey = db.Column(db.String, nullable=False)
     phone = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
+    pubkey = db.Column(db.String, nullable=False)
+    privkey = db.Column(db.String, nullable=False)
     documents = db.relationship('Document', backref='author', lazy=True)
 
-    def __init__(self, name, phone, address):
+    def __init__(self, username, name, phone, address):
+        self.username = username
         self.name = name
         self.phone = phone
         self.address = address
@@ -35,13 +37,13 @@ class User(db.Model):
         return self.id
 
     def generate_password(self):
-        return create_signature(self.privkey, 'user', self.name)
+        return create_signature(self.privkey, 'user', self.username)
 
     def verify_password(self, password):
-        return verify_signature(self.pubkey, 'user', self.name, password)
+        return verify_signature(self.pubkey, 'user', self.username, password)
 
     def __repr__(self):
-        return f'<User {self.name} (id={self.id})>'
+        return f'<User {self.username} (id={self.id})>'
 
 
 class Document(db.Model):
@@ -58,4 +60,4 @@ class Document(db.Model):
         self.signature = create_signature(author.privkey, title, text)
 
     def __repr__(self):
-        return f'<Document #{self.id} by {self.author.name} (author_id={self.author_id})>'
+        return f'<Document #{self.id} by {self.author.username} (author_id={self.author_id})>'

@@ -41,11 +41,12 @@ def signup():
 
     form = RegisterForm()
     if request.method == 'POST' and form.validate_on_submit():
-        if db.session.query(exists().where(User.name == request.form['username'])).scalar():
+        if db.session.query(exists().where(User.username == request.form['username'])).scalar():
             form.username.errors.append('This username is taken')
         else:
             user = User(
-                name=request.form['username'],
+                username=request.form['username'],
+                name=request.form['name'],
                 phone=request.form['phone'],
                 address=request.form['address'])
             db.session.add(user)
@@ -65,13 +66,13 @@ def login():
 
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate_on_submit():
-        user = User.query.filter_by(name=request.form['username']).first()
+        user = User.query.filter_by(username=request.form['username']).first()
         if user is not None and user.verify_password(request.form['password']):
             login_user(user)
             flash('You were logged in.')
             return redirect('/profile')
         else:
-            form.privkey.errors.append('Incorrect username or password')
+            form.password.errors.append('Incorrect username or password')
     return render_template('login.html', form=form)
 
 

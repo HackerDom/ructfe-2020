@@ -13,7 +13,7 @@
             <div class="card-body">
                 <p> {{ doc.text }} </p>
                 <hr/>
-                <p>Signed by <em>{{ doc.author.name }}</em></p>
+                <p>Signed by <em>{{ doc.author.name }}</em> (registered as {{ doc.author.username }})</p>
                 <p>{{ doc.author.name }}'s signature: <code>{{ doc.signature }}</code> </p>
                 <p>{{ doc.author.name }}'s public key: <code>{{ doc.author.pubkey }}</code> </p>
             </div>

@@ -22,6 +22,7 @@
         <div class="card">
             <h4 class="card-header">Profile details</h4>
             <div class="card-body">
+                <div> <strong>Name</strong>: {{ current_user.name }} </div>
                 <div> <strong>Phone</strong>: {{ current_user.phone }} </div>
                 <div> <strong>Address</strong>: {{ current_user.address }} </div>
                 <div> <strong>Public key</strong>: <code>{{ current_user.pubkey }}</code> </div>

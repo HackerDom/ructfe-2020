@@ -13,10 +13,20 @@
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input id="username" class="form-control {{' is-invalid' if form.username.errors else ''}}"
-                               placeholder="Username" name="username" type="text"
-                               value="{{ request.form.username }}" autofocus>
+                               name="username" type="text" value="{{ request.form.username }}" autofocus>
                         {% if form.username.errors %}
                             {% for error in form.username.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="name">Legal name</label>
+                        <input id="name" class="form-control {{' is-invalid' if form.name.errors else ''}}"
+                               name="name" type="text" value="{{ request.form.name }}" autofocus>
+                        {% if form.name.errors %}
+                            {% for error in form.name.errors %}
                                 <div class="invalid-feedback">{{ error }}</div>
                             {% endfor %}
                         {% endif %}
