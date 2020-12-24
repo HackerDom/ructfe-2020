@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: cleanup after docker from previous runs
-      run: echo $PWD && ls $PWD &&  sudo rm -rf ./ructfe-2020
+      run: echo $PWD && ls $PWD && sudo rm -rf .
 
     - name: Checkout repo
       uses: actions/checkout@v2
