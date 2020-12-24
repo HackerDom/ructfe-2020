@@ -139,7 +139,7 @@ namespace CarpetRadar.Web2.Pages
 
         private bool ValidatePassword(string password)
         {
-            if (password != null && Regex.IsMatch(password, "\\S{3,25}"))
+            if (password != null && Regex.IsMatch(password, "^\\S{3,25}$"))
                 return true;
 
             errors.Add("Incorrect password");
