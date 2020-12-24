@@ -3,6 +3,7 @@ package manager
 import (
 	userstorage "github.com/HackerDom/ructfe2020/internal/storage/users"
 	"github.com/HackerDom/ructfe2020/internal/storage/docs"
+	"github.com/HackerDom/ructfe2020/internal/storage/sessions"
 )
 
 type Manager struct {
@@ -10,9 +11,9 @@ type Manager struct {
 	*documents
 }
 
-func New(usersStorage userstorage.Users, documentsStorage docs.Documents) *Manager {
+func New(usersStorage userstorage.Users, documentsStorage docs.Documents, sessStorage sessions.Sessions) *Manager {
 	return &Manager{
-		&users{usersStorage},
+		&users{usersStorage, sessStorage},
 		&documents{documentsStorage, usersStorage},
 	}
 }

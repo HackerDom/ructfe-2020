@@ -11,11 +11,11 @@ import (
 
 func main() {
 	l, _ := createLog().Build()
-	docsStorage, usersStorage, _, err := storage.Init(l)
+	docsStorage, usersStorage, sessStorage, err := storage.Init(l)
 	if err != nil {
 		panic(err)
 	}
-	err = server.RunServer(manager.New(usersStorage, docsStorage))
+	err = server.RunServer(manager.New(usersStorage, docsStorage, sessStorage))
 	if err != nil {
 		panic(err)
 	}
