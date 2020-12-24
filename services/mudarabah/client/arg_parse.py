@@ -8,6 +8,9 @@ def get_parsed_args():
     parser.add_argument('-gu', '--get-user', dest='get_user',
                         action='store_true',
                         help="get user info by login")
+    parser.add_argument('-gul', '--get-users-listing', dest='get_user_listing',
+                        action='store_true',
+                        help="get listing of users")
     parser.add_argument('-gc', '--get-cookie', dest='get_cookie',
                         action='store_true',
                         help="get user's cookie by login")

@@ -50,6 +50,12 @@ def get_user(login):
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
 
+def get_user_listing():
+    req = urllib.request.Request(HOST+"/list_users",
+                                 headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return json.loads(response.read().decode('utf8'))["addition"]
+
 def main():
     args = get_parsed_args()
     if args.register:
@@ -63,6 +69,8 @@ def main():
         print(get_transaction(args.login))
     if args.get_user:
         print(get_user(args.login))
+    if args.get_user_listing:
+        print(get_user_listing())
 
 if __name__ == "__main__":
     main()
