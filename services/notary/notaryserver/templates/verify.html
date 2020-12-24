@@ -44,11 +44,11 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="pubkey">Author's public key</label>
-                        <textarea id="pubkey" class="form-control {{' is-invalid' if form.pubkey.errors else ''}}"
-                                  name="pubkey">{{ request.form.pubkey }}</textarea>
-                        {% if form.pubkey.errors %}
-                            {% for error in form.pubkey.errors %}
+                        <label for="public_key">Author's public key</label>
+                        <textarea id="public_key" class="form-control {{' is-invalid' if form.public_key.errors else ''}}"
+                                  name="public_key">{{ request.form.public_key }}</textarea>
+                        {% if form.public_key.errors %}
+                            {% for error in form.public_key.errors %}
                                 <div class="invalid-feedback">{{ error }}</div>
                             {% endfor %}
                         {% endif %}

@@ -4,8 +4,8 @@ from flask import abort, flash, Flask, Markup, redirect, render_template, reques
 from flask_login import current_user, login_required, login_user, logout_user, LoginManager
 from sqlalchemy.sql.expression import exists
 
-from cryptography import verify_signature
 from forms import LoginForm, RegisterForm, SignForm, VerifyForm
+from notary import Notary
 from models import db, Document, User
 
 
@@ -125,7 +125,7 @@ def verify():
     form = VerifyForm()
     error = None
     if request.method == 'POST' and form.validate_on_submit():
-        if verify_signature(form.pubkey.data, form.title.data, form.text.data, form.signature.data):
+        if Notary.verify(form.public_key.data, form.title.data, form.text.data, form.signature.data):
             flash('The signature is valid')
         else:
             error = 'The signature is invalid'

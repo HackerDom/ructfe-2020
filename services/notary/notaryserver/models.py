@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 
-from cryptography import create_signature, gen_privkey, get_pubkey_from_privkey, verify_signature
+from notary import Notary
 
 
 db = SQLAlchemy()
@@ -12,8 +12,8 @@ class User(db.Model):
     name = db.Column(db.String, nullable=False)
     phone = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
-    pubkey = db.Column(db.String, nullable=False)
-    privkey = db.Column(db.String, nullable=False)
+    public_key = db.Column(db.String, nullable=False)
+    private_key = db.Column(db.String, nullable=False)
     documents = db.relationship('Document', backref='author', lazy=True)
 
     def __init__(self, username, name, phone, address):
@@ -21,8 +21,8 @@ class User(db.Model):
         self.name = name
         self.phone = phone
         self.address = address
-        self.privkey = gen_privkey()
-        self.pubkey = get_pubkey_from_privkey(self.privkey)
+        self.private_key = Notary.generate_private_key()
+        self.public_key = Notary.get_public_key(self.private_key)
 
     def is_authenticated(self):
         return True
@@ -37,10 +37,10 @@ class User(db.Model):
         return self.id
 
     def generate_password(self):
-        return create_signature(self.privkey, 'user', self.username)
+        return Notary.sign(self.private_key, 'user', self.username)
 
     def verify_password(self, password):
-        return verify_signature(self.pubkey, 'user', self.username, password)
+        return Notary.verify(self.public_key, 'user', self.username, password)
 
     def __repr__(self):
         return f'<User {self.username} (id={self.id})>'
@@ -57,7 +57,7 @@ class Document(db.Model):
         self.author_id = author.id
         self.title = title
         self.text = text
-        self.signature = create_signature(author.privkey, title, text)
+        self.signature = Notary.sign(author.private_key, title, text)
 
     def __repr__(self):
         return f'<Document #{self.id} by {self.author.username} (author_id={self.author_id})>'

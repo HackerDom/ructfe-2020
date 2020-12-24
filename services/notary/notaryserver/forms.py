@@ -24,4 +24,4 @@ class VerifyForm(FlaskForm):
     title = StringField('title', validators=[DataRequired(), Length(min=3, max=200)])
     text = StringField('text', validators=[DataRequired(), Length(min=3, max=20000)])
     signature = StringField('signature', validators=[DataRequired(), Length(min=3, max=20000)])
-    pubkey = StringField('pubkey', validators=[DataRequired(), Length(min=3, max=20000)])
+    public_key = StringField('public_key', validators=[DataRequired(), Length(min=3, max=20000)])
