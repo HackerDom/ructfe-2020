@@ -14,16 +14,24 @@ checker = Checker()
 @checker.define_check
 def check(request: CheckRequest) -> Verdict:
     api = Api(request.hostname)
-    print(list_users(api))
-    try:
-        result = api.ping()
-        if result and result['status'] == 200:
-            return Verdict.OK()
-        else:
-            return Verdict.MUMBLE("Wrong ping status")
-    except Exception as ex:
-        print(ex)
-        return Verdict.DOWN("Servise down")
+    res, err = ping(api)
+    if err: return err
+
+    res, err = register(api)
+    if err: return err
+
+    login, password, _, _, cookie = res
+    res, err = get_cookie(api, login, password)
+    if err: return err
+    if res != cookie:
+        return Verdict.MUMBLE("Wrong cookie")
+
+    users, err = list_users(api)
+    if err: return err
+    if login not in users:
+        return Verdict.MUMBLE("User not in users")
+
+    return Verdict.OK()
 
 @checker.define_put(vuln_num=1, vuln_rate=1)
 def put(request: PutRequest) -> Verdict:
@@ -51,6 +59,12 @@ def put(request: PutRequest) -> Verdict:
     if err: return err
 
     flag_id = f'{login1}:{password1}:{priv_key1}:{cookie1}'
+
+    users, err = list_users(api)
+    if err: return err
+    if login1 not in users or login2 not in users:
+        return Verdict.MUMBLE("No user in users")
+
     return Verdict.OK(flag_id)
 
 @checker.define_get(vuln_num=1)
@@ -88,6 +102,14 @@ def get(request: GetRequest) -> Verdict:
 
     return Verdict.OK()
 
+
+def ping(api):
+    result = api.ping()
+    if result is None:
+        return None, Verdict.DOWN("Can't ping service")
+    if result["status"] != 200:
+        return None, Verdict.MUMBLE("Wrong ping status")
+    return "OK", None
 
 def register(api):
     login = get_random_string(10)

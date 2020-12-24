@@ -8,8 +8,11 @@ class Api:
         self.hostname = f"http://{host}:{PORT}"
 
     def ping(self):
-        r = requests.get(f"{self.hostname}/ping")
-        return r.json()
+        try:
+            r = requests.get(f"{self.hostname}/ping")
+            return r.json()
+        except Exception:
+            return None
 
     def register(self, login, password, credit_card_credentials):
         data = {"addition": {
