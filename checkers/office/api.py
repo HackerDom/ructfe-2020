@@ -1,8 +1,9 @@
 import requests
 
-from google.protobuf.json_format import MessageToJson, Parse
+from google.protobuf.json_format import MessageToJson, MessageToDict, Parse
 import proto.office_pb2 as pb
 from errs import INVALID_FORMAT_ERR, FAILED_TO_CONNECT
+import json
 
 
 class Api:
@@ -16,11 +17,13 @@ class Api:
             d = MessageToJson(req)
             r = self.session.post(f"{self.url}/docs/create", data=d)
         except Exception as e:
+            print("failed to create doc")
             print(e)
             return None, FAILED_TO_CONNECT
         try:
             return Parse(r.text, pb.CreateDocumentResponse()), None
         except Exception as e:
+            print("failed to create doc")
             print(e)
             return None, INVALID_FORMAT_ERR
 
@@ -29,24 +32,31 @@ class Api:
             d = MessageToJson(req)
             r = self.session.post(f"{self.url}/docs/list", data=d)
         except Exception as e:
+            print("failed to list docs")
             print(e)
             return None, FAILED_TO_CONNECT
         try:
             return Parse(r.text, pb.ListDocumentsResponse()), None
         except Exception as e:
+            print("failed to list docs")
             print(e)
             return None, INVALID_FORMAT_ERR
 
     def execute_doc(self, req: pb.ExecuteRequest) -> (pb.ExecuteResponse, str):
         try:
-            d = MessageToJson(req)
-            r = self.session.post(f"{self.url}/docs/execute", data=d)
+            d = {
+                "doc_id": int(req.doc_id),
+                "token": req.token,
+            }
+            r = self.session.post(f"{self.url}/docs/execute", data=json.dumps(d))
         except Exception as e:
+            print("failed to execute doc")
             print(e)
             return None, FAILED_TO_CONNECT
         try:
-            return Parse(r.text, pb.ExecuteResponse()), None
+            return json.loads(r.text), None
         except Exception as e:
+            print("failed to execute doc")
             print(e)
             return None, INVALID_FORMAT_ERR
 
@@ -55,36 +65,42 @@ class Api:
             d = MessageToJson(req)
             r = self.session.post(f"{self.url}/users/login", data=d)
         except Exception as e:
+            print("failed to login doc")
             print(e)
             return None, FAILED_TO_CONNECT
         try:
-            return Parse(r.text, pb.LoginResponse()), None
+            return None
         except Exception as e:
+            print("failed to login doc")
             print(e)
-            return None, INVALID_FORMAT_ERR
+            return INVALID_FORMAT_ERR
 
     def register(self, req: pb.RegisterRequest) -> (pb.RegisterResponse, str):
         try:
             d = MessageToJson(req)
             r = self.session.post(f"{self.url}/users/register", data=d)
         except Exception as e:
+            print("failed to register doc")
             print(e)
-            return None, FAILED_TO_CONNECT
+            return FAILED_TO_CONNECT
         try:
-            return Parse(r.text, pb.RegisterResponse()), None
+            return None
         except Exception as e:
+            print("failed to register doc")
             print(e)
-            return None, INVALID_FORMAT_ERR
+            return INVALID_FORMAT_ERR
 
     def list_users(self, req: pb.ListRequest) -> (pb.ListResponse, str):
         try:
             d = MessageToJson(req)
             r = self.session.post(f"{self.url}/users/list", data=d)
         except Exception as e:
+            print("failed to list users")
             print(e)
             return None, FAILED_TO_CONNECT
         try:
             return Parse(r.text, pb.ListResponse()), None
         except Exception as e:
+            print("failed to list users")
             print(e)
             return None, INVALID_FORMAT_ERR

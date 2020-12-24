@@ -26,3 +26,16 @@ login_from varchar not null,
 login_to varchar not null,
 amount int not null,
 description bytea not null);
+
+CREATE FUNCTION delete_old_transactions() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  DELETE FROM public.transactions WHERE timestamp < NOW() - INTERVAL '20 minutes';
+  RETURN NULL;
+END;
+$$;
+
+CREATE TRIGGER delete_old_transactions_trigger
+    AFTER INSERT ON public.transactions FOR EACH ROW
+    EXECUTE PROCEDURE delete_old_transactions();

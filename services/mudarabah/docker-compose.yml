@@ -2,7 +2,7 @@ version: '2.2'
 
 services:
   postgres:
-    image: postgres:11-alpine
+    image: postgres:13.1-alpine
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
@@ -10,6 +10,9 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: on-failure
+    mem_limit: 1G
+    memswap_limit: 1G
+    pids_limit: 100
 
   web:
     build: .
@@ -18,3 +21,10 @@ services:
       - postgres
     ports:
       - "3113:3113"
+    ulimits:
+      nofile:
+        soft: 12000
+        hard: 12000
+    mem_limit: 1G
+    memswap_limit: 1G
+    pids_limit: 100

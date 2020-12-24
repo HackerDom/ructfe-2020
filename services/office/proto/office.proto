@@ -34,7 +34,7 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
-  User user = 1;
+  string session = 1;
 }
 
 message LoginRequest {
@@ -80,8 +80,9 @@ message ListDocumentsResponse {
 }
 
 message ExecuteRequest {
-  string username = 1;
-  int64 doc_id = 2;
+  string session = 1;
+  string token = 2;
+  int64 doc_id = 3;
 }
 
 message ExecuteResponse {
