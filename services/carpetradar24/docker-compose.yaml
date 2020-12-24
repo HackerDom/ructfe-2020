@@ -8,6 +8,8 @@ services:
     restart: always
     ports:
       - 12345:12345
+    depends_on:
+      - cassandra
     pids_limit: 100
     mem_limit: 1G
     memswap_limit: 1G
@@ -19,6 +21,8 @@ services:
     restart: always
     ports:
       - 7000:7000
+    depends_on:
+      - cassandra
     pids_limit: 100
     mem_limit: 1G
     memswap_limit: 1G
