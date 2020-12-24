@@ -42,10 +42,13 @@ def create_signature(privkey, title, text):
 
 
 def verify_signature(pubkey, title, text, signature):
-    result = libnotary.verify(
-        deserialize_bytes(pubkey),
-        pack_document(title, text).encode('utf-8'),
-        deserialize_bytes(signature))
+    try:
+        pubkey = deserialize_bytes(pubkey)
+        signature = deserialize_bytes(signature)
+    except ValueError:
+        return False  # Garbage input
+
+    result = libnotary.verify(pubkey, pack_document(title, text).encode('utf-8'), signature)
     if result is None:
         return False  # The public key is invalid, makes sense to return False
     return result
