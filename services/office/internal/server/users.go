@@ -53,8 +53,10 @@ func (s *usersService) Mount(mux *chi.Mux) {
 func (s *usersService) List(ctx context.Context, req *pb.ListRequest) (*pb.ListResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
 	defer cancel()
-	// TODO: [12/13/20] (vaspahomov): pagination
-	names, err := s.m.GetNames(ctx)
+	if err := pagingValid(req.Limit, req.Offset); err != nil {
+		return nil, err
+	}
+	names, err := s.m.GetNames(ctx, int(req.Limit), int(req.Offset))
 	if err != nil {
 		return nil, err
 	}

@@ -3,11 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using CarpetRadar.Services;
 using CarpetRadar.Services.DataStorage;
 using CarpetRadar.Services.IdentityServices;
@@ -42,13 +40,13 @@ namespace CarpetRadar.TrackServer
             var r = new Random();
 
             var rs = new RegistrationService(dataStorage, logger);
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 2; i++)
             {
                 var id = Guid.NewGuid().ToString("N").Substring(0, 5);
                 var login = i + "i" + id;
                 var userId = rs.RegisterUser(login, "password", "company " + id).Result;
 
-                for (int f = 0; f < 4; f++)
+                for (int f = 0; f < 2; f++)
                 {
                     var flightId = Guid.NewGuid();
 

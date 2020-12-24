@@ -15,7 +15,7 @@ const (
 	Addr = "[::]"
 
 	reqTimeout = 3 * time.Second
-	debug      = false
+	debug      = true
 )
 
 type server struct {
@@ -57,4 +57,17 @@ func (s *server) Register(mux *chi.Mux) {
 	// mount controllers
 	s.usersService.Mount(mux)
 	s.documentsService.Mount(mux)
+}
+
+func pagingValid(limit, offset int32) error {
+	if limit > maxLimit {
+		return fmt.Errorf("req.limit = %d, max=%d", limit, maxLimit)
+	}
+	if limit < minLimit {
+		return fmt.Errorf("req.limit = %d, min=%d", limit, minLimit)
+	}
+	if offset < minOffset {
+		return fmt.Errorf("req.offset = %d, min=%d", offset, minOffset)
+	}
+	return nil
 }

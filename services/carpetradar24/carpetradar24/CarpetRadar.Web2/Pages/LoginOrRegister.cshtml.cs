@@ -58,7 +58,7 @@ namespace CarpetRadar.Web2.Pages
                 return Page();
             }
 
-            return RedirectToPage("/Statistics");
+            return RedirectToPage("/Chronicle");
         }
 
         private async Task<IActionResult> LoginAction(string userName, string password)
@@ -74,7 +74,7 @@ namespace CarpetRadar.Web2.Pages
                 return Page();
             }
 
-            return RedirectToPage("/Statistics");
+            return RedirectToPage("/Chronicle");
         }
 
         private async Task<bool> RegisterUser(string userName, string password, string company)
@@ -130,7 +130,7 @@ namespace CarpetRadar.Web2.Pages
 
         private bool ValidateUserName(string userName)
         {
-            if (userName != null && Regex.IsMatch(userName, "\\w{3,15}"))
+            if (userName != null && Regex.IsMatch(userName, "^\\w{3,15}$"))
                 return true;
 
             errors.Add("Incorrect username");

@@ -1,6 +1,6 @@
-using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using NLog.Web;
 
 namespace CarpetRadar.Web2
 {
@@ -13,6 +13,8 @@ namespace CarpetRadar.Web2
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseKestrel().UseStartup<Startup>(); });
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseKestrel().UseStartup<Startup>(); })
+                .ConfigureLogging(logging => { })
+                .UseNLog();
     }
 }

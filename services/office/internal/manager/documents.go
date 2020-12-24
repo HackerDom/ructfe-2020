@@ -21,8 +21,8 @@ func (d *documents) Delete(ctx context.Context, docID int64) error {
 	return d.s.Delete(ctx, docID)
 }
 
-func (d *documents) List(ctx context.Context) ([]*pb.ShortDocument, error) {
-	ds, err := d.s.List(ctx)
+func (d *documents) List(ctx context.Context, limit, offset int) ([]*pb.ShortDocument, error) {
+	ds, err := d.s.List(ctx, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (d *documents) ExecForUser(ctx context.Context, id int64, username string) 
 		return "", err
 	}
 	doc := document.FromPB(docPB)
-	users, err := d.users.List(ctx)
+	users, err := d.users.List(ctx, 0, 0, true)
 	if err != nil {
 		return "", err
 	}

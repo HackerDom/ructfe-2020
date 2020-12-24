@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CarpetRadar.Services.DataStorage;
 using CarpetRadar.Services.IdentityServices;
@@ -11,7 +9,7 @@ using NLog;
 
 namespace CarpetRadar.Web2.Pages
 {
-    public class StatisticsModel : PageModel
+    public class ChronicleModel : PageModel
     {
         public (string Login, string Company) UserInfo { get; set; }
         public IEnumerable<Flight> UserFlights { get; set; }
@@ -21,7 +19,7 @@ namespace CarpetRadar.Web2.Pages
         private readonly IDataStorage dataStorage;
         private readonly ILogger logger;
 
-        public StatisticsModel(IAuthenticationService authenticationService, IDataStorage dataStorage, ILogger logger)
+        public ChronicleModel(IAuthenticationService authenticationService, IDataStorage dataStorage, ILogger logger)
         {
             this.authenticationService = authenticationService;
             this.dataStorage = dataStorage;

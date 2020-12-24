@@ -1,0 +1,4 @@
+gornilo
+requests
+bs4
+lxml

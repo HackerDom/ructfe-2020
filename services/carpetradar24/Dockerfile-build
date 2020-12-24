@@ -21,6 +21,6 @@ WORKDIR CarpetRadar.Web2
 
 COPY --from=trackserver_build /app/CarpetRadar.TrackServer/bin/Debug /trackserver
 
-RUN cp /trackserver/CarpetRadar.Services.dll CarpetRadar.Services.dll
+RUN cp -r /trackserver/* .
 
 CMD ["bash", "-c", "dotnet restore && dotnet publish -c Debug -o publish && cp -r /trackserver bin/Debug"]
