@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length
 
 
@@ -20,6 +20,7 @@ class RegisterForm(FlaskForm):
 class SignForm(FlaskForm):
     title = StringField('title', validators=[DataRequired(), Length(min=3, max=200)])
     text = StringField('text', validators=[DataRequired(), Length(min=3, max=20000)])
+    is_public = BooleanField('is_public')
 
 
 class VerifyForm(FlaskForm):

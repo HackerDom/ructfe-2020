@@ -54,12 +54,14 @@ class Document(db.Model):
     title = db.Column(db.String, nullable=False)
     text = db.Column(db.String, nullable=False)
     signature = db.Column(db.String, nullable=False)
+    is_public = db.Column(db.Boolean, nullable=False)
 
-    def __init__(self, author, title, text):
+    def __init__(self, author, title, text, is_public):
         self.author_id = author.id
         self.title = title
         self.text = text
         self.signature = Notary.sign(author.private_key, title, text)
+        self.is_public = is_public
 
     def __repr__(self):
         return f'<Document #{self.id} by {self.author.username} (author_id={self.author_id})>'

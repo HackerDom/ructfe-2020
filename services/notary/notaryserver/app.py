@@ -97,14 +97,16 @@ def doc(doc_id):
     doc = Document.query.get(doc_id)
     if doc is None:
         return abort(404)
-    return render_template('doc.html', doc=doc)
+    visible = doc.is_public or current_user.is_authenticated and current_user.id == doc.author_id
+    return render_template('doc.html', doc=doc, visible=visible)
 
 
 @app.route('/')
 def recent_docs():
     page = request.args.get('page', 1, type=int)
     docs = Document.query.order_by(Document.id.desc()).paginate(page=page, per_page=DOCS_PER_PAGE)
-    return render_template('docs.html', docs=docs)
+    current_user_id = current_user.id if current_user.is_authenticated else None
+    return render_template('docs.html', docs=docs, current_user_id=current_user_id)
 
 
 @app.route('/sign', methods=['GET', 'POST'])
@@ -116,7 +118,8 @@ def sign():
     document = Document(
         author=current_user,
         title=request.form['title'],
-        text=request.form['text'])
+        text=request.form['text'],
+        is_public=request.form.get('is_public') == 'on')
     db.session.add(document)
     db.session.commit()
     return redirect(url_for('doc', doc_id=document.id))

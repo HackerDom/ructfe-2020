@@ -13,8 +13,12 @@
                     <a href="{{ url_for('doc', doc_id=doc.id) }}">{{ doc.title }}</a>
                 </h4>
                 <div class="card-body">
+                    {% if doc.is_public or current_user_id == doc.author_id %}
                     <p>{{ doc.text | truncate(1024, end='') }}
                         {% if doc.text|length > 1024 %} <strong>[...]</strong>{% endif %}</p>
+                    {% else %}
+                    <p> <em>Private document</em> </p>
+                    {% endif %}
                     <span class="text-muted">Signed by <em>{{ doc.author.name }}</em></span>
                 </div>
             </div>

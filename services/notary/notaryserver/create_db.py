@@ -11,5 +11,5 @@ with app.app_context():
     db.session.commit()
     print(f'qwer\'s password is "{u.generate_password()}"')
     for i in range(115):
-        db.session.add(Document(u, f'title{i}', f'text{i}'))
+        db.session.add(Document(u, f'title{i}', f'text{i}', i % 2 == 0))
     db.session.commit()

@@ -11,11 +11,17 @@
                 <a href="{{ url_for('doc', doc_id=doc.id) }}">{{ doc.title }}</a>
             </h4>
             <div class="card-body">
+                {% if visible %}
                 <p> {{ doc.text }} </p>
+                {% else %}
+                <p> <em>Sorry, the document text is private.</em> </p>
+                {% endif %}
                 <hr/>
                 <p>Signed by <em>{{ doc.author.name }}</em> (registered as {{ doc.author.username }})</p>
+                {% if visible %}
                 <p>{{ doc.author.name }}'s signature: <code>{{ doc.signature }}</code> </p>
-                <p>{{ doc.author.name }}'s public key: <code>{{ doc.author.pubkey }}</code> </p>
+                <p>{{ doc.author.name }}'s public key: <code>{{ doc.author.public_key }}</code> </p>
+                {% endif %}
             </div>
         </div>
     </div>
