@@ -28,26 +28,23 @@ func (m *users) GetNames(ctx context.Context, limit, offset int) ([]string, erro
 	return names, nil
 }
 
-func (m *users) LoginUser(ctx context.Context, username, pass string) (*pb.LoginResponse, error) {
+func (m *users) LoginUser(ctx context.Context, username, pass string) (string, error) {
 	if err := validateUsername(username); err != nil {
-		return nil, err
+		return "", err
 	}
 	pass = hashutil.PersistDigest(pass)
 	user, err := m.s.User(ctx, username)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	if user.Password != pass {
-		return nil, fmt.Errorf("user with this credentionals does not exist")
+		return "", fmt.Errorf("user with this credentionals does not exist")
 	}
-	session, err := m.sess.Token(ctx, user.Name)
-	if err != nil {
-		return nil, nil
-	}
-	response := &pb.LoginResponse{
-		Session: session,
-	}
-	return response, nil
+	return m.sess.Token(ctx, user.Name)
+}
+
+func (m *users) Username(ctx context.Context, session string) (string, error) {
+	return m.sess.Username(ctx, session)
 }
 
 func (m *users) RegisterUser(ctx context.Context, username, pass, bio string) (*pb.User, error) {

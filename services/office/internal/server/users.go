@@ -29,7 +29,15 @@ func (s *usersService) Mount(mux *chi.Mux) {
 	httprpc.New("POST", registerPath).
 		Mount(mux).
 		WithJSONPbReader(&pb.RegisterRequest{}).
-		WithJSONPbWriter().
+		WithCustomWriter(func(w http.ResponseWriter, respPb proto.Message) error {
+			resp := respPb.(*pb.RegisterResponse)
+			http.SetCookie(w, &http.Cookie{
+				Name:  "session",
+				Value: resp.Session,
+			})
+			w.WriteHeader(200)
+			return nil
+		}).
 		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) { return s.Register(ctx, req.(*pb.RegisterRequest)) })
 	httprpc.New("POST", listPath).
 		Mount(mux).
@@ -44,7 +52,9 @@ func (s *usersService) Mount(mux *chi.Mux) {
 			http.SetCookie(w, &http.Cookie{
 				Name:  "session",
 				Value: resp.Session,
+				Path:  "/",
 			})
+			w.WriteHeader(200)
 			return nil
 		}).
 		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) { return s.Login(ctx, req.(*pb.LoginRequest)) })
@@ -66,19 +76,25 @@ func (s *usersService) List(ctx context.Context, req *pb.ListRequest) (*pb.ListR
 func (s *usersService) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
 	defer cancel()
-	u, err := s.m.RegisterUser(ctx, req.Name, req.Password, req.Bio)
+	_, err := s.m.RegisterUser(ctx, req.Name, req.Password, req.Bio)
+	if err != nil {
+		return nil, err
+	}
+	session, err := s.m.LoginUser(ctx, req.Name, req.Password)
 	if err != nil {
 		return nil, err
 	}
 	return &pb.RegisterResponse{
-		User: u,
+		Session: session,
 	}, nil
 }
 
 func (s *usersService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
 	defer cancel()
-	// TODO: [12/21/20] (vaspahomov):
-	panic("not implemented")
-	return &pb.LoginResponse{}, nil
+	session, err := s.m.LoginUser(ctx, req.Name, req.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.LoginResponse{Session: session}, nil
 }
