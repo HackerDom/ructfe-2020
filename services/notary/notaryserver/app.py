@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 
 from flask import abort, flash, Flask, Markup, redirect, render_template, request, url_for
