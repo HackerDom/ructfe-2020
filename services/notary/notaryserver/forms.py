@@ -28,3 +28,7 @@ class VerifyForm(FlaskForm):
     text = StringField('text', validators=[DataRequired(), Length(min=3, max=20000)])
     signature = StringField('signature', validators=[DataRequired(), Length(min=3, max=20000)])
     public_key = StringField('public_key', validators=[DataRequired(), Length(min=3, max=20000)])
+
+
+class DocumentForm(FlaskForm):
+    password = PasswordField('password', validators=[DataRequired()])

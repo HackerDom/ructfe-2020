@@ -15,6 +15,24 @@
                 <p> {{ doc.text }} </p>
                 {% else %}
                 <p> <em>Sorry, the document text is private.</em> </p>
+                <form method="POST" action="">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <textarea id="password" class="form-control {{' is-invalid' if form.password.errors else ''}}"
+                                  name="password">{{ request.form.password }}</textarea>
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    {{ form.csrf_token }}
+
+                    <button type="submit" name="submit" class="btn btn-lg btn-info btn-block">
+                        View
+                    </button>
+                </form>
                 {% endif %}
                 <hr/>
                 <p>Signed by <em>{{ doc.author.name }}</em> (registered as {{ doc.author.username }})</p>
