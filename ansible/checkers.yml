@@ -26,6 +26,7 @@
     pip:
       executable: pip3
       requirements: "{{ cs_dir }}/checkers/{{ item }}/requirements.txt"
+    ignore_errors: yes
     loop:
       - office
       - sesame
@@ -33,3 +34,5 @@
       - mumbler
       - carpetradar24
       - mudarabah
+      - notary
+      - quantum
