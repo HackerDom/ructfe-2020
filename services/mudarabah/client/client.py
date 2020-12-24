@@ -59,7 +59,12 @@ def get_user_listing():
 def main():
     args = get_parsed_args()
     if args.register:
-        print(register(args.login, args.password, args.credit_card_credentials))
+        res = register(args.login, args.password, args.credit_card_credentials)
+        priv_key_hex = res["priv_key"]
+        with open(f"{args.login}.key", "w") as f:
+            f.write(priv_key_hex)
+            print(f"key is written to {args.login}.key")
+        print(res)
     if args.get_cookie:
         print(get_token(args.login, args.password))
     if args.send_money:
