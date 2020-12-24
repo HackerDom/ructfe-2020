@@ -19,4 +19,5 @@
     - { role: service, service_name: sesame, tags: [sesame] }
     - { role: service, service_name: keeper, tags: [keeper] }
     - { role: service, service_name: mumbler, tags: [mumbler] }
+    - { role: service, service_name: mudarabah, tags: [mudarabah] }
     - { role: service, service_name: carpetradar24, tags: [carpetradar24] }
