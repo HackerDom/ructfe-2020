@@ -70,24 +70,3 @@ class Notary:
             return False  # The public key is invalid, makes sense to return False
         
         return result
-
-
-# import random
-#
-#
-# def gen_privkey():
-#     return 'priv' + str(random.randint(0, 2 ** 32 - 1))
-#
-#
-# def get_pubkey_from_privkey(privkey):
-#     return 'pub' + privkey[4:]
-#
-#
-# def create_signature(privkey, title, text):
-#     data = pack_document(title, text)
-#     return f'signature for {data}: {privkey}'
-#
-#
-# def verify_signature(pubkey, title, text, signature):
-#     data = pack_document(title, text)
-#     return signature == f'signature for {data}: priv{pubkey[3:]}'

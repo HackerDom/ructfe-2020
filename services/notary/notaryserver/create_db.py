@@ -6,10 +6,19 @@ from models import db, User, Document
 
 with app.app_context():
     db.create_all()
-    u = User('qwer', 'Qwer Qwer', '+1234', 'addr')
-    db.session.add(u)
-    db.session.commit()
-    print(f'qwer\'s password is "{u.generate_password()}"')
-    for i in range(115):
-        db.session.add(Document(u, f'title{i}', f'text{i}', i % 2 == 0))
-    db.session.commit()
+
+    for i in range(10):
+        user = User(f'user{i}', f'User{i} Name{i}', f'+1234{i}', f'Address{i}')
+        
+        db.session.add(user)
+        db.session.commit()
+
+        print(f'{user.username}\'s password is "{user.generate_password()}"')
+        
+        public_document = Document(user, f'public title{i}', f'public text{i}', True)
+        db.session.add(public_document)
+        
+        private_document = Document(user, f'private title{i}', f'private text{i}', False)
+        db.session.add(private_document)
+        
+        db.session.commit()
