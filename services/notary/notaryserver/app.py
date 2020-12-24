@@ -77,7 +77,7 @@ def login():
 def logout():
     logout_user()
     flash('You were logged out.')
-    return redirect(url_for('.index'))
+    return redirect(url_for('/'))
 
 
 @app.route('/profile')

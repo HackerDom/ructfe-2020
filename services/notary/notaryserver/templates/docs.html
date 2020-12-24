@@ -4,54 +4,52 @@
 
 {% block page_content %}
 
-<div class="container">
-    {% if docs.items %}
-        {% for doc in docs.items %}
-        <div class="row mb-4">
-            <div class="col-md-8 offset-md-2">
-                <div class="card">
-                    <h4 class="card-header">
-                        <a href="{{ url_for('doc', doc_id=doc.id) }}">{{ doc.title }}</a>
-                    </h4>
-                    <div class="card-body">
-                        <p>{{ doc.text | truncate(1024, end='') }}
-                            {% if doc.text|length > 1024 %} <strong>[...]</strong>{% endif %}</p>
-                        <span class="text-muted">Signed by <em>{{ doc.author.name }}</em></span>
-                    </div>
+{% if docs.items %}
+    {% for doc in docs.items %}
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <h4 class="card-header">
+                    <a href="{{ url_for('doc', doc_id=doc.id) }}">{{ doc.title }}</a>
+                </h4>
+                <div class="card-body">
+                    <p>{{ doc.text | truncate(1024, end='') }}
+                        {% if doc.text|length > 1024 %} <strong>[...]</strong>{% endif %}</p>
+                    <span class="text-muted">Signed by <em>{{ doc.author.name }}</em></span>
                 </div>
             </div>
         </div>
-        {% endfor %}
-        <div class="row mb-4">
-            <div class="col-md-8 offset-md-2">
-                <a href="{{ url_for('recent_docs', page=docs.prev_num) }}" class="btn btn-outline-dark
-                        {% if docs.page == 1 %}disabled{% endif %}">
-                    &laquo;
-                </a>
-                {% for page_num in docs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-                    {% if page_num %}
-                        {% if docs.page == page_num %}
-                            <a href="{{ url_for('recent_docs', page=page_num) }}" class="btn btn-dark">
-                                <b>{{ page_num }}</b>
-                            </a>
-                        {% else %}
-                            <a href="{{ url_for('recent_docs', page=page_num) }}" class="btn btn-outline-dark">
-                                {{ page_num }}
-                            </a>
-                        {% endif %}
+    </div>
+    {% endfor %}
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            <a href="{{ url_for('recent_docs', page=docs.prev_num) }}" class="btn btn-outline-dark
+                    {% if docs.page == 1 %}disabled{% endif %}">
+                &laquo;
+            </a>
+            {% for page_num in docs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                {% if page_num %}
+                    {% if docs.page == page_num %}
+                        <a href="{{ url_for('recent_docs', page=page_num) }}" class="btn btn-dark">
+                            <b>{{ page_num }}</b>
+                        </a>
                     {% else %}
-                        <span class="mx-2">...</span>
+                        <a href="{{ url_for('recent_docs', page=page_num) }}" class="btn btn-outline-dark">
+                            {{ page_num }}
+                        </a>
                     {% endif %}
-                {% endfor %}
-                <a href="{{ url_for('recent_docs', page=docs.next_num) }}" class="btn btn-outline-dark
-                        {% if docs.page == docs.pages %}disabled{% endif %}">
-                    &raquo;
-                </a>
-            </div>
+                {% else %}
+                    <span class="mx-2">...</span>
+                {% endif %}
+            {% endfor %}
+            <a href="{{ url_for('recent_docs', page=docs.next_num) }}" class="btn btn-outline-dark
+                    {% if docs.page == docs.pages %}disabled{% endif %}">
+                &raquo;
+            </a>
         </div>
-    {% else %}
-        No one has published any documents so far.
-    {% endif %}
-</div>
+    </div>
+{% else %}
+    <span class="mb-4">No one has published any documents so far.</span>
+{% endif %}
 
 {% endblock %}
