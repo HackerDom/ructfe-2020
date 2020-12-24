@@ -26,7 +26,6 @@ def point_double(point, curve):
     return Point(x, y)
 
 
-
 def point_add(point1, point2, curve):
     if point1 == ZERO:
         return point2
@@ -74,8 +73,7 @@ def curve_from_point(point, N):
     return Curve(a, b, q)
 
 
-def data_to_point(data, q):
-    q_length = (q.bit_length() - 1) // 8
+def compress_data(data, q_length):
     value = [0xFF] * (2 * q_length)
     i = 0
 
@@ -84,6 +82,13 @@ def data_to_point(data, q):
             i = 0
         value[i] ^= x
         i += 1
+
+    return bytes(value)
+
+
+def data_to_point(data, q):
+    q_length = (q.bit_length() - 1) // 8
+    value = compress_data(data, q_length)
     
     x = gmpy.mpz(int.from_bytes(value[:q_length], 'little'))
     y = gmpy.mpz(int.from_bytes(value[q_length:], 'little'))
@@ -134,7 +139,7 @@ def pack_numbers(*numbers):
 
 
 def create_sign(private, data):
-    N, p, q, e, d = load_numbers(data)
+    N, p, q, e, d = load_numbers(private)
     point = data_to_point(data, N)
     curve = curve_from_point(point, N)
     sign = point_multiply(point, d, curve)
@@ -144,8 +149,8 @@ def create_sign(private, data):
 def verify_sign(public, data, sign):
     N, e = load_numbers(public)
     sign = Point(*load_numbers(sign))
-    point = data_to_point(data, public.N)
-    curve = curve_from_point(point, public.N)
+    point = data_to_point(data, N)
+    curve = curve_from_point(point, N)
 
     if not point_is_on_curve(sign, curve):
         return False
