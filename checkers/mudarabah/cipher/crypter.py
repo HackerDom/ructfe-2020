@@ -35,7 +35,6 @@ class Crypter:
         pt_word = bytes_to_codeword(pt, self.code.G.shape[0])
         z = np.array([1 for _ in range(self.errors)] + [0 for _  in range(self.n - self.errors)], dtype=int)
         np.random.shuffle(z)
-
         return codeword_to_bytes(((pt_word @ self.public_key % 2) + z) % 2)
 
     def decrypt(self, ct):

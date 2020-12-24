@@ -34,7 +34,7 @@ def send_money(cookie=None, login_to=None, description=None, amount=None):
         db.update_balance(user_to.login, user_to.balance + transaction.amount)
         db.add_transaction(transaction)
 
-    return jsonify({"status": 200, "result": True})
+    return jsonify({"status": 200})
 
 
 @app.route('/get_cookie', methods=['POST'])
@@ -48,7 +48,7 @@ def login(login=None, password=None):
         print(f"login {user}", flush=True)
         if not user:
             return "Incorrect username or password"
-    return jsonify({"status": 200, "result": True, "addition": {"cookie":str(user.cookie)}})
+    return jsonify({"status": 200, "addition": {"cookie":user.cookie}})
 
 
 @app.route('/register', methods=['POST'])
@@ -58,14 +58,14 @@ def register(login=None, password=None, credit_card_credentials=None):
     print(f"reg {login}, pass {password}, credit_card {credit_card_credentials}")
     with DatabaseClient() as db:
         if db.check_if_username_free(login):
-            code = LDPC.from_params(256, 4, 8)
+            code = LDPC.from_params(512, 4, 8)
             crypter = Crypter.from_code(code)
             private_key = crypter.dump_private()
             user = User.create(login, password, private_key, credit_card_credentials)
             db.add_user(user)
         else:
             return "this user already exists"
-    return jsonify({"status": 200, "result": True, "addition": {"cookie":str(user.cookie), "priv_key":private_key.hex()}})
+    return jsonify({"status": 200, "addition": {"cookie":user.cookie, "priv_key":private_key.hex()}})
 
 
 @app.route('/transactions', methods=["POST"])
@@ -83,7 +83,8 @@ def get_transactions(login=None):
         "amount": x.amount,
         "description": crypter.encrypt(x.description).hex()
     } for x in transactions]
-    return jsonify({"status": 200, "result": True, "addition": transactions})
+    print(transactions, flush=True)
+    return jsonify({"status": 200, "addition": {"transactions": transactions}})
 
 
 @app.route('/users_pubkey', methods=["POST"])
@@ -95,11 +96,11 @@ def get_users_pubkey(login=None):
             return "Wrong username"
     crypter = Crypter.load_private(user.private_key)
     pub_key = crypter.dump_public()
-    return jsonify({"status": 200, "result": True, "addition": {"pub_key":pub_key.hex()}})
+    return jsonify({"status": 200, "addition": {"pub_key":pub_key.hex()}})
 
 @app.route("/ping")
 def ping():
-    return jsonify({"status": 200, "result": True})
+    return jsonify({"status": 200})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3113, debug=True)
