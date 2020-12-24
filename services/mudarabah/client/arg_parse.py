@@ -44,4 +44,7 @@ def get_parsed_args():
     parser.add_argument('-k', '--priv-key',
                         help='private key for crypt transaction description',
                         default=None, dest='priv_key')
+    parser.add_argument('-kf', '--priv-key-filename',
+                        help='private key for crypt transaction description filename',
+                        default=None, dest='priv_key_filename')
     return parser.parse_args()

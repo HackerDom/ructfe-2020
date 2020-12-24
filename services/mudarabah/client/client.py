@@ -64,7 +64,12 @@ def main():
         print(get_token(args.login, args.password))
     if args.send_money:
         #please check it
-        print(send_money(args.cookie, args.login_to, args.amount, args.description, args.priv_key))
+        if args.priv_key_filename:
+            with open(args.priv_key_filename, "r") as f:
+                key = f.read() # should be hex
+        else:
+            key = args.priv_key 
+        print(send_money(args.cookie, args.login_to, args.amount, args.description, key))
     if args.get_transactions:
         print(get_transaction(args.login))
     if args.get_user:
