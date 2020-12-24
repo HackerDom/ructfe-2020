@@ -1,19 +1,73 @@
-import random
+import base64
+import binascii
+
+import libnotary
+
+
+def serialize_bytes(bs):
+    return base64.b64encode(bs).decode('utf-8')
+
+
+def deserialize_bytes(string):
+    try:
+        return base64.b64decode(string).decode('utf-8')
+    except binascii.Error as err:
+        raise ValueError('Failed to deserialize bytes') from err
+
+
+def pack_document(title, text):
+    return title + '|' + text.replace('|', '\\|')
 
 
 def gen_privkey():
-    return 'priv' + str(random.randint(0, 2 ** 32 - 1))
+    key = libnotary.generate()
+    if key is None:
+        raise ValueError('Failed to generate a private key')
+    return serialize_bytes(key)
 
 
 def get_pubkey_from_privkey(privkey):
-    return 'pub' + privkey[4:]
+    pubkey = libnotary.get_public(deserialize_bytes(privkey))
+    if pubkey is None:
+        raise ValueError('Invalid private key')
+    return serialize_bytes(pubkey)
 
 
 def create_signature(privkey, title, text):
-    data = title + '|' + text.replace('|', '\\|')
-    return f'signature for {data}: {privkey}'
+    signature = libnotary.sign(
+        deserialize_bytes(privkey),
+        pack_document(title, text).encode('utf-8'))
+    if signature is None:
+        raise ValueError('Invalid private key')
+    return serialize_bytes(signature)
 
 
 def verify_signature(pubkey, title, text, signature):
-    data = title + '|' + text.replace('|', '\\|')
-    return signature == f'signature for {data}: priv{pubkey[3:]}'
+    result = libnotary.verify(
+        deserialize_bytes(pubkey),
+        pack_document(title, text).encode('utf-8'),
+        deserialize_bytes(signature))
+    if result is None:
+        return False  # The public key is invalid, makes sense to return False
+    return result
+
+
+# import random
+#
+#
+# def gen_privkey():
+#     return 'priv' + str(random.randint(0, 2 ** 32 - 1))
+#
+#
+# def get_pubkey_from_privkey(privkey):
+#     return 'pub' + privkey[4:]
+#
+#
+# def create_signature(privkey, title, text):
+#     data = pack_document(title, text)
+#     return f'signature for {data}: {privkey}'
+#
+#
+# def verify_signature(pubkey, title, text, signature):
+#     data = pack_document(title, text)
+#     return signature == f'signature for {data}: priv{pubkey[3:]}'
