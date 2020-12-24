@@ -195,6 +195,18 @@ fun App.addLoginHandler(): Javalin = javalin.post(Endpoints.LOGIN) { ctx ->
 }
 
 
+fun App.addLogoutHandler(): Javalin = javalin.post(Endpoints.LOGOUT) { ctx ->
+    val authenticatedUser = getAuthenticatedUser(ctx)
+
+    if (authenticatedUser == null) {
+        ctx.status(400)
+        return@post
+    }
+
+    sessionManager.delete(authenticatedUser)
+}
+
+
 fun App.authenticate(ctx: Context, login: String) {
     ctx.clearCookieStore()
     val secret = sessionManager.create(login)
@@ -206,6 +218,8 @@ fun App.authenticate(ctx: Context, login: String) {
 
 fun App.addRegisterHandler(): Javalin = javalin.post(Endpoints.REGISTER) { ctx ->
     val login = ctx.getFormParamOrBadStatus("login") ?: run { return@post }
+    File(STORAGE_PATH).resolve(safeEscapeLogin(login)).mkdirs()
+
     val password = ctx.getFormParamOrBadStatus("password") ?: run { return@post }
 
     if (userStorage.exists(login)) {
@@ -215,15 +229,4 @@ fun App.addRegisterHandler(): Javalin = javalin.post(Endpoints.REGISTER) { ctx -
 
     userStorage.create(login, password)
     authenticate(ctx, login)
-}
-
-fun App.addUploadHandler() {
-    //    app.javalin.post("/upload") { ctx ->
-//        ctx.uploadedFiles("files").forEach { (contentType, content, name, extension) ->
-//            println(contentType)
-//            println(content)
-//            println(name)
-//            println(extension)
-//        }
-//    }
 }
