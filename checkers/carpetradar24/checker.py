@@ -115,15 +115,16 @@ def get_flag(request: GetRequest) -> Verdict:
     login, password = request.flag_id.strip().split(":")
     token = client.login_and_get_auth_token(login, password)
     if token is None:
-        return Verdict.MUMBLE("Can't login or parse auth token")
+        print(f"[---] Cannot log in, maybe user data is lost")
+        return Verdict.CORRUPT("Can't login or parse auth token")
 
     flights = client.get_chronicle(token)
     if flights is None:
         return Verdict.MUMBLE("Can't get or parse chronicle")
 
     if len(flights) < 1 or len(flights[0]) < 8:
-        print(f"[---] Flights list length in chronicle is incorrect")
-        return Verdict.MUMBLE("Not enough records in chronicle")
+        print(f"[---] Flights list length in chronicle is incorrect, maybe user flights data is lost")
+        return Verdict.CORRUPT("Not enough records in chronicle")
     print(f"[+] Flights list has {len(flights)} rows")
     print(f"[+] Will compare expected and actual flags")
 
