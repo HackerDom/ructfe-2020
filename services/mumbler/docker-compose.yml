@@ -1,7 +1,6 @@
 version: '2.2'
 services:
   mumbler:
-    image: mumbler
     build: .
     mem_limit: 1G
     memswap_limit: 1G
