@@ -19,7 +19,7 @@ services:
     restart: always
     ports:
       - 7000:7000
-    pids_limit: 10
+    pids_limit: 100
     mem_limit: 1G
     memswap_limit: 1G
 
