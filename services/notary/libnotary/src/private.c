@@ -94,7 +94,7 @@ void private_get_public(public_ptr public, private_srcptr private) {
 }
 
 void __private_generate_prime(mpz_ptr prime, size_t bits, FILE *random) {
-    const int32_t checks = 25;
+    const int32_t checks = 10;
 
     mpz_t result, remainder;
     uint64_t seed;
@@ -164,7 +164,7 @@ bool private_generate(private_ptr private) {
 }
 
 bool private_is_valid(private_srcptr private) {
-    const int32_t checks = 25;
+    const int32_t checks = 10;
 
     mpz_t N, phi, gcd, ed;
     bool result;

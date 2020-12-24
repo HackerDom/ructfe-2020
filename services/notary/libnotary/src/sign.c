@@ -140,6 +140,17 @@ void __sign_create_curve(curve_ptr curve, point_srcptr point, mpz_srcptr N) {
     mpz_clears(a, b, q, x, y, NULL);
 }
 
+void __sign_exclude_identity(curve_ptr curve, point_ptr point, mpz_srcptr N) {
+    const unsigned long default_x = 31337, default_y = 31337;
+
+    if (point_is_identity(point) || !curve_is_valid(curve)) {
+        mpz_set_ui(point->x, default_x);
+        mpz_set_ui(point->y, default_y);
+
+        __sign_create_curve(curve, point, N);
+    }
+}
+
 void sign_create(sign_ptr sign, private_srcptr private, size_t data_size, const uint8_t *data) {
     size_t result_data_size;
     uint8_t *result_data;
@@ -151,6 +162,7 @@ void sign_create(sign_ptr sign, private_srcptr private, size_t data_size, const 
 
     __sign_data_to_point(data_point, private->N, data_size, data);
     __sign_create_curve(curve, data_point, private->N);
+    __sign_exclude_identity(curve, data_point, private->N);
     
     point_multiply(sign_point, data_point, private->d, curve);
 
@@ -164,6 +176,8 @@ void sign_create(sign_ptr sign, private_srcptr private, size_t data_size, const 
 }
 
 bool sign_verify(sign_srcptr sign, public_srcptr public, size_t data_size, const uint8_t *data) {
+    const unsigned long default_x = 31337, default_y = 31337;
+
     mpz_t *mpzs;
     size_t mpzs_count;
     curve_t curve;
@@ -180,13 +194,16 @@ bool sign_verify(sign_srcptr sign, public_srcptr public, size_t data_size, const
         mpz_set(sign_point->x, mpzs[0]);
         mpz_set(sign_point->y, mpzs[1]);
 
-        __sign_data_to_point(data_point, public->N, data_size, data);
-        __sign_create_curve(curve, data_point, public->N);
+        if (!point_is_identity(sign_point)) {
+            __sign_data_to_point(data_point, public->N, data_size, data);
+            __sign_create_curve(curve, data_point, public->N);
+            __sign_exclude_identity(curve, data_point, public->N);
 
-        if (point_is_on_curve(sign_point, curve)) {
-            point_multiply(data_point_expected, sign_point, public->e, curve);
+            if (point_is_on_curve(sign_point, curve)) {
+                point_multiply(data_point_expected, sign_point, public->e, curve);
 
-            result = point_is_equal(data_point, data_point_expected);
+                result = point_is_equal(data_point, data_point_expected);
+            }
         }
 
         point_clears(data_point, data_point_expected, sign_point, NULL);
