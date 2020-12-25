@@ -5,6 +5,7 @@
     <title>{% block title %}Notary{% endblock title %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style type="text/css">
         * {
             word-break: break-all;
@@ -17,6 +18,10 @@
     {% block navbar %}
     <div class="container">
         <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+            <a href="/" class="navbar-brand">
+                <img class="card-img-top img-responsive" style="width: 80px"
+                     src="{{ url_for('static', filename='logo.png') }}">
+            </a>
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/">Recently signed documents</a>
