@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using System.Threading;
 using CarpetRadar.Services;
 using CarpetRadar.Services.DataStorage;
@@ -47,9 +48,10 @@ namespace CarpetRadar.TrackServer
                     logger.Info($"Threadpool characteristics: available={workerThreads}, availableIO={completionPortThreads}");
 
                     var client = server.AcceptTcpClient();
+                    client.ReceiveTimeout = 5000;
                     logger.Info($"Connected: {client.Client.RemoteEndPoint.Serialize()}");
 
-                    ThreadPool.QueueUserWorkItem(HandleDevice, client);
+                    ThreadPool.QueueUserWorkItem(HandleCarpet, client);
                 }
             }
             catch (SocketException e)
@@ -59,14 +61,99 @@ namespace CarpetRadar.TrackServer
             }
         }
 
-        private async void HandleDevice(object obj)
+        private void HandleDevice1(object obj)
+        {
+            var client = (TcpClient) obj;
+            var stream = client.GetStream();
+            var bytes = new byte[10000];
+            int i;
+            try
+            {
+                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                {
+                    var data = Encoding.ASCII.GetString(bytes, 0, i);
+                    logger.Info($"{Thread.CurrentThread.ManagedThreadId}: Received: {data}");
+
+                    var bf = new BinaryFormatter();
+                    FlightState c;
+                    using (var m = new MemoryStream(bytes))
+                    {
+                        c = (FlightState) bf.Deserialize(m);
+                    }
+
+                    var str = "Hey Device!";
+                    var reply = Encoding.ASCII.GetBytes(str);
+                    stream.Write(reply, 0, reply.Length);
+                    logger.Info($"{Thread.CurrentThread.ManagedThreadId}: Sent: {str}");
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn(e, "Exception");
+                client.Close();
+            }
+        }
+
+        private async void HandleCarpet(object obj)
+        {
+            var client = (TcpClient) obj;
+            var stream = client.GetStream();
+            var bytes = new byte[10000];
+            int i;
+            try
+            {
+                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                {
+                    var bf = new BinaryFormatter();
+                    FlightState request;
+                    using (var m = new MemoryStream(bytes))
+                    {
+                        request = (FlightState) bf.Deserialize(m);
+                    }
+
+                    var userId = await authService.ResolveUser(request.Token);
+                    if (userId == null)
+                    {
+                        stream.Send("Authentication error.");
+                        return;
+                    }
+
+                    var errorMsg = await dataStorage.AddFlightState(request, userId.Value);
+                    if (errorMsg != null)
+                    {
+                        stream.Send(errorMsg);
+                        return;
+                    }
+
+                    var currentPositions = (await dataStorage.GetCurrentPositions()).ToArray();
+
+                    using (var ms = new MemoryStream())
+                    {
+                        bf.Serialize(ms, currentPositions);
+                        ms.WriteTo(stream);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Warn($"Exception in thread {Thread.CurrentThread.ManagedThreadId}");
+                logger.Warn(e);
+                stream.TrySend("Internal error");
+            }
+            finally
+            {
+                client.Close();
+            }
+        }
+
+        private async void HandleDevice2(object obj)
         {
             var client = (TcpClient) obj;
             var stream = client.GetStream();
             try
             {
                 var bf = new BinaryFormatter();
-                var request = (FlightState) bf.Deserialize(stream);
+                var request = (FlightState) bf.Deserialize(stream); /// ошибка при слишком коротком стриме. надо вычитывать отдельно, чтобы форматтер знал, что больше байтов не будет
 
                 var userId = await authService.ResolveUser(request.Token);
                 if (userId == null)
