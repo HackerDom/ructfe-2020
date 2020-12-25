@@ -46,20 +46,35 @@ Secret info: '{{sercretinfo}}'!!!"""
 @checker.define_check
 async def check_service(request: CheckRequest) -> Verdict:
     api = Api(f'{request.hostname}:8080')
-    req = pb.ListDocumentsRequest()
-    req.offset = 0
-    req.limit = 100
-    # todo: check listing (may be move to get)
-    r, err = api.list_doc(req)
+    # check /docs/test
+    name = get_random_str()
+    password = get_random_str(30)
+    bio = get_random_str(30)
+    req = pb.RegisterRequest()
+    req.name = name
+    req.password = password
+    req.bio = bio
+    err = api.register(req)
     if err != None:
         return verdict_from_api_err(err)
-    req = pb.ListRequest()
-    req.offset = 0
-    req.limit = 100
-    # todo: check listing (may be move to get)
-    r, err = api.list_users(req)
+    doc = create_doc()
+    req = pb.TestDocRequest()
+    req.content = doc
+    r, err = api.test_doc(req)
     if err != None:
         return verdict_from_api_err(err)
+    try:
+        executed = r["executed"]
+    except:
+        return Verdict.MUMBLE(err)
+    di, err = DocInfo.parse(executed)
+    if err != None:
+        return Verdict.MUMBLE(err)
+    if di.name != di.username:
+        return Verdict.MUMBLE(INVALID_FORMAT_ERR)
+    if di.bio != bio:
+        return Verdict.MUMBLE("invalid flag")
+
     return Verdict.OK()
 
 
@@ -76,11 +91,13 @@ async def put(request: PutRequest) -> Verdict:
     err = api.register(req)
     if err != None:
         return verdict_from_api_err(err)
-
+    check_users_pagination(api, "", name)
+    d = create_doc()
     req = pb.CreateDocumentRequest()
     req.name = name
-    req.doc = create_doc()
+    req.doc = d
     r, err = api.create_doc(req)
+    check_docs_pagination(api, r.id, name)
     if err != None:
         return verdict_from_api_err(err)
     try:
@@ -88,6 +105,32 @@ async def put(request: PutRequest) -> Verdict:
     except:
         return Verdict.MUMBLE(INVALID_FORMAT_ERR)
     return Verdict.OK(f"{name}:{password}:{user_id}:{r.token}")
+
+
+def check_users_pagination(api: Api, user_id, username):
+    req = pb.ListRequest()
+    req.offset = 0
+    req.limit = 3000
+    r, err = api.list_users(req)
+    if err != None:
+        return verdict_from_api_err(err)
+    for u in r.usernames:
+        if username == u:
+            return None
+    return Verdict.MUMBLE("invalid users listing")
+
+
+def check_docs_pagination(api: Api, doc_id, doc_name):
+    req = pb.ListDocumentsRequest()
+    req.offset = 0
+    req.limit = 3000
+    r, err = api.list_doc(req)
+    if err != None:
+        return verdict_from_api_err(err)
+    for d in r.docs:
+        if doc_name == d.name and doc_id == d.id:
+            return None
+    return Verdict.MUMBLE("invalid users listing")
 
 
 @checker.define_put(vuln_num=2, vuln_rate=1)

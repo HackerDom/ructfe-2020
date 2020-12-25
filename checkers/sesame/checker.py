@@ -33,10 +33,15 @@ def check_service(request: CheckRequest) -> Verdict:
 def put_flag(request: PutRequest) -> Verdict:
     url = "http://" + request.hostname + ":4280/"
     try:
-        response = requests.post(url, data = { "secret": request.flag[:31] }, allow_redirects = False)
-        key = response.headers['Location'][1:]
-        print("Saved flag " + request.flag)
-        return Verdict.OK(key)
+        for _ in range(5):
+            response = requests.post(url, data = { "secret": request.flag[:31] }, allow_redirects = False)
+            key = response.headers['Location'][1:]
+            if len(key) == 0:
+                print("Couldn't get flag id. Response was: ", response.text)
+                
+                continue
+            print("Saved flag " + request.flag)
+            return Verdict.OK(key)
     except:
         traceback.print_exc()
         return Verdict.MUMBLE("Couldn't get a meaningful response!")
