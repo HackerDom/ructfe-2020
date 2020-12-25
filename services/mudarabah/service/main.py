@@ -28,7 +28,7 @@ def send_money(cookie=None, login_to=None, description=None, amount=None):
         user_to = db.get_user_by_login(login_to)
         if not user_to:
             return jsonify({"status": 400, "addition": {"error": "No user with login_to"}})
-        if user_from.balance < amount:
+        if user_from.balance < amount or amount < 0:
             return jsonify({"status": 400, "addition": {"error": "Not enough money to make transaction"}})
     crypter = Crypter.load_private(user_from.private_key)
     description = crypter.decrypt(bytes.fromhex(description))
@@ -93,7 +93,7 @@ def get_user(login=None):
     with DatabaseClient() as db:
         user = db.get_user_by_login(login)
         if user is None:
-            return jsonify({"status": 200, "addition": {"error": "No user with this login"}})
+            return jsonify({"status": 400, "addition": {"error": "No user with this login"}})
     crypter = Crypter.load_private(user.private_key)
     pub_key = b85encode(crypter.dump_public()).decode()
     return jsonify({"status": 200, "addition": {"login": user.login, "balance": user.balance, "pub_key": pub_key}})
