@@ -145,7 +145,7 @@ def get_2(request: GetRequest) -> Verdict:
     res, err = check_card(api, login, card_pattern)
     if err: return err
     if res != card:
-        return Verdict.MUMBLE("Wrong credit card")
+        return Verdict.CORRUPT("Wrong credit card")
 
     return Verdict.OK()
 
