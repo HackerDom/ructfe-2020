@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/HackerDom/ructfe2020/internal/document"
 	"github.com/HackerDom/ructfe2020/internal/hashutil"
 	"github.com/HackerDom/ructfe2020/internal/manager"
@@ -60,14 +61,16 @@ func ExecuteDocumentsRequestReader(r *http.Request) (proto.Message, error) {
 	}{}
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("failed to read execute doc req: %s", err))
 		return nil, err
 	}
-	err = json.Unmarshal(bodyBytes, &body)
-	if err != nil {
+	if err := json.Unmarshal(bodyBytes, &body); err != nil {
+		fmt.Println(fmt.Sprintf("failed to unmarshal execute doc req: %s", err))
 		return nil, err
 	}
 	session, err := r.Cookie("session")
 	if err != nil {
+		fmt.Println(fmt.Sprintf("failed to get session: %s", err))
 		return nil, err
 	}
 	return &pb.ExecuteRequest{
@@ -83,14 +86,16 @@ func TestDocumentRequestReader(r *http.Request) (proto.Message, error) {
 	}{}
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("failed to read test doc req: %s", err))
 		return nil, err
 	}
-	err = json.Unmarshal(bodyBytes, &body)
-	if err != nil {
+	if err := json.Unmarshal(bodyBytes, &body); err != nil {
+		fmt.Println(fmt.Sprintf("failed to unmarshal test doc req: %s", err))
 		return nil, err
 	}
 	session, err := r.Cookie("session")
 	if err != nil {
+		fmt.Println(fmt.Sprintf("failed to get session: %s", err))
 		return nil, err
 	}
 	return &pb.TestDocRequest{

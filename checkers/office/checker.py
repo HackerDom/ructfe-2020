@@ -60,6 +60,36 @@ async def check_service(request: CheckRequest) -> Verdict:
     r, err = api.list_users(req)
     if err != None:
         return verdict_from_api_err(err)
+
+    # check /docs/test
+    name = get_random_str()
+    password = get_random_str(30)
+    bio = get_random_str(30)
+    req = pb.RegisterRequest()
+    req.name = name
+    req.password = password
+    req.bio = bio
+    err = api.register(req)
+    if err != None:
+        return verdict_from_api_err(err)
+    doc = create_doc()
+    req = pb.TestDocRequest()
+    req.content = doc
+    r, err = api.test_doc(req)
+    if err != None:
+        return verdict_from_api_err(err)
+    try:
+        executed = r["executed"]
+    except:
+        return Verdict.MUMBLE(err)
+    di, err = DocInfo.parse(executed)
+    if err != None:
+        return Verdict.MUMBLE(err)
+    if di.name != di.username:
+        return Verdict.MUMBLE(INVALID_FORMAT_ERR)
+    if di.bio != bio:
+        return Verdict.MUMBLE("invalid flag")
+
     return Verdict.OK()
 
 
