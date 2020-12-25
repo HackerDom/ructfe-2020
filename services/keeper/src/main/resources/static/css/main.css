@@ -1,5 +1,6 @@
 body {
     background-color: black;
+    color: #e04e00;
 }
 
 #terminal {
@@ -9,4 +10,56 @@ body {
 
 #dlink {
     color: white;
+}
+
+#chest {
+    display: block;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5%;
+}
+
+.text-field {
+    width: 100%;
+    margin-top: 3%;
+    margin-bottom: 3%;
+    height: 4%;
+    font-size: 100%;
+    background-color: #4a1a00;
+    border-color: #e04e00;
+    font-family: Consolas,monaco,monospace;
+    outline-color: #e04e00;
+    color: #e04e00;
+}
+.text-field:focus {
+    outline: none !important;
+    border-color: #e04e00;
+}
+
+button {
+    background-color: #e04e00;
+    outline-color: #e04e00;
+    border: #e04e00 solid 1px;
+    border-radius: 1%;
+    width: 45%;
+    height: 4%;
+    margin: 0;
+    padding: 0;
+    font-family: Consolas,monaco,monospace;
+}
+
+label {
+    font-family: Consolas,monaco,monospace;
+}
+
+#cont {
+    width: 1000px;
+    height: 570px;
+}
+
+.center {
+    margin: auto;
+    width: 60%;
+    padding-top: 10%;
 }

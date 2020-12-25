@@ -2,9 +2,10 @@ import requests
 
 from google.protobuf.json_format import MessageToJson, MessageToDict, Parse
 import proto.office_pb2 as pb
-from errs import INVALID_FORMAT_ERR, FAILED_TO_CONNECT
 import json
 
+INVALID_FORMAT_ERR = "invalid format"
+FAILED_TO_CONNECT = "failed to connect"
 
 class Api:
     def __init__(self, host: str):

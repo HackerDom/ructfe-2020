@@ -44,7 +44,10 @@ def index():
 
 @app.route("/mumble")
 def mumble():
-    response = INDEX.replace("#", "").replace("&", hashed).replace("?", "@")
+    response = INDEX\
+        .replace("#", "")\
+        .replace("&", hashed)\
+        .replace("?", '<label style="color: red">@</label>')
     return make_response(response, 200)
 
 
