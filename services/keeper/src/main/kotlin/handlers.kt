@@ -124,7 +124,7 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
         ctx.redirect("/register_page")
         return@get
     }
-
+    ctx.res.characterEncoding = "utf-8"
     ctx.withHtml {
         head {
             meta { content = "text/html; charset=utf-8" }
@@ -173,7 +173,7 @@ fun App.addRegisterPageHandler(): Javalin = javalin.get(Endpoints.REGISTER_PAGE)
         ctx.redirect("/")
         return@get
     }
-
+    ctx.res.characterEncoding = "utf-8"
     ctx.withHtml {
         head {
             meta { content = "text/html; charset=utf-8" }
@@ -256,6 +256,7 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
         return@get
     }
 
+    ctx.res.characterEncoding = "utf-8"
     ctx.withHtml {
         head {
             meta { content = "text/html; charset=utf-8" }
@@ -298,6 +299,7 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
 
 
 fun App.addCoolChestHandler(): Javalin = javalin.get("/chest") { ctx ->
+    ctx.res.characterEncoding = "utf-8"
     ctx.withHtml {
         head {
             meta { content = "text/html; charset=utf-8" }
