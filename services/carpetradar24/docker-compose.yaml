@@ -17,6 +17,7 @@ services:
       nofile:
         soft: 12000
         hard: 12000
+    stop_grace_period: 10s
 
   web:
     build:
@@ -34,6 +35,7 @@ services:
       nofile:
         soft: 12000
         hard: 12000
+    stop_grace_period: 10s
 
   cassandra:
     image: cassandra:3.11.9
@@ -50,3 +52,4 @@ services:
       nofile:
         soft: 12000
         hard: 12000
+    stop_grace_period: 10s
