@@ -59,6 +59,12 @@ function processLS(args, term) {
 }
 
 
+function processHelp(args, term) {
+    let cmds = Object.keys(processors);
+    term.echo(`Commands list:\n${cmds.join("\n")}`);
+}
+
+
 function processCD(args, term) {
     let newPathParts = args[0].split("/");
     let oldPath = [...path];
@@ -159,6 +165,7 @@ const processors = {
     'upload': processUpload,
     'mkdir': processMkdir,
     'logout': processLogout,
+    'help': processHelp,
 };
 
 
@@ -180,12 +187,9 @@ function main() {
                 processors[cmd](args, term);
             }
         }, {
-            greetings: 'Javascript Interpreter',
+            greetings: "Hello there! Keeper is a service for keeping any files. Type 'help' for command list. Have fun! :3",
             name: 'js_demo',
-            // height: '100%',
-            // width: 450,
             prompt: cmd_prompt
-            // prompt: 'user@keeper: ~/path '
         });
     });
 
