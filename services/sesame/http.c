@@ -209,7 +209,7 @@ bool process_request(char *request, char *response, uint64 *response_length)
 			return true;
 		}
 
-		char value[32];
+		char value[64];
 		char key[64];
 		bzero(key, sizeof(key));
 

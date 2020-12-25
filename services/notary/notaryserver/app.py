@@ -3,6 +3,7 @@
 import os
 
 from flask import abort, flash, Flask, Markup, redirect, render_template, request, url_for
+from flask_uuid import FlaskUUID
 from flask_login import current_user, login_user, logout_user, LoginManager
 from sqlalchemy.sql.expression import exists
 
@@ -11,7 +12,7 @@ from models import db, Document, User
 from notary import Notary, pack_document
 
 
-DB_URI = os.getenv('DATABASE_URI')
+DATABASE_URI = os.getenv('DATABASE_URI')
 SECRET_KEY_PATH = '/tmp/secret.key'
 
 login_manager = LoginManager()
@@ -28,11 +29,12 @@ def get_secret_key(path):
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = get_secret_key(SECRET_KEY_PATH)
     login_manager.init_app(app)
     db.init_app(app)
+    FlaskUUID(app)
 
     return app
 
@@ -104,7 +106,7 @@ def logout():
     return redirect('/')
 
 
-@app.route('/user/<string:user_id>')
+@app.route('/user/<uuid:user_id>')
 def user(user_id):
     user = User.query.get(user_id)
     
@@ -116,7 +118,7 @@ def user(user_id):
     return render_template('user.html', user=user, is_current_user=is_current_user)
 
 
-@app.route('/doc/<string:doc_id>', methods=['GET', 'POST'])
+@app.route('/doc/<uuid:doc_id>', methods=['GET', 'POST'])
 def doc(doc_id):
     doc = Document.query.get(doc_id)
     

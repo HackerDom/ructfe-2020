@@ -74,6 +74,7 @@ func (p *pg) Insert(ctx context.Context, document *pb.Document) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	id := 0
 	if !row.Next() {
 		return 0, fmt.Errorf("not enougth returning rows")

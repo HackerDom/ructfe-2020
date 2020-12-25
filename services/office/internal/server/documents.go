@@ -24,28 +24,28 @@ type documentsService struct {
 }
 
 func (s *documentsService) Mount(mux *chi.Mux) {
-	httprpc.New("POST", "/docs/create").
+	httprpc.New("POST", "/api/docs/create").
 		Mount(mux).
 		WithJSONPbReader(&pb.CreateDocumentRequest{}).
 		WithJSONPbWriter().
 		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) {
 			return s.Create(ctx, req.(*pb.CreateDocumentRequest))
 		})
-	httprpc.New("POST", "/docs/list").
+	httprpc.New("POST", "/api/docs/list").
 		Mount(mux).
 		WithJSONPbReader(&pb.ListDocumentsRequest{}).
 		WithJSONPbWriter().
 		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) {
 			return s.List(ctx, req.(*pb.ListDocumentsRequest))
 		})
-	httprpc.New("POST", "/docs/execute").
+	httprpc.New("POST", "/api/docs/execute").
 		Mount(mux).
 		WithRequestReader(ExecuteDocumentsRequestReader).
 		WithJSONPbWriter().
 		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) {
 			return s.Execute(ctx, req.(*pb.ExecuteRequest))
 		})
-	httprpc.New("POST", "/docs/test").
+	httprpc.New("POST", "/api/docs/test").
 		Mount(mux).
 		WithRequestReader(TestDocumentRequestReader).
 		WithJSONPbWriter().

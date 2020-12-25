@@ -1,6 +1,6 @@
 body {
     background-color: black;
-    color: orange;
+    color: #e04e00;
 }
 
 #terminal {
@@ -26,21 +26,21 @@ body {
     margin-bottom: 3%;
     height: 4%;
     font-size: 100%;
-    background-color: #4a3000;
-    border-color: saddlebrown;
+    background-color: #4a1a00;
+    border-color: #e04e00;
     font-family: Consolas,monaco,monospace;
-    outline-color: brown;
-    color: orange;
+    outline-color: #e04e00;
+    color: #e04e00;
 }
 .text-field:focus {
     outline: none !important;
-    border-color: saddlebrown;
+    border-color: #e04e00;
 }
 
 button {
-    background-color: orange;
-    outline-color: orange;
-    border: orange solid 1px;
+    background-color: #e04e00;
+    outline-color: #e04e00;
+    border: #e04e00 solid 1px;
     border-radius: 1%;
     width: 45%;
     height: 4%;
@@ -51,4 +51,15 @@ button {
 
 label {
     font-family: Consolas,monaco,monospace;
+}
+
+#cont {
+    width: 1000px;
+    height: 570px;
+}
+
+.center {
+    margin: auto;
+    width: 60%;
+    padding-top: 10%;
 }

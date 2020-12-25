@@ -21,7 +21,14 @@ def check(request: CheckRequest) -> Verdict:
     res, err = register(api)
     if err: return err
 
-    login, password, card, _, cookie = res
+    login, password, card, priv_key, cookie = res
+
+    try:
+        if len(b85decode(priv_key.encode())) > 23000:
+            return Verdict.MUMBLE("Private key is too big")
+    except Exception:
+        return Verdict.MUMBLE("Wrong private key format")
+
     res, err = get_cookie(api, login, password)
     if err: return err
     if res != cookie:
@@ -39,6 +46,7 @@ def check(request: CheckRequest) -> Verdict:
 
     return Verdict.OK()
 
+# VULN 1
 @checker.define_put(vuln_num=1, vuln_rate=1)
 def put_1(request: PutRequest) -> Verdict:
     flag = request.flag
@@ -48,9 +56,23 @@ def put_1(request: PutRequest) -> Verdict:
     if err: return err
     login1, password1, card1, priv_key1, cookie1 = res
 
+    try:
+        if len(b85decode(priv_key1.encode())) > 23000:
+            return Verdict.MUMBLE("Private key is too big")
+    except Exception:
+        return Verdict.MUMBLE("Wrong private key format")
+
+
     res, err = register(api)
     if err: return err
     login2, password2, card2, priv_key2, cookie2 = res
+
+    try:
+        if len(b85decode(priv_key2.encode())) > 23000:
+            return Verdict.MUMBLE("Private key is too big")
+    except Exception:
+        return Verdict.MUMBLE("Wrong private key format")
+
 
     try:
         crypter = Crypter.load_private(b85decode(priv_key2.encode()))
@@ -106,6 +128,7 @@ def get_1(request: GetRequest) -> Verdict:
 
     return Verdict.OK()
 
+# VULN 2
 @checker.define_put(vuln_num=2, vuln_rate=1)
 def put_2(request: PutRequest) -> Verdict:
     flag = request.flag

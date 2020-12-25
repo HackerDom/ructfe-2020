@@ -56,7 +56,7 @@ class User(db.Model):
 
 class Document(db.Model):
     id = db.Column(UUIDType(), primary_key=True, default=uuid.uuid4)
-    author_id = db.Column(UUIDType(), db.ForeignKey('user.id'), nullable=False)
+    author_id = db.Column(UUIDType(), db.ForeignKey('user.id', ondelete="CASCADE"), nullable=False)
     title = db.Column(db.String, nullable=False)
     text = db.Column(db.String, nullable=False)
     signature = db.Column(db.String, nullable=False)
