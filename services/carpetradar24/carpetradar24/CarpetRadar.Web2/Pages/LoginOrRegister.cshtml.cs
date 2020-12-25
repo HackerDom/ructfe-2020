@@ -49,7 +49,7 @@ namespace CarpetRadar.Web2.Pages
             var isRegistered = await RegisterUser(userName, password, company);
             if (!isRegistered)
             {
-                return Page();
+                return Page(); /// код другой
             }
 
             var isAuthenticated = await AuthenticateUser(userName, password);

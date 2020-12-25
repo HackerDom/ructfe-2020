@@ -21,14 +21,18 @@ namespace CarpetRadar.Web2.Pages
             this.logger = logger;
         }
 
+        public int I = 0;
+
         public async Task OnGet()
         {
             var users = (await dataStorage.GetUserInfos()).ToList();
             var positions = await dataStorage.GetCurrentPositions();
             PositionsData = positions
                 .Select(p => (Pos: p, User: users.FirstOrDefault(u => u.Id == p.UserId)))
+                .Where(p => !p.Pos.Finished)
                 .Select(item => (item.Pos, item.User.Login, item.User.Company))
                 .ToList();
+
         }
     }
 }

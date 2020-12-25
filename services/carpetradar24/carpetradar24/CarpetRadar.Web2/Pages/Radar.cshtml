@@ -3,10 +3,152 @@
 @{
     ViewData["Title"] = "Radar";
 }
+<div id="anychart-embed-samples-maps-connectors-12" class="anychart-embed anychart-embed-samples-maps-connectors-12">
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-map.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-data-adapter.min.js"></script>
+    <script src="https://cdn.anychart.com/geodata/latest/custom/world/world.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.15/proj4.js"></script>
+    <link href="https://cdn.anychart.com/playground-css/anychart-loader.css" type="text/css" rel="stylesheet">
+    <link href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css" type="text/css" rel="stylesheet">
+    <link href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css" type="text/css" rel="stylesheet">
+    <style type="text/css">
+        #container {
+            width: 100%;
+            height: 400px;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 
+    <script>
+        daata = [];
+        anychart.onDocumentReady(function() {
+            var stage = acgraph.create('container');
+            anychart.data.loadJsonFile(
+                'https://cdn.anychart.com/samples/maps-point-maps-dot-maps/35-most-amazing-national-parks-on-earth/data.json',
+                function(data) {
+                    var imageLink = 'carpets/';
+                    data = [];
+                    @foreach (var d in Model.PositionsData)
+                    {
+                        @:ss = {
+                        @:    number: @(++Model.I),
+                        @:    lat: @(d.Position.X % 180 - 90),
+                        @:    long: @(d.Position.Y % 360 - 180),
+                        @:    name: "@(d.Position.Label)"
+                        @:};
+                        @:data.push(ss);
+                    }
+                    daata = data;
+                    var images = [];
+                    for (var i = 0; i < data.length; i++) {
+                        images.push(imageLink + (data[i].number % 12 + 1) + '.png');
+                    }
+                    preload(images,
+                        function() {
+                            var map = anychart.map();
+                            map.scale().gap(0.05);
+                            map.padding(0);
+
+                            map.unboundRegions()
+                                .enabled(true)
+                                .fill('#e8d01f')
+                                .stroke('#аааааа');
+
+                            // sets geodata using https://cdn.anychart.com/geodata/latest/custom/world/world.js
+                            map.geoData('anychart.maps.world');
+
+
+                            // creates marker series
+                            var series = map.marker(anychart.data.set(data));
+                            series
+                                .stroke('0.5 #212121')
+                                .fill(function() {
+                                    if (this.index >= 0) {
+                                        return {
+                                            src: imageLink + (data[this.index].number % 12 + 1) + '.png'
+                                        };
+                                    }
+                                })
+                                .size(10)
+                                .type('line')
+                                .selectionMode('none')
+                                .labels(false)
+                                .tooltip(false);
+
+                            series
+                                .hovered()
+                                .stroke('2 #212121')
+                                .fill(function() {
+                                    if (this.index >= 0) {
+                                        return {
+                                            src: imageLink + (data[this.index].number % 12 + 1) + '.png'
+                                        };
+                                    }
+                                })
+                                .size(50)
+                                .type('line');
+
+                            series
+                                .hovered()
+                                .labels()
+                                .enabled(true)
+                                .width(200)
+                                .position('right')
+                                .anchor('left-top')
+                                .offsetX(50)
+                                .offsetY(-51)
+                                .padding(15)
+                                .useHtml(true)
+                                .fontWeight('normal')
+                                .format(function() {
+                                    return (
+                                        '<span style="font-size: 14px; color: #929292">' +
+                                            this.getData('name') +
+                                            '</span>'
+                                    );
+                                });
+
+                            series
+                                .hovered()
+                                .labels()
+                                .background()
+                                .enabled(true)
+                                .fill('#fff')
+                                .stroke('2 #212121')
+                                .corners(0)
+                                .cornerType('ROUND');
+
+
+                            var zoomController = anychart.ui.zoom();
+                            zoomController.render(map);
+                            map.container(stage);
+                            map.draw();
+                        });
+                })
+        });
+
+        function preload(pictureUrls, callback) {
+            var loaded = 0;
+            for (var i = 0; i < pictureUrls.length; i++) {
+                var img = new Image();
+                var src = pictureUrls[i];
+                img.onload =
+                    ++loaded === pictureUrls.length && callback ? callback : false;
+                img.src = src;
+            }
+        }
+
+    </script>
+</div>
+<div id="container"></div>
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <h3> Now there are @Model.PositionsData.Count(d => !d.Position.Finished) magic carpets in the air</h3>
+    <p><br/></p>
+    <h3> Now there are @Model.PositionsData.Count() magic carpets in the air</h3>
     <table>
         <thead>
         <tr>
@@ -18,7 +160,7 @@
         </tr>
         </thead>
         <tbody>
-        @foreach (var cp in Model.PositionsData.Where(d => !d.Position.Finished))
+        @foreach (var cp in Model.PositionsData)
         {
             <tr>
                 <td>@cp.Position.Label</td>
