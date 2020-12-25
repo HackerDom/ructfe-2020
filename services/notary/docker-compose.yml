@@ -33,5 +33,23 @@ services:
     memswap_limit: 1G
     pids_limit: 128
 
+  cleaner:
+    build: cleaner
+    restart: on-failure
+    environment: 
+      - DATABASE_URI=postgresql://postgres:postgres@postgres/postgres
+      - CLEAN_INTERVAL=20 minutes
+      - SLEEP_SECONDS=120
+    depends_on:
+      - postgres
+    stop_grace_period: 3s
+    mem_limit: 128M
+    memswap_limit: 128M
+    pids_limit: 128
+    ulimits: 
+      nofile:
+        soft: 8192
+        hard: 8192
+
 volumes:
   pg_data:
