@@ -72,19 +72,28 @@ fun App.addFilesHandler(): Javalin = javalin.get("/files/*") { ctx ->
 fun App.addUploadFilesHandler(): Javalin = javalin.post("/files/*") { ctx ->
     val authenticatedUserDir = checkFilesAccess(ctx) ?: return@post
     val newFile = try {
-        ctx.uploadedFile("file") ?: return@post
+        ctx.uploadedFile("file")
     } catch (e: IllegalStateException) {
         ctx.result("Invalid uploading format")
         ctx.status(400)
         return@post
     }
 
-    val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length)
+    val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length).split("/").singleOrNull() ?: run {
+        ctx.result("Incorrect path")
+        ctx.status(400)
+        return@post
+    }
 
     val file = authenticatedUserDir.resolve(lastPath)
     if (file.exists()) {
         ctx.result("File already exists")
         ctx.status(400)
+        return@post
+    }
+
+    if (newFile == null) {
+        file.mkdirs()
         return@post
     }
 
