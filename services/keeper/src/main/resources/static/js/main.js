@@ -123,6 +123,10 @@ function processUpload(args, term) {
         term.echo("Pass one argument as filename to upload");
         return;
     }
+    if (args[0].includes("/")) {
+        term.echo("Incorrect filename");
+        return;
+    }
     uploadFilename = args[0];
     $("#ufile").click();
 }
@@ -134,6 +138,10 @@ function processMkdir(args, term) {
         return;
     }
     let newDirName = args[0];
+    if (newDirName.includes("/")) {
+        term.echo("Incorrect directory name");
+        return;
+    }
     let formData = new FormData();
     fetch(buildFileUrl(newDirName), {method: "POST", body: formData});
 }

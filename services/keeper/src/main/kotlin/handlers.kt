@@ -79,11 +79,7 @@ fun App.addUploadFilesHandler(): Javalin = javalin.post("/files/*") { ctx ->
         return@post
     }
 
-    val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length).split(".").singleOrNull() ?: run {
-        ctx.result("Incorrect path.")
-        ctx.status(400)
-        return@post
-    }
+    val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length)
 
     if ("/" in lastPath && !authenticatedUserDir.resolve(File(lastPath).parentFile).exists()) {
         ctx.result("Incorrect path")
