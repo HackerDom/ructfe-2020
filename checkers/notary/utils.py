@@ -1,5 +1,7 @@
 import hashlib
 import json
+import random
+import string
 from contextlib import contextmanager
 from dataclasses import dataclass
 
@@ -97,7 +99,7 @@ fake = Faker()
 def generate_user():
     profile = fake.profile()
     return UserInfo(
-        username=profile['username'],
+        username=profile['username'] + ''.join(random.choices(string.digits, k=7)),
         name=profile['name'],
         phone=fake.phone_number(),
         address=profile['address'])
