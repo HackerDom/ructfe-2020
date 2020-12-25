@@ -15,7 +15,7 @@ class UDPReceiver:
     udp_max_size = 8192
 
     def __init__(self):
-        self.max_ports_size = 1000
+        self.max_ports_size = 12000
         self.listeners = dict()
         self.lock = threading.Lock()
         threading.Thread(target=self.log_status).start()
@@ -28,7 +28,7 @@ class UDPReceiver:
             print >> sys.stderr, "Amount of working threads: {}"\
                 .format(threading.active_count())
 
-    def add_listener(self, buf_size):
+    def add_listener(self, data):
         with self.lock:
             if len(self.listeners) >= self.max_ports_size:
                 raise ValueError("too much listeners")
@@ -42,14 +42,14 @@ class UDPReceiver:
 
             print >> sys.stderr, "opened socket at {}".format(current_port)
 
-            t = threading.Thread(target=self.__create_listener, args=(sock, current_port, lst_id, buf_size))
+            t = threading.Thread(target=self.__create_listener, args=(sock, current_port, lst_id, data))
             self.listeners[lst_id] = t
             t.start()
             return current_port
 
-    def __create_listener(self, sock, port, lst_id, buf_size):
+    def __create_listener(self, sock, port, lst_id, ds):
         try:
-            arr = bytearray(min(self.udp_max_size, buf_size))
+            arr = bytearray(min(self.udp_max_size, ds))
             _, __ = sock.recvfrom_into(arr, self.udp_max_size)
             self.__handle(arr)
         finally:

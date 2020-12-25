@@ -9,8 +9,8 @@ services:
 
     ulimits:
       nofile:
-        soft: 12000
-        hard: 12000
+        soft: 15000
+        hard: 15000
 
     volumes:
       - ./storage:/app/storage
