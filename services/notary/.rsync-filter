@@ -1,0 +1,6 @@
++ /notaryserver
++ /notaryserver/**
++ /Dockerfile
++ /docker-compose.yml
++ /entrypoint.sh
+- /*

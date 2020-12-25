@@ -1,0 +1,37 @@
+version: '2.2'
+
+services:
+  notary:
+    build: .
+    restart: on-failure
+    ports:
+      - 17171:8080
+    environment: 
+      - DATABASE_URI=postgresql://postgres:postgres@postgres/postgres
+    depends_on:
+      - postgres
+    stop_grace_period: 3s
+    mem_limit: 1G
+    memswap_limit: 1G
+    cpu_count: 1
+    pids_limit: 128
+    ulimits: 
+      nofile:
+        soft: 8192
+        hard: 8192
+
+  postgres:
+    image: postgres:13.1-alpine
+    restart: on-failure
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+    mem_limit: 1G
+    memswap_limit: 1G
+    pids_limit: 128
+
+volumes:
+  pg_data:
