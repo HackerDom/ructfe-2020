@@ -152,11 +152,11 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
 fun FlowOrInteractiveOrPhrasingContent.loginAndPassword() {
     label { text("Login") }
     br
-    input(type = InputType.text, name = "login", classes = "text-field")
+    input(type = InputType.text, name = "login", classes = "text-field") { id = "lgn-fld" }
     br
     label { text("Password") }
     br
-    input(type = InputType.password, name = "password", classes = "text-field")
+    input(type = InputType.password, name = "password", classes = "text-field") { id = "psw-fld" }
     br
 }
 
@@ -188,6 +188,7 @@ fun App.addRegisterPageHandler(): Javalin = javalin.get(Endpoints.REGISTER_PAGE)
                 div {
                     id = "reg"
                     form(action = Endpoints.REGISTER, method = FormMethod.post) {
+                        id = "reg-form"
                         loginAndPassword()
                         button {
                             id = "act-btn"
@@ -268,6 +269,7 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
                 div {
                     id = "reg"
                     form(action = Endpoints.LOGIN, method = FormMethod.post) {
+                        id = "reg-form"
                         loginAndPassword()
                         button {
                             id = "act-btn"
@@ -323,6 +325,33 @@ fun App.addLoginHandler(): Javalin = javalin.post(Endpoints.LOGIN) { ctx ->
     } else {
         ctx.status(403)
     }
+}
+
+
+fun App.addCheckPairHandler(): Javalin = javalin.get(Endpoints.CHECK_PAIR) { ctx ->
+    val login = ctx.queryParam("login") ?: run {
+        ctx.result("Login query parameter is required")
+        ctx.status(400)
+        return@get
+    }
+    val password = ctx.queryParam("password") ?: run {
+        ctx.result("Password query parameter is required")
+        ctx.status(400)
+        return@get
+    }
+
+    ctx.result(userStorage.isValid(login, password).toString())
+}
+
+
+fun App.addIsLoginExistsHandler(): Javalin = javalin.get(Endpoints.IS_LOGIN_EXISTS) { ctx ->
+    val login = ctx.queryParam("login") ?: run {
+        ctx.result("Login query parameter is required")
+        ctx.status(400)
+        return@get
+    }
+
+    ctx.result(userStorage.exists(login).toString())
 }
 
 

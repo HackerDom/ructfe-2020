@@ -34,5 +34,7 @@ fun main() {
         addFilesHandler()
         addUploadFilesHandler()
         addCoolChestHandler()
+        addIsLoginExistsHandler()
+        addCheckPairHandler()
     }
 }
