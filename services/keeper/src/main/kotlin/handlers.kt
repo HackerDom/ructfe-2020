@@ -135,11 +135,11 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
                     +"let cmd_prompt = \"$authenticatedUser@keeper:~ \";"
                 }
             }
-            script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
-            script(null, "https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.20.1/js/jquery.terminal.min.js") {}
+            script(null, "/js/jquery-3.2.1.min.js") {}
+            script(null, "/js/jquery.terminal.min.js") {}
             script(null, "/js/main.js") {}
             link(
-                href = "https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.20.1/css/jquery.terminal.min.css",
+                href = "/css/jquery.terminal.min.css",
                 rel = "stylesheet"
             )
             link(href = "/css/main.css", rel = "stylesheet")
@@ -177,7 +177,7 @@ fun App.addRegisterPageHandler(): Javalin = javalin.get(Endpoints.REGISTER_PAGE)
     ctx.withHtml {
         head {
             meta { content = "text/html; charset=utf-8" }
-            script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
+            script(null, "/js/jquery-3.2.1.min.js") {}
             script(null, "/js/form.js") {}
             link(href = "/css/main.css", rel = "stylesheet")
         }
@@ -259,7 +259,7 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
     ctx.withHtml {
         head {
             meta { content = "text/html; charset=utf-8" }
-            script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
+            script(null, "/js/jquery-3.2.1.min.js") {}
             script(null, "/js/form.js") {}
             link(href = "/css/main.css", rel = "stylesheet")
         }
@@ -301,7 +301,7 @@ fun App.addCoolChestHandler(): Javalin = javalin.get("/chest") { ctx ->
     ctx.withHtml {
         head {
             meta { content = "text/html; charset=utf-8" }
-            script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
+            script(null, "/js/jquery-3.2.1.min.js") {}
             script(null, "/js/form.js") {}
         }
         body {
