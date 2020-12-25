@@ -50,6 +50,14 @@ def login(login=None, password=None):
         return jsonify({"status": 400, "addition": {"error": "Incorrect username or password"}})
     return jsonify({"status": 200, "addition": {"cookie": user.cookie}})
 
+@app.route('/check_card', methods=['POST'])
+@need_args("login", "credit_card_credentials")
+def check_card(login=None, credit_card_credentials=None):
+    with DatabaseClient() as db:
+        user = db.check_credit_card(login, credit_card_credentials)
+    if not user:
+        return jsonify({"status": 400, "addition": {"error": "Wrong login or credit card"}})
+    return jsonify({"status": 200, "addition": {"credit_card_credentials": user.credit_card_credentials}})
 
 @app.route('/register', methods=['POST'])
 @need_args("login", "password", "credit_card_credentials")

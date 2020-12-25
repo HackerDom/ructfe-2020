@@ -17,6 +17,9 @@ def get_parsed_args():
     parser.add_argument('-gt', '--get-transactions', dest='get_transactions',
                         action='store_true',
                         help="get all transactions of user specified by login")
+    parser.add_argument('-cc', '--check-card', dest='check_card',
+                        action='store_true',
+                        help="check credit card of user")
     parser.add_argument('-s', '--send-money', dest='send_money',
                         action='store_true',
                         help="send money")

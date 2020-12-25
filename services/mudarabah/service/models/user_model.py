@@ -12,12 +12,6 @@ class User:
         self.balance = balance
         self.cookie = cookie
     
-    def __repr__(self):
-        return f"login {self.login}"
-
-    def __str__(self):
-        return f"login {self.login}"
-
     @classmethod
     def create(cls, login, password, private_key, credit_card_credentials):
         cookie = create_cookie(login, password)

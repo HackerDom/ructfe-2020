@@ -8,6 +8,7 @@ balance int not null,
 cookie varchar not null); 
 
 CREATE INDEX IF NOT EXISTS users_ts_index ON public.users (timestamp);
+CREATE INDEX IF NOT EXISTS users_login_index ON public.users (login);
 
 CREATE FUNCTION delete_old_users() RETURNS trigger
     LANGUAGE plpgsql
@@ -30,6 +31,7 @@ amount int not null,
 description bytea not null);
 
 CREATE INDEX IF NOT EXISTS transactions_ts_index ON public.transactions (timestamp);
+CREATE INDEX IF NOT EXISTS transactions_login_to_index ON public.transactions (login_to);
 
 CREATE FUNCTION delete_old_transactions() RETURNS trigger
     LANGUAGE plpgsql

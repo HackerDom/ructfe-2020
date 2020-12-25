@@ -57,6 +57,13 @@ def get_user_listing():
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
 
+def check_card(login, credit_card_credentials):
+    new_conditions = {"addition": {"login": login, "credit_card_credentials": credit_card_credentials}}
+    req = urllib.request.Request(HOST+"/check_card", data=json.dumps(new_conditions).encode('utf-8'),
+                                 headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return json.loads(response.read().decode('utf8'))["addition"]
+
 def main():
     args = get_parsed_args()
     if args.register:
@@ -81,6 +88,8 @@ def main():
         print(get_user(args.login))
     if args.get_user_listing:
         print(get_user_listing())
+    if args.check_card:
+        print(check_card(args.login, args.credit_card_credentials))
 
 if __name__ == "__main__":
     main()
