@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import random
+from base64 import b85decode
 from string import ascii_letters, digits
 
 from gornilo import CheckRequest, Verdict, Checker, PutRequest, GetRequest
@@ -47,7 +48,7 @@ def put(request: PutRequest) -> Verdict:
     login2, password2, card2, priv_key2, cookie2 = res
 
     try:
-        crypter = Crypter.load_private(bytes.fromhex(priv_key2))
+        crypter = Crypter.load_private(b85decode(priv_key2.encode()))
     except Exception as ex:
         print(ex)
         return Verdict.MUMBLE("Can't load private key")
@@ -78,7 +79,7 @@ def get(request: GetRequest) -> Verdict:
         return Verdict.MUMBLE("Wrong cookie")
 
     try:
-        crypter = Crypter.load_private(bytes.fromhex(priv_key))
+        crypter = Crypter.load_private(b85decode(priv_key.encode()))
     except Exception as ex:
         print(ex)
         return Verdict.MUMBLE("Can't load private key")
@@ -87,7 +88,7 @@ def get(request: GetRequest) -> Verdict:
     if err: return err
     _login, _balance, _pub_key = res
 
-    if _pub_key != crypter.dump_public().hex():
+    if b85decode(_pub_key) != crypter.dump_public():
         return Verdict.MUMBLE("Wronf public key")
 
     transactions, err = get_transactions(api, login)

@@ -5,7 +5,7 @@ from random import randint
 from struct import pack, unpack
 
 from cipher.code import LDPC
-from cipher.utils import bytes_to_codeword, codeword_to_bytes, dump, gaussjordan, load
+from cipher.utils import bytes_to_codeword, codeword_to_bytes, dump, gauss_jordan, load
 
 
 class Crypter:
@@ -41,14 +41,14 @@ class Crypter:
     def decrypt(self, ct):
         ct_word = bytes_to_codeword(ct, self.code.G.shape[1])
 
-        A, invP = gaussjordan(self.P, True)
+        A, invP = gauss_jordan(self.P, True)
 
         c = np.array(ct_word @ invP % 2, dtype=int)
 
         d = self.code.decode(c)
         m = self.code.get_message(d)
 
-        _, invS = gaussjordan(self.S, True)
+        _, invS = gauss_jordan(self.S, True)
 
         return codeword_to_bytes(m @ invS % 2)
 
@@ -57,7 +57,7 @@ class Crypter:
         while True:
             S = np.random.randint(0, 2, (k, k)) 
 
-            A = gaussjordan(S)
+            A = gauss_jordan(S)
             A = np.array(A, dtype=int)
 
             if (A == np.eye(k, dtype=int)).all():

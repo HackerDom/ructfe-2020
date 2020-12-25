@@ -8,8 +8,6 @@ fun Context.withHtml(block : HTML.() -> Unit = {}) = res.writer.appendHTML().htm
     block()
 }
 
-
-
 const val ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 
@@ -20,3 +18,11 @@ fun randomString(length: Int = 20) = (1..length)
 
 
 fun stringHash(password: String): ByteArray = MessageDigest.getInstance("SHA-256").digest(password.toByteArray())
+
+fun safeEscapeLogin(username: String): String {
+    var res = username
+    for (c in username.toSet().filter { !it.isLetterOrDigit() }) {
+        res = res.replace(c.toString(), "")
+    }
+    return res
+}

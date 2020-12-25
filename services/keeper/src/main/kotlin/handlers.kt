@@ -2,6 +2,11 @@ import io.javalin.Javalin
 import io.javalin.http.Context
 import kotlinx.html.*
 import java.io.File
+import kotlin.math.min
+
+const val MAX_FILE_SIZE = 10240
+const val MAX_FILE_COUNT_IN_RESPONSE = 1024
+val loginRegex = "[a-zA-Z0-9]{3,30}".toRegex()
 
 
 fun App.getAuthenticatedUser(ctx: Context): String? {
@@ -43,6 +48,7 @@ fun App.addFilesHandler(): Javalin = javalin.get("/files/*") { ctx ->
 
     val file = authenticatedUserDir.resolve(lastPath)
     if (!file.exists()) {
+        ctx.result("File already exists")
         ctx.status(400)
         return@get
     }
@@ -53,7 +59,11 @@ fun App.addFilesHandler(): Javalin = javalin.get("/files/*") { ctx ->
     }
 
     if (file.isDirectory) {
-        ctx.json((file.list() ?: emptyArray()) as Array<String>)
+        val offset = maxOf(ctx.queryParam("offset")?.toIntOrNull() ?: 0, 0)
+        val result = (file.list() ?: emptyArray()) as Array<String>
+        val left = min(result.size, offset)
+        val right = min(result.size, offset + MAX_FILE_COUNT_IN_RESPONSE)
+        ctx.json(result.sliceArray(left until right))
         return@get
     }
 }
@@ -62,20 +72,36 @@ fun App.addFilesHandler(): Javalin = javalin.get("/files/*") { ctx ->
 fun App.addUploadFilesHandler(): Javalin = javalin.post("/files/*") { ctx ->
     val authenticatedUserDir = checkFilesAccess(ctx) ?: return@post
     val newFile = try {
-        ctx.uploadedFile("file") ?: return@post
+        ctx.uploadedFile("file")
     } catch (e: IllegalStateException) {
+        ctx.result("Invalid uploading format")
         ctx.status(400)
         return@post
     }
 
-    val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length)
+    val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length).split("/").singleOrNull() ?: run {
+        ctx.result("Incorrect path")
+        ctx.status(400)
+        return@post
+    }
 
     val file = authenticatedUserDir.resolve(lastPath)
     if (file.exists()) {
+        ctx.result("File already exists")
         ctx.status(400)
         return@post
     }
 
+    if (newFile == null) {
+        file.mkdirs()
+        return@post
+    }
+
+    if (newFile.size > MAX_FILE_SIZE) {
+        ctx.result("File is too big")
+        ctx.status(400)
+        return@post
+    }
     file.writeBytes(newFile.content.readAllBytes())
 }
 
@@ -157,6 +183,41 @@ fun App.addRegisterPageHandler(): Javalin = javalin.get(Endpoints.REGISTER_PAGE)
 }
 
 
+fun App.addRegisterHandler(): Javalin = javalin.post(Endpoints.REGISTER) { ctx ->
+    val login = ctx.getFormParamOrBadStatus("login") ?: run {
+        ctx.result("Can not get login from form data")
+        ctx.status(400)
+        return@post
+    }
+    if (loginRegex.find(login) == null) {
+        ctx.result("Incorrect login")
+        ctx.status(400)
+        return@post
+    }
+    File(STORAGE_PATH).resolve(safeEscapeLogin(login)).mkdirs()
+
+    val password = ctx.getFormParamOrBadStatus("password") ?: run {
+        ctx.result("Can not get password from form data")
+        ctx.status(400)
+        return@post
+    }
+
+    if (userStorage.exists(login)) {
+        ctx.result("Login already exists")
+        ctx.status(400)
+        return@post
+    }
+
+    if (login.length > 30 || password.length > 30) {
+        ctx.result("Too long login or password")
+        ctx.status(400)
+        return@post
+    }
+    userStorage.create(login, password)
+    authenticate(ctx, login)
+}
+
+
 fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx ->
     getAuthenticatedUser(ctx)?.let {
         ctx.redirect("/")
@@ -195,35 +256,22 @@ fun App.addLoginHandler(): Javalin = javalin.post(Endpoints.LOGIN) { ctx ->
 }
 
 
+fun App.addLogoutHandler(): Javalin = javalin.post(Endpoints.LOGOUT) { ctx ->
+    val authenticatedUser = getAuthenticatedUser(ctx)
+
+    if (authenticatedUser == null) {
+        ctx.status(400)
+        return@post
+    }
+
+    sessionManager.delete(authenticatedUser)
+}
+
+
 fun App.authenticate(ctx: Context, login: String) {
     ctx.clearCookieStore()
     val secret = sessionManager.create(login)
     ctx.cookie("login", login)
     ctx.cookie("secret", secret)
     ctx.redirect("/main")
-}
-
-
-fun App.addRegisterHandler(): Javalin = javalin.post(Endpoints.REGISTER) { ctx ->
-    val login = ctx.getFormParamOrBadStatus("login") ?: run { return@post }
-    val password = ctx.getFormParamOrBadStatus("password") ?: run { return@post }
-
-    if (userStorage.exists(login)) {
-        ctx.status(400)
-        return@post
-    }
-
-    userStorage.create(login, password)
-    authenticate(ctx, login)
-}
-
-fun App.addUploadHandler() {
-    //    app.javalin.post("/upload") { ctx ->
-//        ctx.uploadedFiles("files").forEach { (contentType, content, name, extension) ->
-//            println(contentType)
-//            println(content)
-//            println(name)
-//            println(extension)
-//        }
-//    }
 }

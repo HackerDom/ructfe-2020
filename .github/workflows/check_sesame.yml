@@ -7,7 +7,12 @@ on:
     paths:
       - 'services/sesame/**'
       - 'checkers/sesame/**'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      cleanup_before_deploy:
+        description: 'Stops and fully removes service (with volumes!) before deploying again. Type "yes" to do it.'
+        required: false
+        default: "no"
 
 jobs:
   check_sesame:
@@ -52,6 +57,10 @@ jobs:
 
     - name: Run prebuilt hook
       run: if [ -f services/sesame/before_image_build.sh ]; then (cd ./services/sesame && ./before_image_build.sh); fi
+
+    - name: stop sesame, destroy volumes and cleanup service before fresh deploy
+      if: ${{ github.event.inputs.cleanup_before_deploy == 'yes' }}
+      run: ./vuln_image/cleanup_first_ten_teams.sh sesame
 
     - name: try to deploy sesame
       run: ./vuln_image/update_first_ten_teams.sh sesame

@@ -11,15 +11,16 @@ class UserStorage(
         }
     }
 
-    fun exists(username: String) = storagePath.resolve(username).exists()
+    fun exists(username: String) = storagePath.resolve(safeEscapeLogin(username)).exists()
     fun create(username: String, password: String) {
-        storagePath.resolve(username).writeBytes(stringHash(password))
+        storagePath.resolve(safeEscapeLogin(username)).writeBytes(stringHash(password))
     }
 
     fun isValid(username: String, password: String): Boolean {
-        if (!exists(username)) {
+        val safeUsername = safeEscapeLogin(username)
+        if (!exists(safeUsername)) {
             return false
         }
-        return storagePath.resolve(username).readBytes().contentEquals(stringHash(password))
+        return storagePath.resolve(safeUsername).readBytes().contentEquals(stringHash(password))
     }
 }

@@ -1,12 +1,12 @@
 
-name: Check office
+name: Check notary
 on:
   push:
     branches:
       - main
     paths:
-      - 'services/office/**'
-      - 'checkers/office/**'
+      - 'services/notary/**'
+      - 'checkers/notary/**'
   workflow_dispatch:
     inputs:
       cleanup_before_deploy:
@@ -15,8 +15,8 @@ on:
         default: "no"
 
 jobs:
-  check_office:
-    name: Check office
+  check_notary:
+    name: Check notary
     runs-on: ubuntu-18.04
 
     steps:
@@ -24,10 +24,10 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Run prebuilt hook
-      run: if [ -f services/office/before_image_build.sh ]; then (cd ./services/office && ./before_image_build.sh); fi
+      run: if [ -f services/notary/before_image_build.sh ]; then (cd ./services/notary && ./before_image_build.sh); fi
 
-    - name: Setup office
-      run: (cd ./services/office && docker-compose pull && docker-compose build && docker-compose up --build -d)
+    - name: Setup notary
+      run: (cd ./services/notary && docker-compose pull && docker-compose build && docker-compose up --build -d)
 
     - name: Prepare python for checker
       uses: actions/setup-python@v2
@@ -35,14 +35,14 @@ jobs:
         python-version: 3.8.5
 
     - name: Setup checker libraries
-      run: if [ -f checkers/office/requirements.txt ]; then python -m pip install -r checkers/office/requirements.txt; fi
+      run: if [ -f checkers/notary/requirements.txt ]; then python -m pip install -r checkers/notary/requirements.txt; fi
 
     - name: Test checker on service
-      run: checkers/office/checker.py TEST 127.0.0.1
+      run: checkers/notary/checker.py TEST 127.0.0.1
 
-  update_office:
+  update_notary:
     name: Deploy service using ansible to first teams
-    needs: check_office
+    needs: check_notary
     runs-on: ubuntu-18.04
 
     steps:
@@ -56,12 +56,12 @@ jobs:
       run: chmod 0600 ./vuln_image/keys/id_rsa
 
     - name: Run prebuilt hook
-      run: if [ -f services/office/before_image_build.sh ]; then (cd ./services/office && ./before_image_build.sh); fi
+      run: if [ -f services/notary/before_image_build.sh ]; then (cd ./services/notary && ./before_image_build.sh); fi
 
-    - name: stop office, destroy volumes and cleanup service before fresh deploy
+    - name: stop notary, destroy volumes and cleanup service before fresh deploy
       if: ${{ github.event.inputs.cleanup_before_deploy == 'yes' }}
-      run: ./vuln_image/cleanup_first_ten_teams.sh office
+      run: ./vuln_image/cleanup_first_ten_teams.sh notary
 
-    - name: try to deploy office
-      run: ./vuln_image/update_first_ten_teams.sh office
+    - name: try to deploy notary
+      run: ./vuln_image/update_first_ten_teams.sh notary
 
