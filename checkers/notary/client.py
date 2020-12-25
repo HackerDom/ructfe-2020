@@ -17,7 +17,7 @@ class UserInfo:
     name: str = None
     phone: str = None
     address: str = None
-    id: int = None
+    id: str = None
     password: str = None
     public_key: str = None
     private_key: str = None
@@ -27,7 +27,7 @@ class UserInfo:
 class DocumentInfo:
     title: str = None
     text: str = None
-    id: int = None
+    id: str = None
     password: str = None
 
 
@@ -96,8 +96,10 @@ class Parser:
     def user_id(self):
         with mumble('extracting the profile url', {TypeError, KeyError}):
             url = self.soup.select_one('a.nav-link:-soup-contains("Profile")')['href']
-        with mumble('parsing user id from the profile url', {ValueError}):
-            return int(url.split('/')[-1])
+        with mumble():
+            user_id = url.split('/')[-1]
+            assert user_id, 'Could not parse user id from the profile url'
+            return user_id
 
     def profile_field(self, label, code_wrapped=False):
         with mumble(f'extracting user\'s {label.lower()} from the profile page', {AttributeError, IndexError}):
@@ -129,9 +131,10 @@ class Parser:
 
     @classmethod
     def id_from_url(cls, url):
-        with mumble(f'parsing id from the url', {ValueError}):
-            return int(url.rsplit('/', 1)[-1])
-
+        with mumble():
+            id = url.rsplit('/', 1)[-1]
+            assert id, 'Could not parse id from the url'
+            return id
 
 @dataclass
 class Urls:
