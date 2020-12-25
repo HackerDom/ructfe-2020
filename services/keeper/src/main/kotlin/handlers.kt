@@ -115,15 +115,7 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
     val authenticatedUser = getAuthenticatedUser(ctx)
 
     if (authenticatedUser == null) {
-        ctx.withHtml {
-            body {
-                p {
-                    +"You need to authorize "
-                    a(Endpoints.REGISTER_PAGE) { +"here" }
-                }
-            }
-        }
-        ctx.contentType("text/html")
+        ctx.redirect("/register_page")
         return@get
     }
 
@@ -147,7 +139,10 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
         }
         body {
             div { id = "terminal" }
-            input(type = InputType.file) { id = "ufile" }
+            input(type = InputType.file) {
+                style = "display: none"
+                id = "ufile"
+            }
         }
     }
     ctx.contentType("text/html")
@@ -156,10 +151,12 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
 
 fun FlowOrInteractiveOrPhrasingContent.loginAndPassword() {
     label { text("Login") }
-    input(type = InputType.text, name = "login")
+    br
+    input(type = InputType.text, name = "login", classes = "text-field")
     br
     label { text("Password") }
-    input(type = InputType.password, name = "password")
+    br
+    input(type = InputType.password, name = "password", classes = "text-field")
     br
 }
 
@@ -171,12 +168,34 @@ fun App.addRegisterPageHandler(): Javalin = javalin.get(Endpoints.REGISTER_PAGE)
     }
 
     ctx.withHtml {
+        head {
+            script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
+            script(null, "/js/form.js") {}
+            link(href = "/css/main.css", rel = "stylesheet")
+        }
         body {
-            form(action = Endpoints.REGISTER, method = FormMethod.post) {
-                loginAndPassword()
-                button { text("Register") }
+            div {
+                div {
+                    img(src = "/images/chest.png", classes = "center") {
+                        id = "chest"
+                        width = "40%"
+                    }
+                }
+                div {
+                    id = "reg"
+                    form(action = Endpoints.REGISTER, method = FormMethod.post) {
+                        loginAndPassword()
+                        button {
+                            id = "act-btn"
+                            text("Register")
+                        }
+                    }
+                    button {
+                        id = "chg-btn"
+                        text("Go to login page")
+                    }
+                }
             }
-            a(href = Endpoints.LOGIN_PAGE) { +"Go to login page" }
         }
     }
     ctx.contentType("text/html")
@@ -225,12 +244,50 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
     }
 
     ctx.withHtml {
+        head {
+            script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
+            script(null, "/js/form.js") {}
+            link(href = "/css/main.css", rel = "stylesheet")
+        }
         body {
-            form(action = Endpoints.LOGIN, method = FormMethod.post) {
-                loginAndPassword()
-                button { text("Login") }
+            div {
+                div {
+                    img(src = "/images/chest.png", classes = "center") {
+                        id = "chest"
+                        width = "40%"
+                    }
+                }
+                div {
+                    id = "reg"
+                    form(action = Endpoints.LOGIN, method = FormMethod.post) {
+                        loginAndPassword()
+                        button {
+                            id = "act-btn"
+                            text("Login")
+                        }
+                    }
+                    button {
+                        id = "chg-btn"
+                        text("Go to register page")
+                    }
+                }
             }
-            a(href = Endpoints.REGISTER_PAGE) { +"Go to register page" }
+        }
+    }
+    ctx.contentType("text/html")
+}
+
+
+fun App.addSandboxHandler(): Javalin = javalin.get("/sandbox") { ctx ->
+    ctx.withHtml {
+        body {
+            style = "background-color: black;"
+
+            div {
+                img(src = "/images/chest.png", classes = "center") {
+                    width = "40%"
+                }
+            }
         }
     }
     ctx.contentType("text/html")
