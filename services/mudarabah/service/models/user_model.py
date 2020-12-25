@@ -1,4 +1,3 @@
-import re
 from hashlib import md5
 
 from helpers.helpers import create_cookie

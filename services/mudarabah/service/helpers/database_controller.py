@@ -1,7 +1,6 @@
 import psycopg2
 from hashlib import md5
 
-from cipher.crypter import Crypter
 from models.user_model import User
 
 conn = None
