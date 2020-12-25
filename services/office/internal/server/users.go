@@ -20,9 +20,9 @@ type usersService struct {
 
 // users service routes
 const (
-	loginPath    = "/users/login"
-	registerPath = "/users/register"
-	listPath     = "/users/list"
+	loginPath    = "/api/users/login"
+	registerPath = "/api/users/register"
+	listPath     = "/api/users/list"
 )
 
 func (s *usersService) Mount(mux *chi.Mux) {

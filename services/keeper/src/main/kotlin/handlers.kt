@@ -176,10 +176,14 @@ fun App.addRegisterPageHandler(): Javalin = javalin.get(Endpoints.REGISTER_PAGE)
         body {
             div {
                 div {
-                    img(src = "/images/chest.png", classes = "center") {
-                        id = "chest"
-                        width = "40%"
-                    }
+                        div(classes = "center") {
+                            id = "cont"
+                            style = "text-align: center; color: #e04e00;"
+                            pre {
+                                id = "pre"
+                                +chest
+                            }
+                        }
                 }
                 div {
                     id = "reg"
@@ -252,9 +256,13 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
         body {
             div {
                 div {
-                    img(src = "/images/chest.png", classes = "center") {
-                        id = "chest"
-                        width = "40%"
+                    div(classes = "center") {
+                        id = "cont"
+                        style = "text-align: center; color: #e04e00;"
+                        pre {
+                            id = "pre"
+                            +chest
+                        }
                     }
                 }
                 div {
@@ -278,14 +286,19 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
 }
 
 
-fun App.addSandboxHandler(): Javalin = javalin.get("/sandbox") { ctx ->
+fun App.addCoolChestHandler(): Javalin = javalin.get("/chest") { ctx ->
     ctx.withHtml {
+        head {
+            script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
+            script(null, "/js/form.js") {}
+        }
         body {
             style = "background-color: black;"
-
             div {
-                img(src = "/images/chest.png", classes = "center") {
-                    width = "40%"
+                style = "text-align: center; color: #e04e00;"
+                pre {
+                    id = "pre"
+                    +chest
                 }
             }
         }

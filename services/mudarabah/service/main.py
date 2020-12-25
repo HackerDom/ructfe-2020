@@ -84,7 +84,11 @@ def register(login=None, password=None, credit_card_credentials=None):
 def get_transactions(login=None):
     with DatabaseClient() as db:
         user = db.get_user_by_login(login)
+        if not user:
+            return jsonify({"status": 400, "addition": {"error": "Wrong login"}})
         transactions = db.get_users_transactions(login)
+        if not transactions:
+            return jsonify({"status": 400, "addition": {"error": "User has no transactions"}})
 
     crypter = Crypter.load_private(user.private_key)
     transactions = list(map(Transaction.load, transactions))
