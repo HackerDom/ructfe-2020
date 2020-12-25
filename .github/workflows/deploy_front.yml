@@ -1,0 +1,32 @@
+name: Deploy front
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'front/**'
+  workflow_dispatch:
+    inputs:
+      cleanup_before_deploy:
+        description: 'Stops and fully removes service (with volumes!) before deploying again. Type "yes" to do it.'
+        required: false
+        default: "no"
+
+jobs:
+  update_front:
+    name: Deploy front using ansible to first teams
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: install ansible
+      run: sudo apt-get install -y ansible
+
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: change permission for ssh key
+      run: chmod 0600 ./vuln_image/keys/id_rsa
+
+    - name: try to deploy front
+      run: ./vuln_image/update_first_ten_teams.sh front
+
