@@ -60,7 +60,7 @@ jobs:
 
     - name: stop notary, destroy volumes and cleanup service before fresh deploy
       if: ${{ github.event.inputs.cleanup_before_deploy == 'yes' }}
-      run: ./vuln_image/cleanup_first_ten_teams.sh
+      run: ./vuln_image/cleanup_first_ten_teams.sh notary
 
     - name: try to deploy notary
       run: ./vuln_image/update_first_ten_teams.sh notary

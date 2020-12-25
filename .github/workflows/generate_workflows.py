@@ -73,7 +73,7 @@ jobs:
 
     - name: stop {service}, destroy volumes and cleanup service before fresh deploy
       if: ${{{{ github.event.inputs.cleanup_before_deploy == 'yes' }}}}
-      run: ./vuln_image/cleanup_first_ten_teams.sh
+      run: ./vuln_image/cleanup_first_ten_teams.sh {service}
 
     - name: try to deploy {service}
       run: ./vuln_image/update_first_ten_teams.sh {service}
