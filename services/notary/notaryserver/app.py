@@ -11,7 +11,7 @@ from models import db, Document, User
 from notary import Notary, pack_document
 
 
-DB_URI = os.getenv('DATABASE_URI')
+DATABASE_URI = os.getenv('DATABASE_URI')
 SECRET_KEY_PATH = '/tmp/secret.key'
 
 login_manager = LoginManager()
@@ -28,7 +28,7 @@ def get_secret_key(path):
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = get_secret_key(SECRET_KEY_PATH)
     login_manager.init_app(app)
