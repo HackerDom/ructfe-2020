@@ -1,4 +1,5 @@
 import json
+from base64 import b85encode
 from flask import Flask, request, redirect, url_for, render_template, session, jsonify
 
 from cipher.code import LDPC
@@ -65,7 +66,7 @@ def register(login=None, password=None, credit_card_credentials=None):
             db.add_user(user)
         else:
             return "this user already exists"
-    return jsonify({"status": 200, "addition": {"cookie":user.cookie, "priv_key":private_key.hex()}})
+    return jsonify({"status": 200, "addition": {"cookie":user.cookie, "priv_key":b85encode(private_key).decode()}})
 
 
 @app.route('/transactions', methods=["POST"])
@@ -96,7 +97,7 @@ def get_user(login=None):
             return "Wrong username"
     crypter = Crypter.load_private(user.private_key)
     pub_key = crypter.dump_public()
-    return jsonify({"status": 200, "addition": {"login": user.login, "balance":user.balance, "pub_key":pub_key.hex()}})
+    return jsonify({"status": 200, "addition": {"login": user.login, "balance":user.balance, "pub_key":b85encode(pub_key).decode()}})
 
 @app.route('/list_users')
 def list_users():

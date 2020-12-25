@@ -1,5 +1,6 @@
 import json
 import urllib.request
+from base64 import b85decode
 from arg_parse import get_parsed_args
 from cipher.crypter import Crypter
 
@@ -60,9 +61,9 @@ def main():
     args = get_parsed_args()
     if args.register:
         res = register(args.login, args.password, args.credit_card_credentials)
-        priv_key_hex = res["priv_key"]
+        priv_key = res["priv_key"]
         with open(f"{args.login}.key", "wb") as f:
-            f.write(bytes.fromhex(priv_key_hex))
+            f.write(b85decode(priv_key.encode()))
             print(f"key is written to {args.login}.key")
         print(res)
     if args.get_cookie:
