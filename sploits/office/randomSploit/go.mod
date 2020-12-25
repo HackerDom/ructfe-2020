@@ -1,0 +1,1 @@
+module "github.com/HackerDom/ructfe-2020/sploits/office/randomSploit"
