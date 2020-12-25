@@ -93,10 +93,18 @@ def down(phase_name=None, exc_messages=None):
     return check(DOWN, phase_name, exc_messages)
 
 
-fake = Faker()
+ARAB_FAKE = Faker('ar_AA')
+ENGLISH_FAKE = Faker()
+ARAB_PROBABILITY = 0.15
+PRINTABLE = set(string.printable)
+
+
+def select_fake():
+    return ARAB_FAKE if random.random() < ARAB_PROBABILITY else ENGLISH_FAKE
 
 
 def generate_user():
+    fake = select_fake()
     profile = fake.profile()
     return UserInfo(
         username=profile['username'] + ''.join(random.choices(string.digits, k=7)),
@@ -105,7 +113,13 @@ def generate_user():
         address=profile['address'])
 
 
-def generate_document():
+def generate_document(author_name=None):
+    if author_name is None:
+        fake = select_fake()
+    elif any(sym not in PRINTABLE for sym in author_name):
+        fake = ARAB_FAKE
+    else:
+        fake = ENGLISH_FAKE
     return DocumentInfo(
         title=fake.sentence(),
         text=fake.text(max_nb_chars=400))

@@ -38,8 +38,8 @@ def create_user(client: Client, flag=None):
     return user
 
 
-def create_document(client: Client, author_id, public=False, flag=None):
-    doc = generate_document()
+def create_document(client: Client, author_id, public=False, flag=None, author_name=None):
+    doc = generate_document(author_name)
     if flag is not None:
         doc.text = flag
     doc = client.sign(title=doc.title, text=doc.text, author_id=author_id, public=public)
@@ -130,8 +130,10 @@ def check_service(request: CheckRequest) -> Verdict:
     private_client = Client(request.hostname)
     public_user = create_user(public_client)
     private_user = create_user(private_client)
-    public_doc = create_document(public_client, author_id=public_user.id, public=True)
-    private_doc = create_document(private_client, author_id=private_user.id, public=False)
+    public_doc = create_document(
+        public_client, author_id=public_user.id, public=True, author_name=public_user.name)
+    private_doc = create_document(
+        private_client, author_id=private_user.id, public=False, author_name=private_user.name)
 
     check_user_profile_privately(Client(request.hostname), public_user, (public_doc,))
     check_user_profile_publicly(Client(request.hostname), private_user, (private_doc,))
@@ -147,10 +149,12 @@ def put_flag(request: PutRequest) -> Verdict:
     client = Client(request.hostname)
     if request.vuln_id == 1:
         user = create_user(client, flag=request.flag)
-        doc = create_document(client, author_id=user.id, public=True)
+        doc = create_document(
+            client, author_id=user.id, public=True, author_name=user.name)
     else:
         user = create_user(client)
-        doc = create_document(client, author_id=user.id, public=False, flag=request.flag)
+        doc = create_document(
+            client, author_id=user.id, public=False, flag=request.flag, author_name=user.name)
 
     user.document_ids = []  # Don't need to compare them
     info_hash = hash_dict(dict(user=vars(user), doc=vars(doc)))
