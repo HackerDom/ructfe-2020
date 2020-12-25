@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import base64
 import hashlib
+import sys
 
 import requests
 import traceback
@@ -19,6 +20,7 @@ PORT = 3687
 REGISTER_URL = "http://{hostname}:{port}/register"
 LOGIN_URL = "http://{hostname}:{port}/login"
 FILE_URL = "http://{hostname}:{port}/files/{filename}"
+INDEX_URL = "http://{hostname}:{port}/"
 
 ALPHA = string.ascii_letters + string.digits
 
@@ -58,29 +60,56 @@ def download_file(session, hostname, filename):
     return r.content.decode()
 
 
+class NetworkChecker:
+    def __init__(self):
+        self.verdict = Verdict.OK()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        if exc_type in {requests.exceptions.ConnectionError, ConnectionError, ConnectionAbortedError, ConnectionRefusedError, ConnectionResetError}:
+            self.verdict = Verdict.DOWN("Service is down")
+        if exc_type in {requests.exceptions.HTTPError}:
+            self.verdict = Verdict.MUMBLE(f"Incorrect http code")
+
+        if exc_type:
+            print(exc_type)
+            print(exc_value.__dict__)
+            traceback.print_tb(exc_traceback, file=sys.stdout)
+        return True
+
+
 @checker.define_check
 def check_service(request: CheckRequest) -> Verdict:
-    return Verdict.OK()
+    with NetworkChecker() as nc:
+        r = requests.get(INDEX_URL.format(hostname=request.hostname, port=PORT))
+        r.raise_for_status()
+    return nc.verdict
 
 
 @checker.define_put(vuln_num=1, vuln_rate=1)
 def put_flag(request: PutRequest) -> Verdict:
-    username, password, filename = gen_string(), gen_string(), gen_string()
-    flag_id = f"{username}:{password}:{filename}"
-    session = register(request.hostname, username, password)
-    upload_file(session, request.hostname, filename, request.flag)
-    return Verdict.OK(flag_id)
+    with NetworkChecker() as nc:
+        username, password, filename = gen_string(), gen_string(), gen_string()
+        flag_id = f"{username}:{password}:{filename}"
+        session = register(request.hostname, username, password)
+        upload_file(session, request.hostname, filename, request.flag)
+        nc.verdict = Verdict.OK(flag_id)
+    return nc.verdict
 
 
 @checker.define_get(vuln_num=1)
 def get_flag(request: GetRequest) -> Verdict:
-    username, password, filename = request.flag_id.strip().split(":")
-    session = login(request.hostname, username, password)
-    real_flag = download_file(session, request.hostname, filename)
-    if request.flag != real_flag:
-        print(f"Different flags, expected: {request.flag}, real: {real_flag}")
-        return Verdict.CORRUPT("Corrupt flag")
-    return Verdict.OK()
+    with NetworkChecker() as nc:
+        username, password, filename = request.flag_id.strip().split(":")
+        session = login(request.hostname, username, password)
+        real_flag = download_file(session, request.hostname, filename)
+        if request.flag != real_flag:
+            print(f"Different flags, expected: {request.flag}, real: {real_flag}")
+            return Verdict.CORRUPT("Corrupt flag")
+        nc.verdict = Verdict.OK()
+    return nc.verdict
 
 
 def get_hash(text: str) -> str:

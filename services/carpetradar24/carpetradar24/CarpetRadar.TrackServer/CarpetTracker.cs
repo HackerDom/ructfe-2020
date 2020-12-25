@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Threading;
 using CarpetRadar.Services;
 using CarpetRadar.Services.DataStorage;
@@ -35,57 +34,8 @@ namespace CarpetRadar.TrackServer
             StartListener();
         }
 
-        private void AddSomeTestData()
-        {
-            var r = new Random();
-
-            var rs = new RegistrationService(dataStorage, logger);
-            for (int i = 0; i < 2; i++)
-            {
-                var id = Guid.NewGuid().ToString("N").Substring(0, 5);
-                var login = i + "i" + id;
-                var userId = rs.RegisterUser(login, "password", "company " + id).Result;
-
-                for (int f = 0; f < 2; f++)
-                {
-                    var flightId = Guid.NewGuid();
-
-                    for (int j = 0; j < 20; j++)
-                    {
-                        int x = r.Next();
-                        int y = r.Next();
-                        var c = new FlightState
-                        {
-                            FlightId = flightId,
-                            Finished = false,
-                            Label = "label " + id,
-                            License = "license " + id,
-                            X = x,
-                            Y = y
-                        };
-                        dataStorage.AddFlightState(c, userId.Value).GetAwaiter().GetResult();
-                    }
-                }
-            }
-
-            //var fs = new FlightState
-            //{
-            //    FlightId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
-            //    X = 255,
-            //    Y = 256 * 256 - 1,
-            //    License = Guid.Empty.ToString("N"),
-            //    Token = Guid.Empty.ToString("N"),
-            //    Finished = true,
-            //    Label = "LABELlabelLABEL",
-            //};
-            //var bf = new BinaryFormatter();
-            //bf.Serialize(new FileStream("flight_state_example1.bin", FileMode.Create), fs);
-        }
-
         public void StartListener()
         {
-            AddSomeTestData();
-
             try
             {
                 while (true)
@@ -93,46 +43,13 @@ namespace CarpetRadar.TrackServer
                     var client = server.AcceptTcpClient();
                     logger.Info($"Connected: {client.Client.RemoteEndPoint.Serialize()}");
 
-                    new Thread(HandleDevice).Start(client); /// как правильно делать пул
+                    new Thread(HandleDevice).Start(client);
                 }
             }
             catch (SocketException e)
             {
                 logger.Warn(e, "SocketException");
                 server.Stop();
-            }
-        }
-
-        private void HandleDevice2(object obj)
-        {
-            var client = (TcpClient) obj;
-            var stream = client.GetStream();
-            var bytes = new byte[10000];
-            int i;
-            try
-            {
-                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-                {
-                    var data = Encoding.ASCII.GetString(bytes, 0, i);
-                    logger.Info($"{Thread.CurrentThread.ManagedThreadId}: Received: {data}");
-
-                    var bf = new BinaryFormatter();
-                    FlightState c;
-                    using (var m = new MemoryStream(bytes))
-                    {
-                        c = (FlightState) bf.Deserialize(m);
-                    }
-
-                    var str = "Hey Device!";
-                    var reply = Encoding.ASCII.GetBytes(str);
-                    stream.Write(reply, 0, reply.Length);
-                    logger.Info($"{Thread.CurrentThread.ManagedThreadId}: Sent: {str}");
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Warn(e, "Exception");
-                client.Close();
             }
         }
 
@@ -143,13 +60,13 @@ namespace CarpetRadar.TrackServer
             try
             {
                 var bf = new BinaryFormatter();
-                var request = (FlightState) bf.Deserialize(stream); /// ошибка при слишком коротком стриме. надо вычитывать отдельно, чтобы форматтер знал, что больше байтов не будет
+                var request = (FlightState) bf.Deserialize(stream);
 
                 var userId = await authService.ResolveUser(request.Token);
                 if (userId == null)
                 {
                     stream.Send("Authentication error.");
-                    return; /// потенциальная бага))))
+                    return;
                 }
 
                 var errorMsg = await dataStorage.AddFlightState(request, userId.Value);

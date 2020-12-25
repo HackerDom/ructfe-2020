@@ -144,7 +144,7 @@ const processors = {
 
 function main() {
     jQuery(function ($, undefined) {
-        $('#term_demo').terminal(function (line, term) {
+        $('#terminal').terminal(function (line, term) {
             if (line === '') {
                 return;
             }

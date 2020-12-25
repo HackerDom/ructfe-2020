@@ -1,33 +1,34 @@
+import redis.clients.jedis.Jedis
 import java.io.File
 import java.util.*
 
 class SessionManager(
-    storage: String
+    private val jedis: Jedis
 ) {
-    private val storage = File(storage)
-
     init {
-        if (!this.storage.exists()) {
-            this.storage.mkdirs()
-        }
+        jedis.connect()
     }
 
     fun create(username: String): String {
+        val safeUsername = safeEscapeLogin(username)
         val salt = randomString()
-        val secret = Base64.getEncoder().encode(stringHash(username + salt))
-        storage.resolve(username).writeText(salt)
+        val secret = Base64.getEncoder().encode(stringHash(safeUsername + salt))
+        jedis[safeUsername] = salt
         return String(secret)
     }
 
+    fun delete(username: String) {
+        try {
+            jedis.del(username)
+        } catch (e: Throwable) { }
+    }
+
     fun validate(username: String, secret: String): Boolean {
+        val safeUsername = safeEscapeLogin(username)
         try {
             val decoded = Base64.getDecoder().decode(secret)
-            val saltFile = storage.resolve(username)
-            if (!saltFile.exists()) {
-                return false
-            }
-            val salt = saltFile.readText()
-            return stringHash(username + salt).contentEquals(decoded)
+            val salt = jedis.get(safeUsername) ?: return false
+            return stringHash(safeUsername + salt).contentEquals(decoded)
         } catch (e: Throwable) {
             return false
         }

@@ -17,6 +17,9 @@ var usersSchema = `CREATE TABLE IF NOT EXISTS users (
 
 CREATE INDEX IF NOT EXISTS users_ts_index ON users (ts);
 
+DROP TRIGGER IF EXISTS users_delete_old_rows_trigger ON users;
+DROP FUNCTION IF EXISTS users_delete_old_rows;
+
 CREATE FUNCTION users_delete_old_rows() RETURNS trigger
     LANGUAGE plpgsql
     AS $$

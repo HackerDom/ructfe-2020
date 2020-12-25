@@ -8,8 +8,11 @@ class Api:
         self.hostname = f"http://{host}:{PORT}"
 
     def ping(self):
-        r = requests.get(f"{self.hostname}/ping")
-        return r.json()
+        try:
+            r = requests.get(f"{self.hostname}/ping")
+            return r.json()
+        except Exception:
+            return None
 
     def register(self, login, password, credit_card_credentials):
         data = {"addition": {
@@ -47,12 +50,12 @@ class Api:
         except Exception:
             return None
 
-    def get_public_key(self, login):
+    def get_user(self, login):
         data = {"addition": {
             "login": login,
         }}
         try:
-            r = requests.post(f"{self.hostname}/users_pubkey", json=data, headers=HEADERS)
+            r = requests.post(f"{self.hostname}/get_user", json=data, headers=HEADERS)
             return r.json()
         except Exception:
             return None
@@ -63,6 +66,13 @@ class Api:
         }}
         try:
             r = requests.post(f"{self.hostname}/transactions", json=data, headers=HEADERS)
+            return r.json()
+        except Exception:
+            return None
+    
+    def list_users(self):
+        try:
+            r = requests.get(f"{self.hostname}/list_users")
             return r.json()
         except Exception:
             return None

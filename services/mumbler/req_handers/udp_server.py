@@ -43,7 +43,7 @@ class UDPReceiver:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.bind(("0.0.0.0", port))
             print >> sys.stderr, "opened socket at {}".format(port)
-            arr = bytearray(buf_size)
+            arr = bytearray(min(self.udp_max_size, buf_size))
             _, __ = sock.recvfrom_into(arr, self.udp_max_size)
             self.__handle(arr)
         finally:
