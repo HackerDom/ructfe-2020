@@ -13,5 +13,7 @@ namespace CarpetRadar.Services.Models
 
         public string Label { get; set; }
         public bool Finished { get; set; }
+
+        public DateTime ReportMoment { get; set; }
     }
 }

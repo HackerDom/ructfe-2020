@@ -6,7 +6,6 @@ namespace CarpetRadar.Services.DataStorage
 {
     public static class DataStorageBuilder
     {
-        private static ICluster cluster;
         private static ISession session;
         private static readonly object Lock = new object();
 
@@ -16,10 +15,10 @@ namespace CarpetRadar.Services.DataStorage
             {
                 try
                 {
-                    if (cluster != null)
+                    if (session != null && !session.IsDisposed)
                         return new DataStorage(session, logger);
 
-                    cluster = Cluster.Builder()
+                    var cluster = Cluster.Builder()
                         .AddContactPoint("cassandra")
                         .WithPort(9042)
                         .WithLoadBalancingPolicy(new DCAwareRoundRobinPolicy("datacenter1"))
@@ -88,6 +87,7 @@ namespace CarpetRadar.Services.DataStorage
                 "label text, " +
                 "x int, " +
                 "y int, " +
+                "time timestamp, " +
                 "finished boolean, " +
                 "PRIMARY KEY(id));");
 

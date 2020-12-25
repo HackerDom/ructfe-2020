@@ -51,20 +51,23 @@ namespace CarpetRadar.Services.DataStorage
                 || flightState.Y < 0)
                 return "Empty request parameters";
 
-            var c = $"UPDATE {Constants.ColumnFamily.CarpetFlights} SET " +
-                    $"user_id = {userId}, " +
-                    $"label = '{flightState.Label}', " +
-                    $"license = '{flightState.License}', " +
-                    $"finished = {flightState.Finished}, " +
-                    $"x = x + [{flightState.X}], " +
-                    $"y = y + [{flightState.Y}], " +
-                    $"time = time + [{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}] " +
-                    $"WHERE id = {flightState.FlightId};";
-            var addToCarpets = new SimpleStatement(c);
+            var time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var addToCarpets = new SimpleStatement(
+                $"UPDATE {Constants.ColumnFamily.CarpetFlights} SET " +
+                $"user_id = {userId}, " +
+                $"label = '{flightState.Label}', " +
+                $"license = '{flightState.License}', " +
+                $"finished = {flightState.Finished}, " +
+                $"x = x + [{flightState.X}], " +
+                $"y = y + [{flightState.Y}], " +
+                $"time = time + [{time}] " +
+                $"WHERE id = {flightState.FlightId};");
 
             var addToPositions = new SimpleStatement(
-                $"INSERT INTO {Constants.ColumnFamily.CurrentPositions} (user_id, id, label, x, y, finished) VALUES (?, ?, ?, ?, ?, ?)",
-                userId, flightState.FlightId, flightState.Label, flightState.X, flightState.Y, flightState.Finished);
+                $"INSERT INTO {Constants.ColumnFamily.CurrentPositions} " +
+                "(user_id, id, label, x, y, time, finished)" +
+                " VALUES (?, ?, ?, ?, ?, ?, ?)",
+                userId, flightState.FlightId, flightState.Label, flightState.X, flightState.Y, time, flightState.Finished);
             await session.ExecuteAsync(new BatchStatement()
                 .Add(addToCarpets)
                 .Add(addToPositions));
@@ -78,15 +81,17 @@ namespace CarpetRadar.Services.DataStorage
             statement.SetPageSize(100);
             var rs = session.Execute(statement);
             var coordinates = rs.Select(row =>
-                new CurrentPosition
-                {
-                    UserId = row.GetValue<Guid>("user_id"),
-                    FlightId = row.GetValue<Guid>("id"),
-                    Label = row.GetValue<string>("label"),
-                    X = row.GetValue<int>("x"),
-                    Y = row.GetValue<int>("y"),
-                    Finished = row.GetValue<bool>("finished"),
-                });
+                    new CurrentPosition
+                    {
+                        UserId = row.GetValue<Guid>("user_id"),
+                        FlightId = row.GetValue<Guid>("id"),
+                        Label = row.GetValue<string>("label"),
+                        X = row.GetValue<int>("x"),
+                        Y = row.GetValue<int>("y"),
+                        ReportMoment = row.GetValue<DateTimeOffset>("time").UtcDateTime,
+                        Finished = row.GetValue<bool>("finished"),
+                    })
+                .Where(position => (DateTime.UtcNow - position.ReportMoment) < TimeSpan.FromMinutes(20));
             return coordinates;
         }
 

@@ -55,8 +55,8 @@ def check_service(request: CheckRequest) -> Verdict:
     flight_id = uuid.uuid4()
     label = get_random_string(15)
     license = get_random_string(32)
-    response = client.send_flight_state(token, get_random_int(), get_random_int(), flight_id.bytes, label, license,
-                                        False)
+    r = client.send_flight_state(token, get_random_int(), get_random_int(), flight_id.bytes, label, license, False)
+    r = client.send_flight_state(token, get_random_int(), get_random_int(), flight_id.bytes, label, license, False)
 
     positions = client.get_main_page_positions()
     if positions is None:
