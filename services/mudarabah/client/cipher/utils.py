@@ -34,7 +34,7 @@ def binaryproduct(X, Y):
     return A % 2
 
 
-def gaussjordan(X, change=0):
+def gauss_jordan(X, change=0):
     A = np.copy(X)
     m, n = A.shape
 

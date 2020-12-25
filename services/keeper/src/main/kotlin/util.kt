@@ -20,3 +20,11 @@ fun randomString(length: Int = 20) = (1..length)
 
 
 fun stringHash(password: String): ByteArray = MessageDigest.getInstance("SHA-256").digest(password.toByteArray())
+
+fun safeEscapeLogin(username: String): String {
+    var res = username
+    for (c in "./") {
+        res = res.replace(c.toString(), "")
+    }
+    return res
+}

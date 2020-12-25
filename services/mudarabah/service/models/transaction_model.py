@@ -18,6 +18,5 @@ class Transaction:
 
     @classmethod
     def load(cls, data):
-        print(data, flush=True)
         _, login_from, login_to, amount, description = data
         return cls(login_from, login_to, amount, description.tobytes())
