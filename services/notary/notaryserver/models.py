@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
 from notary import Notary, pack_document, load_document, serialize_bytes, deserialize_bytes
@@ -16,7 +17,8 @@ class User(db.Model):
     address = db.Column(db.String, nullable=False)
     public_key = db.Column(db.String, nullable=False)
     private_key = db.Column(db.String, nullable=False)
-    documents = db.relationship('Document', backref='author', lazy=True)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    documents = db.relationship('Document', backref='author', lazy=True, cascade="all, delete")
 
     def __init__(self, username, name, phone, address):
         self.username = username
@@ -25,6 +27,7 @@ class User(db.Model):
         self.address = address
         self.private_key = Notary.generate_private_key()
         self.public_key = Notary.get_public_key(self.private_key)
+        self.timestamp = datetime.utcnow()
 
     def is_authenticated(self):
         return True
@@ -55,6 +58,7 @@ class Document(db.Model):
     text = db.Column(db.String, nullable=False)
     signature = db.Column(db.String, nullable=False)
     is_public = db.Column(db.Boolean, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, author, title, text, is_public):
         self.author_id = author.id
@@ -62,6 +66,7 @@ class Document(db.Model):
         self.text = text
         self.is_public = is_public
         self.signature = Notary.sign(author.private_key, pack_document(title, text))
+        self.timestamp = datetime.utcnow()
 
     def generate_password(self):
         document = pack_document('document_id', str(self.id))
