@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
-import json
-
 from flask_sqlalchemy import SQLAlchemy
 
-from notary import Notary, serialize_bytes, deserialize_bytes
+from notary import Notary, serialize_bytes, deserialize_bytes, pack_document
 
 
 db = SQLAlchemy()
@@ -66,28 +64,26 @@ class Document(db.Model):
         self.is_public = is_public
 
     def generate_password(self):
-        obj = {'documents': [self.id]}
-        obj_data = serialize_bytes(json.dumps(obj).encode('utf-8'))
+        doc = pack_document('document_id', str(self.id))
+        doc_data = serialize_bytes(doc.encode('utf-8'))
         
-        signature = Notary.sign(self.author.private_key, 'document', obj_data)
+        signature = Notary.sign(self.author.private_key, 'password', doc_data)
         
-        return f'{obj_data}.{signature}'
+        return f'{doc_data}.{signature}'
 
     def verify_password(self, password):
         try:
-            obj_data, signature = password.split('.')
-            obj = json.loads(deserialize_bytes(obj_data).decode('utf-8'))
+            doc_data, signature = password.split('.')
+            doc = deserialize_bytes(doc_data.encode('utf-8')).decode('utf-8')
         except ValueError:
             return False
         
-        if not Notary.verify(self.author.public_key, 'document', obj_data, signature):
+        if not Notary.verify(self.author.public_key, 'password', doc_data, signature):
             return False
         
-        documents = obj.get('documents')
-        if documents is None or not isinstance(documents, list):
-            return False
+        expected = pack_document('document_id', str(self.id))
 
-        return self.id in documents
+        return doc == expected
 
     def __repr__(self):
         return f'<Document #{self.id} by {self.author.username} (author_id={self.author_id})>'
