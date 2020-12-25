@@ -63,3 +63,7 @@ label {
     width: 60%;
     padding-top: 10%;
 }
+
+.terminal {
+    --color: #e04e00;
+}
