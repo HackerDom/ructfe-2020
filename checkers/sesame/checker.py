@@ -4,6 +4,7 @@ import requests
 import traceback
 import random
 import string
+import time
 
 from bs4 import BeautifulSoup
 from gornilo import CheckRequest, Verdict, Checker, PutRequest, GetRequest
@@ -33,15 +34,16 @@ def check_service(request: CheckRequest) -> Verdict:
 def put_flag(request: PutRequest) -> Verdict:
     url = "http://" + request.hostname + ":4280/"
     try:
-        for _ in range(5):
+        for i in range(3):
             response = requests.post(url, data = { "secret": request.flag[:31] }, allow_redirects = False)
             key = response.headers['Location'][1:]
             if len(key) == 0:
-                print("Couldn't get flag id. Response was: ", response.text)
-                
+                print("Couldn't get flag id. Response was: ", vars(response))
+                time.sleep(i + 1)
                 continue
             print("Saved flag " + request.flag)
             return Verdict.OK(key)
+        return Verdict.MUMBLE("Couldn't put flag!")
     except:
         traceback.print_exc()
         return Verdict.MUMBLE("Couldn't get a meaningful response!")
