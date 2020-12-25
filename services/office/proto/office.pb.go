@@ -655,7 +655,7 @@ type CreateDocumentResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id    int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id    int  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Token string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
 }
 
@@ -691,7 +691,7 @@ func (*CreateDocumentResponse) Descriptor() ([]byte, []int) {
 	return file_proto_office_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *CreateDocumentResponse) GetId() int64 {
+func (x *CreateDocumentResponse) GetId() int {
 	if x != nil {
 		return x.Id
 	}
