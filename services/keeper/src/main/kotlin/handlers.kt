@@ -127,6 +127,7 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
 
     ctx.withHtml {
         head {
+            meta { content = "text/html; charset=utf-8" }
             script {
                 unsafe {
                     +"let path = [];"
@@ -175,6 +176,7 @@ fun App.addRegisterPageHandler(): Javalin = javalin.get(Endpoints.REGISTER_PAGE)
 
     ctx.withHtml {
         head {
+            meta { content = "text/html; charset=utf-8" }
             script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
             script(null, "/js/form.js") {}
             link(href = "/css/main.css", rel = "stylesheet")
@@ -256,6 +258,7 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
 
     ctx.withHtml {
         head {
+            meta { content = "text/html; charset=utf-8" }
             script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
             script(null, "/js/form.js") {}
             link(href = "/css/main.css", rel = "stylesheet")
@@ -297,6 +300,7 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
 fun App.addCoolChestHandler(): Javalin = javalin.get("/chest") { ctx ->
     ctx.withHtml {
         head {
+            meta { content = "text/html; charset=utf-8" }
             script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
             script(null, "/js/form.js") {}
         }
