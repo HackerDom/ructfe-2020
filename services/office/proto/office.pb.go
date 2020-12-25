@@ -691,7 +691,7 @@ func (*CreateDocumentResponse) Descriptor() ([]byte, []int) {
 	return file_proto_office_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *CreateDocumentResponse) GetId() int {
+func (x *CreateDocumentResponse) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
