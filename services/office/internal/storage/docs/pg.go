@@ -11,7 +11,7 @@ import (
 
 type Documents interface {
 	List(ctx context.Context, limit, offset int) ([]*pb.Document, error)
-	Insert(ctx context.Context, document *pb.Document) (int64, error)
+	Insert(ctx context.Context, document *pb.Document) (int, error)
 	Delete(ctx context.Context, docID int64) error
 	Get(ctx context.Context, name int64) (*pb.Document, error)
 }
@@ -64,7 +64,7 @@ func (p *pg) List(ctx context.Context, limit, offset int) ([]*pb.Document, error
 	return pdocs, nil
 }
 
-func (p *pg) Insert(ctx context.Context, document *pb.Document) (int64, error) {
+func (p *pg) Insert(ctx context.Context, document *pb.Document) (int, error) {
 	pr, err := proto.Marshal(document)
 	if err != nil {
 		return 0, err
@@ -73,7 +73,7 @@ func (p *pg) Insert(ctx context.Context, document *pb.Document) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	id := int64(0)
+	id := int(0)
 	if !row.Next() {
 		return 0, fmt.Errorf("not enougth returning rows")
 	}

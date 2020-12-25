@@ -13,7 +13,7 @@ type documents struct {
 	users userstorage.Users
 }
 
-func (d *documents) Create(ctx context.Context, document *pb.Document) (int64, error) {
+func (d *documents) Create(ctx context.Context, document *pb.Document) (int, error) {
 	return d.s.Insert(ctx, document)
 }
 
