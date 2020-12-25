@@ -30,8 +30,8 @@ def main():
     time.sleep(10)
 
     table_names = [
-        'public.Document',
         'public.User', 
+        'public.Document',
     ]
 
     while True:
