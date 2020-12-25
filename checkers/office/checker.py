@@ -8,19 +8,18 @@ import proto.office_pb2 as pb
 import re
 from errs import INVALID_FORMAT_ERR, FAILED_TO_CONNECT
 
-
 checker = Checker()
 
 
-def get_random_str(length=10, only_chars=True):
+def get_random_str(length=10, only_chars=False):
     if only_chars:
         return "".join(random.choices(string.ascii_letters, k=length))
     return "".join(random.choices(string.ascii_letters + string.digits, k=length))
 
 
 def create_doc():
-    a = get_random_str(length=4)
-    b = get_random_str(length=4)
+    a = get_random_str(length=4, only_chars=True)
+    b = get_random_str(length=4, only_chars=True)
     return f"""
 vars:
   {a}: 'bio'

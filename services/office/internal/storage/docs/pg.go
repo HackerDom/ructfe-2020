@@ -22,7 +22,7 @@ var docsSchema = `CREATE TABLE IF NOT EXISTS documents (
 );`
 
 type doc struct {
-	Id      string `db:"id"`
+	Id      int    `db:"id"`
 	Content []byte `db:"content"`
 }
 
@@ -32,6 +32,7 @@ func (d *doc) Proto() (*pb.Document, error) {
 	if err != nil {
 		return nil, err
 	}
+	p.Id = int64(d.Id)
 	return p, nil
 }
 
@@ -73,12 +74,12 @@ func (p *pg) Insert(ctx context.Context, document *pb.Document) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	id := int64(0)
+	id := 0
 	if !row.Next() {
 		return 0, fmt.Errorf("not enougth returning rows")
 	}
 	err = row.Scan(&id)
-	return id, err
+	return int64(id), err
 }
 
 func (p *pg) Delete(ctx context.Context, docID int64) error {
