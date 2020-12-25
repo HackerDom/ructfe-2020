@@ -1,6 +1,6 @@
 FROM gbrowdy/python-2.7.6
 
-RUN apt-get install -u gosu
+RUN apt-get install -y gosu
 
 COPY requirements.txt /tmp
 RUN pip install -r /tmp/requirements.txt
