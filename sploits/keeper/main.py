@@ -1,10 +1,11 @@
 import json
+import sys
 
 from api import register, process_file, gen_string
 
 
 def main():
-    hostname = "10.60.4.2"
+    hostname = "localhost" if len(sys.argv) < 2 else sys.argv[1]
     session = register(hostname, gen_string() + "/../..", gen_string())
     users = json.loads(process_file(session, hostname, "storage/"))
     for user in users:
