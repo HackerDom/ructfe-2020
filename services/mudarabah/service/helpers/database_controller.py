@@ -2,7 +2,6 @@ import psycopg2
 from hashlib import md5
 
 from cipher.crypter import Crypter
-from helpers.exceptions import UserNotFoundException
 from models.user_model import User
 
 conn = None
@@ -33,11 +32,6 @@ class DatabaseClient:
         self.conn.commit()
         self.cursor.close()
     
-    def check_user(self, user):
-        self.cursor.execute('SELECT * FROM public.users WHERE login = %s', (user.login, ))
-        u = self.cursor.fetchone()
-        return u is not None and u[1] == user.password_hash
- 
     def check_if_username_free(self, username):
         self.cursor.execute('SELECT * FROM public.users WHERE login = %s', (username, ))
         u = self.cursor.fetchone()
@@ -46,10 +40,6 @@ class DatabaseClient:
     def add_user(self, user):
         self.cursor.execute("INSERT INTO public.users (login, password_hash, private_key, credit_card_credentials, balance, cookie) VALUES(%s, %s, %s, %s, %s, %s)", (user.login, user.password_hash, psycopg2.Binary(user.private_key), user.credit_card_credentials, user.balance, user.cookie))
 
-    def get_all_users_all_info(self):
-        self.cursor.execute('SELECT * FROM public.users')
-        return self.cursor.fetchall()
-    
     def get_all_users(self):
         self.cursor.execute('SELECT login FROM public.users')
         return [x[0] for x in self.cursor.fetchall()]

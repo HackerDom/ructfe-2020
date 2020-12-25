@@ -21,16 +21,19 @@ def before_request():
 @app.route('/send_money', methods=['POST'])
 @need_args("cookie", "login_to", "amount", "description")
 def send_money(cookie=None, login_to=None, description=None, amount=None):
-    if request.method != 'POST':
-        return "Wrong"
     with DatabaseClient() as db:
         user_from = db.get_user_by_cookie(cookie)
+        if not user_from:
+            return jsonify({"status": 400, "addition": {"error": "No user with this cookie"}})
         user_to = db.get_user_by_login(login_to)
         if not user_to:
-            return "Wrong login_to"
-        crypter = Crypter.load_private(user_from.private_key)
-        description = crypter.decrypt(bytes.fromhex(description))
-        transaction = Transaction(user_from.login, user_to.login, amount, description)
+            return jsonify({"status": 400, "addition": {"error": "No user with login_to"}})
+        if user_from.balance < amount:
+            return jsonify({"status": 400, "addition": {"error": "Not enough money to make transaction"}})
+    crypter = Crypter.load_private(user_from.private_key)
+    description = crypter.decrypt(bytes.fromhex(description))
+    transaction = Transaction(user_from.login, user_to.login, amount, description)
+    with DatabaseClient() as db:
         db.update_balance(user_from.login, user_from.balance - transaction.amount)
         db.update_balance(user_to.login, user_to.balance + transaction.amount)
         db.add_transaction(transaction)
@@ -43,23 +46,26 @@ def send_money(cookie=None, login_to=None, description=None, amount=None):
 def login(login=None, password=None):
     with DatabaseClient() as db:
         user = db.get_user_by_login_and_pass(login, password)
-        if not user:
-            return "Incorrect username or password"
-    return jsonify({"status": 200, "addition": {"cookie":user.cookie}})
+    if not user:
+        return jsonify({"status": 400, "addition": {"error": "Incorrect username or password"}})
+    return jsonify({"status": 200, "addition": {"cookie": user.cookie}})
 
 
 @app.route('/register', methods=['POST'])
 @need_args("login", "password", "credit_card_credentials")
 def register(login=None, password=None, credit_card_credentials=None):
     with DatabaseClient() as db:
-        if db.check_if_username_free(login):
-            code = LDPC.from_params(512, 4, 8)
-            crypter = Crypter.from_code(code)
-            private_key = crypter.dump_private()
-            user = User.create(login, password, private_key, credit_card_credentials)
-            db.add_user(user)
-        else:
-            return "this user already exists"
+        if not db.check_if_username_free(login):
+            return jsonify({"status": 400, "addition": {"error": "There exists user with this login"}})
+    try:
+        code = LDPC.from_params(512, 4, 8)
+        crypter = Crypter.from_code(code)
+        private_key = crypter.dump_private()
+        user = User.create(login, password, private_key, credit_card_credentials)
+    except Exception:
+        return jsonify({"status": 500, "addition": {"error": "Can not create user"}})
+    with DatabaseClient() as db:
+        db.add_user(user)
     return jsonify({"status": 200, "addition": {"cookie":user.cookie, "priv_key":b85encode(private_key).decode()}})
 
 
@@ -87,10 +93,10 @@ def get_user(login=None):
     with DatabaseClient() as db:
         user = db.get_user_by_login(login)
         if user is None:
-            return "Wrong username"
+            return jsonify({"status": 200, "addition": {"error": "No user with this login"}})
     crypter = Crypter.load_private(user.private_key)
-    pub_key = crypter.dump_public()
-    return jsonify({"status": 200, "addition": {"login": user.login, "balance":user.balance, "pub_key":b85encode(pub_key).decode()}})
+    pub_key = b85encode(crypter.dump_public()).decode()
+    return jsonify({"status": 200, "addition": {"login": user.login, "balance": user.balance, "pub_key": pub_key}})
 
 @app.route('/list_users')
 def list_users():
