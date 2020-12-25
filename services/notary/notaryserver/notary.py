@@ -7,12 +7,12 @@ import libnotary
 
 
 def serialize_bytes(bs):
-    return base64.b64encode(bs).decode('utf-8')
+    return base64.urlsafe_b64encode(bs).decode('utf-8')
 
 
 def deserialize_bytes(string):
     try:
-        return base64.b64decode(string)
+        return base64.urlsafe_b64decode(string)
     except ValueError as err:
         raise ValueError('Failed to deserialize bytes') from err
 
