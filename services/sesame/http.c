@@ -213,8 +213,7 @@ bool process_request(char *request, char *response, uint64 *response_length)
 		char key[64];
 		bzero(key, sizeof(key));
 
-		int i = 0;
-		for (i = 0; i < 64; i++)
+		for (int i = 0; i < 64; i++)
 		{	
 			gen_key(key, i);
 
@@ -224,7 +223,6 @@ bool process_request(char *request, char *response, uint64 *response_length)
 			store_item(key, secret.data);
 			break;
 		}
-		printf("Sending key: %s for secret: %s, i = %d\n", key, secret.data, i);
 
 		render_page(page, key, secret.data);
 		redirect(response, response_length, key);
