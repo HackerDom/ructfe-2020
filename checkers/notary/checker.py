@@ -1,107 +1,102 @@
 #!/usr/bin/env python3
 
-import hashlib
 import json
 import random
 import string
 import sys
 from functools import wraps
 
-from faker import Faker
 from gornilo import CheckRequest, Verdict, Checker, PutRequest, GetRequest
 
-from client import CheckFailed, Client, corrupt, DocumentInfo, mumble, UserInfo
+from client import Client
+from utils import CheckFailed, corrupt, DocumentInfo, generate_document, generate_user, hash_dict, mumble, UserInfo
+from verify_crypto import Verify
 
 
-fake = Faker()
+def check_user_crypto(user: UserInfo):
+    with mumble('checking a user\'s cryptographic data for integrity'):
+        assert Verify.public_key(user.public_key), 'public key is invalid'
+        assert Verify.private_key(user.private_key), 'private key is invalid'
+        assert Verify.key_pair(user.private_key, user.public_key), 'key pair is invalid'
+        assert Verify.user_password(user.password, user.username), 'password is invalid'
 
 
-def generate_user():
-    profile = fake.profile()
-    return UserInfo(
-        username=profile['username'],
-        name=profile['name'],
-        phone=fake.phone_number(),
-        address=profile['address'])
-
-
-def generate_document():
-    return DocumentInfo(
-        title=fake.sentence(),
-        text=fake.text(max_nb_chars=400))
-
-
-def hash_dict(dictionary):
-    data = json.dumps(dictionary, sort_keys=True)
-    return hashlib.sha256(data.encode('utf-8')).hexdigest()
-
-
-checker = Checker()
+def check_doc_crypto(doc: DocumentInfo):
+    with mumble('checking a document\'s cryptographic data for integrity'):
+        assert Verify.signature(doc.signature, doc.text), 'signature is invalid'
+        if doc.password is not None:
+            assert Verify.document_password(doc.password, doc.id), 'password is invalid'
 
 
 def create_user(client: Client, flag=None):
     user = generate_user()
     if flag is not None:
         user.address = flag
-    registered_user = client.register(
+    user = client.register(
         username=user.username, name=user.name, phone=user.phone, address=user.address)
-    user.password = registered_user.password
-    user.id = registered_user.id
-    user.public_key = registered_user.public_key
-    user.private_key = registered_user.private_key
+    check_user_crypto(user)
     return user
 
 
-def create_document(client: Client, public=False, flag=None):
+def create_document(client: Client, author_id, public=False, flag=None):
     doc = generate_document()
     if flag is not None:
         doc.text = flag
-    doc_id, password = client.sign(title=doc.title, text=doc.text, public=public)
-    doc.id = doc_id
-    doc.password = password
+    doc = client.sign(title=doc.title, text=doc.text, author_id=author_id, public=public)
+    check_doc_crypto(doc)
     return doc
 
 
-def check_user_profile(anonymous_client, user, expected_docs):
-    profile = anonymous_client.user(user.id)
+def assert_fields_equal(user, loaded_user, fields):
+    for key in fields:
+        expected_value = getattr(user, key)
+        loaded_value = getattr(loaded_user, key)
+        assert loaded_value, f'{key} is missing'
+        assert loaded_value == expected_value, f'{key} has an unexpected value'
 
-    with mumble('checking user\'s document list'):
-        for doc in expected_docs:
-            assert doc.title.encode('utf-8') in profile, 'titles missing'
-            assert f'doc/{doc.id}'.encode('utf-8') in profile, 'links missing'
 
+def assert_links_not_missing(doc_ids, expected_docs):
+    expected_ids = [doc.id for doc in expected_docs]
+    assert set(expected_ids) <= set(doc_ids), 'links to some documents missing'
+
+
+def check_user_document_list(loaded_user, expected_docs):
+    with mumble('checking a user\'s document list'):
+        assert_links_not_missing(loaded_user.document_ids, expected_docs)
+
+
+def check_user_profile_publicly(anonymous_client, user, expected_docs):
+    loaded_user = anonymous_client.user(user.id)
+    check_user_document_list(loaded_user, expected_docs)
     with mumble('checking public profile info'):
-        for key in ('username', 'name', 'public_key'):
-            value = getattr(user, key)
-            assert value.encode('utf-8') in profile, f'{key} is missing'
+        assert_fields_equal(user, loaded_user, ('username', 'name', 'public_key'))
 
+
+def check_user_profile_privately(anonymous_client, user, expected_docs):
     loaded_user = anonymous_client.log_in(user.username, user.password)
-
+    check_user_document_list(loaded_user, expected_docs)
     with mumble('checking private profile info'):
-        for key in ('phone', 'address', 'private_key'):
-            value = getattr(user, key)
-            assert getattr(loaded_user, key) == value, f'{key} changed'
+        assert_fields_equal(user, loaded_user, ('phone', 'address', 'private_key'))
 
 
 def check_doc_access(anonymous_client, logged_in_client, doc_info):
+    if doc_info.password is not None:
+        loaded_doc = anonymous_client.doc(doc_info.id)
+        with mumble('checking anonymous access to a private document'):
+            assert_fields_equal(doc_info, loaded_doc, ('title', 'author_id'))
+
+        loaded_doc = logged_in_client.doc(doc_info.id)
+        with mumble('checking access to a private document as its author'):
+            assert_fields_equal(doc_info, loaded_doc, ('title', 'text', 'author_id', 'signature'))
+
     loaded_doc = anonymous_client.doc(doc_info.id, password=doc_info.password)
     with mumble('checking access to a document'):
-        assert loaded_doc.text is not None, 'could not load text'
-        assert loaded_doc.text == doc_info.text, 'document text changed'
-
-    if doc_info.password is not None:
-        loaded_doc = logged_in_client.doc(doc_info.id)
-        with mumble('checking access to a document as its author'):
-            assert loaded_doc.text is not None, 'could not load text'
-            assert loaded_doc.text == doc_info.text, 'document text changed'
+        assert_fields_equal(doc_info, loaded_doc, ('title', 'text', 'author_id', 'signature'))
 
 
 def check_doc_visibility(anonymous_client, expected_docs):
-    feed = anonymous_client.feed()
-    with mumble('checking doc visibility'):
-        for doc in expected_docs:
-            assert doc.title.encode('utf-8') in feed, 'titles missing'
-            assert f'doc/{doc.id}'.encode('utf-8') in feed, 'links missing'
+    with mumble('checking feed content'):
+        assert_links_not_missing(anonymous_client.feed(), expected_docs)
 
 
 DEBUG = False
@@ -125,17 +120,23 @@ def errors_to_verdicts(f):
     return wrapper
 
 
+checker = Checker()
+
+
 @checker.define_check
 @errors_to_verdicts
 def check_service(request: CheckRequest) -> Verdict:
-    client = Client(request.hostname)
-    user = create_user(client)
-    public_doc = create_document(client, public=True)
-    private_doc = create_document(client, public=False)
+    public_client = Client(request.hostname)
+    private_client = Client(request.hostname)
+    public_user = create_user(public_client)
+    private_user = create_user(private_client)
+    public_doc = create_document(public_client, author_id=public_user.id, public=True)
+    private_doc = create_document(private_client, author_id=private_user.id, public=False)
 
-    check_user_profile(Client(request.hostname), user, (public_doc, private_doc))
-    check_doc_access(Client(request.hostname), client, public_doc)
-    check_doc_access(Client(request.hostname), client, private_doc)
+    check_user_profile_privately(Client(request.hostname), public_user, (public_doc,))
+    check_user_profile_publicly(Client(request.hostname), private_user, (private_doc,))
+    check_doc_access(Client(request.hostname), public_client, public_doc)
+    check_doc_access(Client(request.hostname), private_client, private_doc)
     check_doc_visibility(Client(request.hostname), (public_doc, private_doc))
 
 
@@ -146,11 +147,12 @@ def put_flag(request: PutRequest) -> Verdict:
     client = Client(request.hostname)
     if request.vuln_id == 1:
         user = create_user(client, flag=request.flag)
-        doc = create_document(client, public=True)
+        doc = create_document(client, author_id=user.id, public=True)
     else:
         user = create_user(client)
-        doc = create_document(client, public=False, flag=request.flag)
+        doc = create_document(client, author_id=user.id, public=False, flag=request.flag)
 
+    user.document_ids = []  # Don't need to compare them
     info_hash = hash_dict(dict(user=vars(user), doc=vars(doc)))
     flag_id = dict(
         username=user.username, password=user.password,
@@ -177,11 +179,15 @@ def get_flag(request: GetRequest) -> Verdict:
     with corrupt(None):
         assert request.flag == actual_flag, 'A flag is missing'
 
+    user.document_ids = []
     info_hash = hash_dict(dict(user=vars(user), doc=vars(doc)))
     with mumble('checking data consistency'):
         assert info_hash == flag_id['hash'], 'either a user\'s profile or a document\'s content changed'
 
-    check_user_profile(Client(request.hostname), user, (doc,))
+    if request.vuln_id == 1:
+        check_user_profile_privately(Client(request.hostname), user, (doc,))
+    else:
+        check_user_profile_publicly(Client(request.hostname), user, (doc,))
     check_doc_access(Client(request.hostname), client, doc)
     check_doc_visibility(Client(request.hostname), (doc,))
 
