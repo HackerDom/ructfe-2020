@@ -10,7 +10,7 @@ HOST = "http://{}:3113"
 def send_money(host, cookie, login_to, amount, description, priv_key):
     crypter = Crypter.load_private(priv_key)
     new_conditions = {"addition": {"cookie":cookie, "login_to":login_to, "amount":int(amount), "description":crypter.encrypt(description.encode()).hex()}}
-    req = urllib.request.Request(HOST+"/send_money",
+    req = urllib.request.Request(host+"/send_money",
                                     data=json.dumps(new_conditions).encode('utf-8'),
                                     headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
@@ -19,7 +19,7 @@ def send_money(host, cookie, login_to, amount, description, priv_key):
 
 def get_cookie(host, login, password):
     new_conditions = {"addition": {"login": login, "password":password}}
-    req = urllib.request.Request(HOST+"/get_cookie", data=json.dumps(new_conditions).encode('utf-8'),
+    req = urllib.request.Request(host+"/get_cookie", data=json.dumps(new_conditions).encode('utf-8'),
                                  headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]["cookie"]
@@ -27,7 +27,7 @@ def get_cookie(host, login, password):
 
 def check_card(host, login, credit_card_credentials):
     new_conditions = {"addition": {"login": login, "credit_card_credentials": credit_card_credentials}}
-    req = urllib.request.Request(HOST+"/check_card", data=json.dumps(new_conditions).encode('utf-8'),
+    req = urllib.request.Request(host+"/check_card", data=json.dumps(new_conditions).encode('utf-8'),
                                  headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
@@ -35,7 +35,7 @@ def check_card(host, login, credit_card_credentials):
 
 def register(host, login, password, credit_card_credentials):
     new_conditions = {"addition": {"login": login, "password":password, "credit_card_credentials":credit_card_credentials}}
-    req = urllib.request.Request(HOST+"/register", data=json.dumps(new_conditions).encode('utf-8'),
+    req = urllib.request.Request(host+"/register", data=json.dumps(new_conditions).encode('utf-8'),
                                  headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
@@ -43,7 +43,7 @@ def register(host, login, password, credit_card_credentials):
 
 def get_transaction(host, login):
     new_conditions = {"addition": {"login": login}}
-    req = urllib.request.Request(HOST+"/transactions", data=json.dumps(new_conditions).encode('utf-8'),
+    req = urllib.request.Request(host+"/transactions", data=json.dumps(new_conditions).encode('utf-8'),
                                  headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
@@ -51,14 +51,14 @@ def get_transaction(host, login):
 
 def get_user(host, login):
     new_conditions = {"addition": {"login": login}}
-    req = urllib.request.Request(HOST+"/get_user", data=json.dumps(new_conditions).encode('utf-8'),
+    req = urllib.request.Request(host+"/get_user", data=json.dumps(new_conditions).encode('utf-8'),
                                  headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
 
 
 def get_user_listing(host):
-    req = urllib.request.Request(HOST+"/list_users",
+    req = urllib.request.Request(host+"/list_users",
                                  headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
@@ -66,6 +66,7 @@ def get_user_listing(host):
 
 def main():
     args = get_parsed_args()
+    host = HOST.format(args.host)
     if args.register:
         res = register(host, args.login, args.password, args.credit_card_credentials)
         priv_key = res["priv_key"]

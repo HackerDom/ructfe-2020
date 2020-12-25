@@ -23,6 +23,9 @@ def get_parsed_args():
     parser.add_argument('-s', '--send-money', dest='send_money',
                         action='store_true',
                         help="send money")
+    parser.add_argument('--host',
+                        help='host',
+                        default='localhost', dest='host')
     parser.add_argument('-l', '--login',
                         help='username',
                         default=None, dest='login')
