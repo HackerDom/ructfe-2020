@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.23.0
 // 	protoc        v3.14.0
-// source: proto/office.proto
+// source: proto/scrolls.proto
 
 package proto
 
@@ -1620,7 +1620,7 @@ var _Users_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/office.proto",
+	Metadata: "proto/scrolls.proto",
 }
 
 // DocumentsClient is the client API for Documents service.
@@ -1800,5 +1800,5 @@ var _Documents_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/office.proto",
+	Metadata: "proto/scrolls.proto",
 }

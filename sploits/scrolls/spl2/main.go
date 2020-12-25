@@ -7,7 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	pb "github.com/HackerDom/ructfe-2020/sploits/office/spl2/proto"
+	pb "github.com/HackerDom/ructfe-2020/sploits/scrolls/spl2/proto"
 	"google.golang.org/protobuf/encoding/protojson"
 	"io/ioutil"
 	"math/rand"
