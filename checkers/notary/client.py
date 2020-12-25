@@ -141,6 +141,13 @@ class Client:
         resp = self._send_form(self.urls.signup, data=dict(
             username=username, name=name, phone=phone, address=address))
         parser = Parser(resp.content)
+        from utils import CheckFailed
+        try:
+            parser.password()
+        except CheckFailed:
+            print(username, name, phone, address)
+            print(str(parser.soup))
+            raise
         return parser.user_info(
             username=username,
             password=parser.password(),
