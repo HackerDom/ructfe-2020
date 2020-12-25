@@ -82,7 +82,7 @@ void __sign_data_to_point(point_ptr point, mpz_srcptr N, size_t data_size, const
     size_t coord_length, value_length;
     uint8_t *value;
 
-    coord_length = (mpz_sizeinbase(N, 2) - 1) / 8;
+    coord_length = (mpz_sizeinbase(N, 2) + 7) / 8;
     value_length = 2 * coord_length * sizeof(uint8_t);
 
     value = malloc(value_length);
@@ -100,6 +100,12 @@ void __sign_data_to_point(point_ptr point, mpz_srcptr N, size_t data_size, const
 
     mpz_import(x, coord_length, LSB_FIRST, sizeof(uint8_t), NATIVE_ENDIANNESS, 0, value);
     mpz_import(y, coord_length, LSB_FIRST, sizeof(uint8_t), NATIVE_ENDIANNESS, 0, value + coord_length);
+
+    // x = x % N
+    mpz_mod(x, x, N);
+
+    // y = y % N
+    mpz_mod(y, y, N);
 
     mpz_set(point->x, x);
     mpz_set(point->y, y);
