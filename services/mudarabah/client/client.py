@@ -4,25 +4,10 @@ from base64 import b85decode
 from arg_parse import get_parsed_args
 from cipher.crypter import Crypter
 
-HOST = "http://localhost:3113"
+HOST = "http://{}:3113"
 
 
-def get_cookie(login, password):
-    new_conditions = {"addition": {"login": login, "password":password}}
-    req = urllib.request.Request(HOST+"/get_cookie", data=json.dumps(new_conditions).encode('utf-8'),
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]["cookie"]
-
-
-def register(login, password, credit_card_credentials):
-    new_conditions = {"addition": {"login": login, "password":password, "credit_card_credentials":credit_card_credentials}}
-    req = urllib.request.Request(HOST+"/register", data=json.dumps(new_conditions).encode('utf-8'),
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
-
-def send_money(cookie, login_to, amount, description, priv_key):
+def send_money(host, cookie, login_to, amount, description, priv_key):
     crypter = Crypter.load_private(priv_key)
     new_conditions = {"addition": {"cookie":cookie, "login_to":login_to, "amount":int(amount), "description":crypter.encrypt(description.encode()).hex()}}
     req = urllib.request.Request(HOST+"/send_money",
@@ -31,65 +16,80 @@ def send_money(cookie, login_to, amount, description, priv_key):
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))
 
-def get_users():
-    req = urllib.request.Request(HOST+"/users_pubkeys", 
-                                headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
 
-def get_transaction(login):
-    new_conditions = {"addition": {"login": login}}
-    req = urllib.request.Request(HOST+"/transactions", data=json.dumps(new_conditions).encode('utf-8'),
+def get_cookie(host, login, password):
+    new_conditions = {"addition": {"login": login, "password":password}}
+    req = urllib.request.Request(HOST+"/get_cookie", data=json.dumps(new_conditions).encode('utf-8'),
                                  headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
+    return json.loads(response.read().decode('utf8'))["addition"]["cookie"]
 
-def get_user(login):
-    new_conditions = {"addition": {"login": login}}
-    req = urllib.request.Request(HOST+"/get_user", data=json.dumps(new_conditions).encode('utf-8'),
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
 
-def get_user_listing():
-    req = urllib.request.Request(HOST+"/list_users",
-                                 headers={'content-type': 'application/json'})
-    response = urllib.request.urlopen(req)
-    return json.loads(response.read().decode('utf8'))["addition"]
-
-def check_card(login, credit_card_credentials):
+def check_card(host, login, credit_card_credentials):
     new_conditions = {"addition": {"login": login, "credit_card_credentials": credit_card_credentials}}
     req = urllib.request.Request(HOST+"/check_card", data=json.dumps(new_conditions).encode('utf-8'),
                                  headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
     return json.loads(response.read().decode('utf8'))["addition"]
 
+
+def register(host, login, password, credit_card_credentials):
+    new_conditions = {"addition": {"login": login, "password":password, "credit_card_credentials":credit_card_credentials}}
+    req = urllib.request.Request(HOST+"/register", data=json.dumps(new_conditions).encode('utf-8'),
+                                 headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return json.loads(response.read().decode('utf8'))["addition"]
+
+
+def get_transaction(host, login):
+    new_conditions = {"addition": {"login": login}}
+    req = urllib.request.Request(HOST+"/transactions", data=json.dumps(new_conditions).encode('utf-8'),
+                                 headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return json.loads(response.read().decode('utf8'))["addition"]
+
+
+def get_user(host, login):
+    new_conditions = {"addition": {"login": login}}
+    req = urllib.request.Request(HOST+"/get_user", data=json.dumps(new_conditions).encode('utf-8'),
+                                 headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return json.loads(response.read().decode('utf8'))["addition"]
+
+
+def get_user_listing(host):
+    req = urllib.request.Request(HOST+"/list_users",
+                                 headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return json.loads(response.read().decode('utf8'))["addition"]
+
+
 def main():
     args = get_parsed_args()
     if args.register:
-        res = register(args.login, args.password, args.credit_card_credentials)
+        res = register(host, args.login, args.password, args.credit_card_credentials)
         priv_key = res["priv_key"]
         with open(f"{args.login}.key", "wb") as f:
             f.write(b85decode(priv_key.encode()))
             print(f"key is written to {args.login}.key")
         print(res)
     if args.get_cookie:
-        print(get_cookie(args.login, args.password))
+        print(get_cookie(host, args.login, args.password))
     if args.send_money:
         if args.priv_key_filename:
             with open(args.priv_key_filename, "rb") as f:
                 key = f.read()
         else:
             key = args.priv_key 
-        print(send_money(args.cookie, args.login_to, args.amount, args.description, key))
+        print(send_money(host, args.cookie, args.login_to, args.amount, args.description, key))
     if args.get_transactions:
-        print(get_transaction(args.login))
+        print(get_transaction(host, args.login))
     if args.get_user:
-        print(get_user(args.login))
+        print(get_user(host, args.login))
     if args.get_user_listing:
-        print(get_user_listing())
+        print(get_user_listing(host))
     if args.check_card:
-        print(check_card(args.login, args.credit_card_credentials))
+        print(check_card(host, args.login, args.credit_card_credentials))
 
 if __name__ == "__main__":
     main()

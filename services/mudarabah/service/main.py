@@ -50,6 +50,7 @@ def login(login=None, password=None):
         return jsonify({"status": 400, "addition": {"error": "Incorrect username or password"}})
     return jsonify({"status": 200, "addition": {"cookie": user.cookie}})
 
+
 @app.route('/check_card', methods=['POST'])
 @need_args("login", "credit_card_credentials")
 def check_card(login=None, credit_card_credentials=None):
@@ -58,6 +59,7 @@ def check_card(login=None, credit_card_credentials=None):
     if not user:
         return jsonify({"status": 400, "addition": {"error": "Wrong login or credit card"}})
     return jsonify({"status": 200, "addition": {"credit_card_credentials": user.credit_card_credentials}})
+
 
 @app.route('/register', methods=['POST'])
 @need_args("login", "password", "credit_card_credentials")
@@ -106,15 +108,18 @@ def get_user(login=None):
     pub_key = b85encode(crypter.dump_public()).decode()
     return jsonify({"status": 200, "addition": {"login": user.login, "balance": user.balance, "pub_key": pub_key}})
 
+
 @app.route('/list_users')
 def list_users():
     with DatabaseClient() as db:
         users = db.get_all_users()
     return jsonify({"status": 200, "addition": {"users": users}})
 
+
 @app.route("/ping")
 def ping():
     return jsonify({"status": 200})
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3113, debug=True)
