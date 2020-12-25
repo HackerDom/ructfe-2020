@@ -89,6 +89,16 @@ message ExecuteResponse {
   string executed = 1;
 }
 
+
+message TestDocRequest {
+  string session = 1;
+  string content = 2;
+}
+
+message TestDocResponse {
+  string executed = 1;
+}
+
 service Users {
   rpc Register(RegisterRequest) returns (RegisterResponse) {}
   rpc List(ListRequest) returns (ListResponse) {}
@@ -98,4 +108,5 @@ service Documents {
   rpc List(ListDocumentsRequest) returns (ListDocumentsResponse) {}
   rpc Create(CreateDocumentRequest) returns (CreateDocumentResponse) {}
   rpc Execute(ExecuteRequest) returns (ExecuteResponse) {}
+  rpc TestDoc(TestDocRequest) returns (TestDocResponse) {}
 }
