@@ -247,7 +247,7 @@ char * gen_key(char *buffer, uint64 modifier)
 	uint64 multiplier = binuuid[0] + 3;
 	for (int i = 0; i < 32; i++)
 	{
-		buffer[i] = 'A' + ((time_id * multiplier + i * 7) % 26);
+		buffer[i] = 'A' + ((time_id * multiplier ^ i * 7) % 26);
 		multiplier = (multiplier * 167 + modifier) % 16769023;
 	}
 
