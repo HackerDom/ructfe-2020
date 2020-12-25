@@ -28,7 +28,7 @@
       requirements: "{{ cs_dir }}/checkers/{{ item }}/requirements.txt"
     ignore_errors: yes
     loop:
-      - office
+      - scrolls
       - sesame
       - keeper
       - mumbler
