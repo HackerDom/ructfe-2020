@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Threading;
 using CarpetRadar.Services;
 using CarpetRadar.Services.DataStorage;
@@ -61,39 +60,6 @@ namespace CarpetRadar.TrackServer
             }
         }
 
-        private void HandleDevice1(object obj)
-        {
-            var client = (TcpClient) obj;
-            var stream = client.GetStream();
-            var bytes = new byte[10000];
-            int i;
-            try
-            {
-                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-                {
-                    var data = Encoding.ASCII.GetString(bytes, 0, i);
-                    logger.Info($"{Thread.CurrentThread.ManagedThreadId}: Received: {data}");
-
-                    var bf = new BinaryFormatter();
-                    FlightState c;
-                    using (var m = new MemoryStream(bytes))
-                    {
-                        c = (FlightState) bf.Deserialize(m);
-                    }
-
-                    var str = "Hey Device!";
-                    var reply = Encoding.ASCII.GetBytes(str);
-                    stream.Write(reply, 0, reply.Length);
-                    logger.Info($"{Thread.CurrentThread.ManagedThreadId}: Sent: {str}");
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Warn(e, "Exception");
-                client.Close();
-            }
-        }
-
         private async void HandleCarpet(object obj)
         {
             var client = (TcpClient) obj;
@@ -104,6 +70,8 @@ namespace CarpetRadar.TrackServer
             {
                 while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                 {
+                    logger.Info($"[Thread {Thread.CurrentThread.ManagedThreadId}] read {i} bytes");
+
                     var bf = new BinaryFormatter();
                     FlightState request;
                     using (var m = new MemoryStream(bytes))
@@ -136,53 +104,8 @@ namespace CarpetRadar.TrackServer
             }
             catch (Exception e)
             {
-                logger.Warn($"Exception in thread {Thread.CurrentThread.ManagedThreadId}");
+                logger.Warn($"[Thread {Thread.CurrentThread.ManagedThreadId}] Exception during handling carpet");
                 logger.Warn(e);
-                stream.TrySend("Internal error");
-            }
-            finally
-            {
-                client.Close();
-            }
-        }
-
-        private async void HandleDevice2(object obj)
-        {
-            var client = (TcpClient) obj;
-            var stream = client.GetStream();
-            try
-            {
-                var bf = new BinaryFormatter();
-                var request = (FlightState) bf.Deserialize(stream); /// ошибка при слишком коротком стриме. надо вычитывать отдельно, чтобы форматтер знал, что больше байтов не будет
-
-                var userId = await authService.ResolveUser(request.Token);
-                if (userId == null)
-                {
-                    stream.Send("Authentication error.");
-                    return;
-                }
-
-                var errorMsg = await dataStorage.AddFlightState(request, userId.Value);
-                if (errorMsg != null)
-                {
-                    stream.Send(errorMsg);
-                    return;
-                }
-
-                var currentPositions = (await dataStorage.GetCurrentPositions()).ToArray();
-
-                using (var ms = new MemoryStream())
-                {
-                    bf.Serialize(ms, currentPositions);
-                    var array = ms.ToArray();
-                    stream.Write(array, 0, array.Length);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.Warn(e, "Exception");
-                logger.Warn(e.Message);
-                logger.Warn(e.StackTrace);
                 stream.TrySend("Internal error");
             }
             finally
