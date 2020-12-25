@@ -16,4 +16,6 @@ COPY entrypoint.sh .
 
 RUN chmod +x entrypoint.sh
 
+USER notary
+
 ENTRYPOINT ./entrypoint.sh
