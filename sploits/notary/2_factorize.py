@@ -115,8 +115,8 @@ def main():
 
         profile = session.post(url + '/login', data={'csrf_token': csrf_token, 'username': username, 'password': password}).text
         
-        phone = re.search(r'<div> <strong>Phone</strong>:(.*?)</div>', profile).group(1)
-        address = re.search(r'<div> <strong>Address</strong>:(.*?)</div>', profile).group(1)
+        phone = re.search(r'<div> <strong>Phone</strong>:(.*?)</div>', profile, re.DOTALL).group(1)
+        address = re.search(r'<div> <strong>Address</strong>:(.*?)</div>', profile, re.DOTALL).group(1)
 
         print(username, phone, address)
 

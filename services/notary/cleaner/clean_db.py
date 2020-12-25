@@ -3,6 +3,8 @@
 import os
 import sys
 import time
+import datetime
+
 import psycopg2
 
 
@@ -33,6 +35,8 @@ def main():
     ]
 
     while True:
+        print(f"STARTED CLEANING AT {datetime.datetime.utcnow()}")
+
         clean_db(database_uri, table_names, clean_interval)
         time.sleep(sleep_seconds)
 
