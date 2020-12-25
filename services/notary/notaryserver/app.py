@@ -42,7 +42,7 @@ app = create_app()
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.filter(User.id == str(user_id)).first()
+    return User.query.filter(User.id == user_id).first()
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -104,7 +104,7 @@ def logout():
     return redirect('/')
 
 
-@app.route('/user/<int:user_id>')
+@app.route('/user/<string:user_id>')
 def user(user_id):
     user = User.query.get(user_id)
     
@@ -116,7 +116,7 @@ def user(user_id):
     return render_template('user.html', user=user, is_current_user=is_current_user)
 
 
-@app.route('/doc/<int:doc_id>', methods=['GET', 'POST'])
+@app.route('/doc/<string:doc_id>', methods=['GET', 'POST'])
 def doc(doc_id):
     doc = Document.query.get(doc_id)
     
@@ -140,7 +140,7 @@ def doc(doc_id):
 
 @app.route('/')
 def recent_docs():
-    docs = Document.query.order_by(Document.id.desc()).all()
+    docs = Document.query.order_by(Document.timestamp.desc()).all()
     
     current_user_id = current_user.id if current_user.is_authenticated else None
     

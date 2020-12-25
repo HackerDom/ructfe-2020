@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
+import uuid
 from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy_utils import UUIDType
 
 from notary import Notary, pack_document, load_document, serialize_bytes, deserialize_bytes
 
@@ -10,7 +13,7 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(UUIDType(), primary_key=True, default=uuid.uuid4)
     username = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
     phone = db.Column(db.String, nullable=False)
@@ -39,7 +42,7 @@ class User(db.Model):
         return False
 
     def get_id(self):
-        return self.id
+        return str(self.id)
 
     def generate_password(self):
         return Notary.sign(self.private_key, self.username.encode('utf-8'))
@@ -52,8 +55,8 @@ class User(db.Model):
 
 
 class Document(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = db.Column(UUIDType(), primary_key=True, default=uuid.uuid4)
+    author_id = db.Column(UUIDType(), db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.String, nullable=False)
     text = db.Column(db.String, nullable=False)
     signature = db.Column(db.String, nullable=False)
