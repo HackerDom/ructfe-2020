@@ -11,7 +11,7 @@ from models import db, Document, User
 from notary import Notary
 
 
-DB_URI = 'sqlite:///data.db'
+DB_URI = os.getenv('DATABASE_URI')
 SECRET_KEY_PATH = 'secret.key'
 DOCS_PER_PAGE = 200
 
