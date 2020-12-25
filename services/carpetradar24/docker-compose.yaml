@@ -13,6 +13,10 @@ services:
     pids_limit: 100
     mem_limit: 1G
     memswap_limit: 1G
+    ulimits:
+      nofile:
+        soft: 12000
+        hard: 12000
 
   web:
     build:
@@ -26,6 +30,10 @@ services:
     pids_limit: 100
     mem_limit: 1G
     memswap_limit: 1G
+    ulimits:
+      nofile:
+        soft: 12000
+        hard: 12000
 
   cassandra:
     image: cassandra:3.11.9
@@ -38,3 +46,7 @@ services:
     pids_limit: 200
     mem_limit: 2G
     memswap_limit: 2G
+    ulimits:
+      nofile:
+        soft: 12000
+        hard: 12000
