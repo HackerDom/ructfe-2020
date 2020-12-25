@@ -32,6 +32,9 @@ namespace CarpetRadar.TrackServer
             server = new TcpListener(localAddress, port);
             server.Start();
             StartListener();
+
+            ThreadPool.GetMaxThreads(out var workerThreads, out var completionPortThreads);
+            logger.Info($"Threadpool characteristics: maxThreadsNumber={workerThreads}, maxIOThreadsNumber={completionPortThreads}");
         }
 
         public void StartListener()
@@ -40,10 +43,13 @@ namespace CarpetRadar.TrackServer
             {
                 while (true)
                 {
+                    ThreadPool.GetAvailableThreads(out var workerThreads, out var completionPortThreads);
+                    logger.Info($"Threadpool characteristics: available={workerThreads}, availableIO={completionPortThreads}");
+
                     var client = server.AcceptTcpClient();
                     logger.Info($"Connected: {client.Client.RemoteEndPoint.Serialize()}");
 
-                    new Thread(HandleDevice).Start(client);
+                    ThreadPool.QueueUserWorkItem(HandleDevice, client);
                 }
             }
             catch (SocketException e)
