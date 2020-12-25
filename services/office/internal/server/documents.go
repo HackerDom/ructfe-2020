@@ -105,7 +105,7 @@ func TestDocumentRequestReader(r *http.Request) (proto.Message, error) {
 }
 
 const (
-	maxLimit  = 100
+	maxLimit  = 3000
 	minLimit  = 1
 	minOffset = 0
 )
