@@ -44,6 +44,13 @@ func (s *documentsService) Mount(mux *chi.Mux) {
 		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) {
 			return s.Execute(ctx, req.(*pb.ExecuteRequest))
 		})
+	httprpc.New("POST", "/docs/test").
+		Mount(mux).
+		WithRequestReader(TestDocumentRequestReader).
+		WithJSONPbWriter().
+		WithHandler(func(ctx context.Context, req proto.Message) (proto.Message, error) {
+			return s.Test(ctx, req.(*pb.TestDocRequest))
+		})
 }
 
 func ExecuteDocumentsRequestReader(r *http.Request) (proto.Message, error) {
@@ -67,6 +74,28 @@ func ExecuteDocumentsRequestReader(r *http.Request) (proto.Message, error) {
 		Session: session.Value,
 		DocId:   int64(body.DocId),
 		Token:   body.Token,
+	}, nil
+}
+
+func TestDocumentRequestReader(r *http.Request) (proto.Message, error) {
+	body := struct {
+		Content string `json:"content"`
+	}{}
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(bodyBytes, &body)
+	if err != nil {
+		return nil, err
+	}
+	session, err := r.Cookie("session")
+	if err != nil {
+		return nil, err
+	}
+	return &pb.TestDocRequest{
+		Session: session.Value,
+		Content: body.Content,
 	}, nil
 }
 
@@ -120,4 +149,18 @@ func (s *documentsService) Execute(ctx context.Context, req *pb.ExecuteRequest) 
 		return nil, err
 	}
 	return &pb.ExecuteResponse{Executed: executed}, nil
+}
+
+func (s *documentsService) Test(ctx context.Context, req *pb.TestDocRequest) (*pb.TestDocResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, reqTimeout)
+	defer cancel()
+	username, err := s.m.Username(ctx, req.Session)
+	if err != nil {
+		return nil, err
+	}
+	executed, err := s.m.TestForUser(ctx, req.Content, username)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.TestDocResponse{Executed: executed}, nil
 }

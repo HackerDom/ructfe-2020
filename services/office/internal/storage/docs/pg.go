@@ -11,7 +11,7 @@ import (
 
 type Documents interface {
 	List(ctx context.Context, limit, offset int) ([]*pb.Document, error)
-	Insert(ctx context.Context, document *pb.Document) (int, error)
+	Insert(ctx context.Context, document *pb.Document) (int64, error)
 	Delete(ctx context.Context, docID int64) error
 	Get(ctx context.Context, name int64) (*pb.Document, error)
 }
@@ -22,7 +22,7 @@ var docsSchema = `CREATE TABLE IF NOT EXISTS documents (
 );`
 
 type doc struct {
-	Id      string `db:"id"`
+	Id      int    `db:"id"`
 	Content []byte `db:"content"`
 }
 
@@ -32,6 +32,7 @@ func (d *doc) Proto() (*pb.Document, error) {
 	if err != nil {
 		return nil, err
 	}
+	p.Id = int64(d.Id)
 	return p, nil
 }
 
@@ -64,7 +65,7 @@ func (p *pg) List(ctx context.Context, limit, offset int) ([]*pb.Document, error
 	return pdocs, nil
 }
 
-func (p *pg) Insert(ctx context.Context, document *pb.Document) (int, error) {
+func (p *pg) Insert(ctx context.Context, document *pb.Document) (int64, error) {
 	pr, err := proto.Marshal(document)
 	if err != nil {
 		return 0, err
@@ -73,12 +74,13 @@ func (p *pg) Insert(ctx context.Context, document *pb.Document) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	id := int(0)
+
+	id := 0
 	if !row.Next() {
 		return 0, fmt.Errorf("not enougth returning rows")
 	}
 	err = row.Scan(&id)
-	return id, err
+	return int64(id), err
 }
 
 func (p *pg) Delete(ctx context.Context, docID int64) error {

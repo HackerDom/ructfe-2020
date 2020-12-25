@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %} Recent documents {% endblock %}
+
+{% block page_content %}
+
+{% if docs %}
+    {% for doc in docs %}
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <h4 class="card-header">
+                    <a href="{{ url_for('doc', doc_id=doc.id) }}">{{ doc.title }}</a>
+                </h4>
+                <div class="card-body">
+                    {% if doc.is_public or current_user_id == doc.author_id %}
+                    <p>{{ doc.text | truncate(256, end='') }}
+                        {% if doc.text|length > 256 %} <strong>[...]</strong>{% endif %}</p>
+                    {% else %}
+                    <p> <em>Private document</em> </p>
+                    {% endif %}
+                    <span class="text-muted">Signed by <a href="{{ url_for('user', user_id=doc.author.id) }}">{{ doc.author.name }}</a> </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <span class="mb-4">No one has published any documents so far.</span>
+{% endif %}
+
+{% endblock %}

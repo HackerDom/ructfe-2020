@@ -32,6 +32,9 @@ namespace CarpetRadar.TrackServer
             server = new TcpListener(localAddress, port);
             server.Start();
             StartListener();
+
+            ThreadPool.GetMaxThreads(out var workerThreads, out var completionPortThreads);
+            logger.Info($"Threadpool characteristics: maxThreadsNumber={workerThreads}, maxIOThreadsNumber={completionPortThreads}");
         }
 
         public void StartListener()
@@ -40,10 +43,14 @@ namespace CarpetRadar.TrackServer
             {
                 while (true)
                 {
+                    ThreadPool.GetAvailableThreads(out var workerThreads, out var completionPortThreads);
+                    logger.Info($"Threadpool characteristics: available={workerThreads}, availableIO={completionPortThreads}");
+
                     var client = server.AcceptTcpClient();
+                    client.ReceiveTimeout = 5000;
                     logger.Info($"Connected: {client.Client.RemoteEndPoint.Serialize()}");
 
-                    new Thread(HandleDevice).Start(client);
+                    ThreadPool.QueueUserWorkItem(HandleCarpet, client);
                 }
             }
             catch (SocketException e)
@@ -53,43 +60,52 @@ namespace CarpetRadar.TrackServer
             }
         }
 
-        private async void HandleDevice(object obj)
+        private async void HandleCarpet(object obj)
         {
             var client = (TcpClient) obj;
             var stream = client.GetStream();
+            var bytes = new byte[10000];
+            int i;
             try
             {
-                var bf = new BinaryFormatter();
-                var request = (FlightState) bf.Deserialize(stream);
-
-                var userId = await authService.ResolveUser(request.Token);
-                if (userId == null)
+                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                 {
-                    stream.Send("Authentication error.");
-                    return;
-                }
+                    logger.Info($"[Thread {Thread.CurrentThread.ManagedThreadId}] read {i} bytes");
 
-                var errorMsg = await dataStorage.AddFlightState(request, userId.Value);
-                if (errorMsg != null)
-                {
-                    stream.Send(errorMsg);
-                    return;
-                }
+                    var bf = new BinaryFormatter();
+                    FlightState request;
+                    using (var m = new MemoryStream(bytes))
+                    {
+                        request = (FlightState) bf.Deserialize(m);
+                    }
 
-                var currentPositions = (await dataStorage.GetCurrentPositions()).ToArray();
+                    var userId = await authService.ResolveUser(request.Token);
+                    if (userId == null)
+                    {
+                        stream.Send("Authentication error.");
+                        return;
+                    }
 
-                using (var ms = new MemoryStream())
-                {
-                    bf.Serialize(ms, currentPositions);
-                    var array = ms.ToArray();
-                    stream.Write(array, 0, array.Length);
+                    var errorMsg = await dataStorage.AddFlightState(request, userId.Value);
+                    if (errorMsg != null)
+                    {
+                        stream.Send(errorMsg);
+                        return;
+                    }
+
+                    var currentPositions = (await dataStorage.GetCurrentPositions()).ToArray();
+
+                    using (var ms = new MemoryStream())
+                    {
+                        bf.Serialize(ms, currentPositions);
+                        ms.WriteTo(stream);
+                    }
                 }
             }
             catch (Exception e)
             {
-                logger.Warn(e, "Exception");
-                logger.Warn(e.Message);
-                logger.Warn(e.StackTrace);
+                logger.Warn($"[Thread {Thread.CurrentThread.ManagedThreadId}] Exception during handling carpet");
+                logger.Warn(e);
                 stream.TrySend("Internal error");
             }
             finally

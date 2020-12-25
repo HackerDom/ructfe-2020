@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{% block title %}Notary{% endblock title %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        * {
+            word-break: break-all;
+        }
+    </style>
+</head>
+
+<body>
+
+    {% block navbar %}
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Recently signed documents</a>
+                </li>
+                <li class="nav-item pl-2">
+                    <a class="nav-link" href="/verify">Verify a signature</a>
+                </li>
+                {% if current_user.is_authenticated %}
+                <li class="nav-item pl-2">
+                    <a class="nav-link" href="/sign">Sign a document</a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav">
+                {% if current_user.is_authenticated %}
+                <li class="nav-item navbar-text mr-3">
+                    <span style="color: #333333">Logged in as {{ current_user.username }}</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('user', user_id=current_user.id) }}">Profile</a>
+                </li>
+                <li class="nav-item pl-2">
+                    <a class="nav-link" href="/logout">Log out</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/signup">Register</a>
+                </li>
+                <li class="nav-item pl-2">
+                    <a class="nav-link" href="/login">Log in</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {%- endblock navbar %}
+
+    {% block content -%}
+    <div class="container">
+        {% if error %}
+        <div class="alert alert-danger alert-dismissible mb-4">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-info alert-dismissible mb-4">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message }}
+        </div>
+        {% endfor %}
+
+        {% block page_content %}
+        {% endblock %}
+    </div>
+    {%- endblock content %}
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

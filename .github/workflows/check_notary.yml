@@ -1,0 +1,67 @@
+
+name: Check notary
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/notary/**'
+      - 'checkers/notary/**'
+  workflow_dispatch:
+    inputs:
+      cleanup_before_deploy:
+        description: 'Stops and fully removes service (with volumes!) before deploying again. Type "yes" to do it.'
+        required: false
+        default: "no"
+
+jobs:
+  check_notary:
+    name: Check notary
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Run prebuilt hook
+      run: if [ -f services/notary/before_image_build.sh ]; then (cd ./services/notary && ./before_image_build.sh); fi
+
+    - name: Setup notary
+      run: (cd ./services/notary && docker-compose pull && docker-compose build && docker-compose up --build -d)
+
+    - name: Prepare python for checker
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8.5
+
+    - name: Setup checker libraries
+      run: if [ -f checkers/notary/requirements.txt ]; then python -m pip install -r checkers/notary/requirements.txt; fi
+
+    - name: Test checker on service
+      run: checkers/notary/checker.py TEST 127.0.0.1
+
+  update_notary:
+    name: Deploy service using ansible to first teams
+    needs: check_notary
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: install ansible
+      run: sudo apt-get install -y ansible
+
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: change permission for ssh key
+      run: chmod 0600 ./vuln_image/keys/id_rsa
+
+    - name: Run prebuilt hook
+      run: if [ -f services/notary/before_image_build.sh ]; then (cd ./services/notary && ./before_image_build.sh); fi
+
+    - name: stop notary, destroy volumes and cleanup service before fresh deploy
+      if: ${{ github.event.inputs.cleanup_before_deploy == 'yes' }}
+      run: ./vuln_image/cleanup_first_ten_teams.sh notary
+
+    - name: try to deploy notary
+      run: ./vuln_image/update_first_ten_teams.sh notary
+

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %} New document {% endblock %}
+
+{% block page_content %}
+
+<div class="row mb-4">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <h4 class="card-header">New document</h4>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <div class="form-group">
+                        <label for="title">Document title</label>
+                        <input id="title" class="form-control {{' is-invalid' if form.title.errors else ''}}"
+                               name="title" type="text" value="{{ request.form.title }}" autofocus>
+                        {% if form.title.errors %}
+                            {% for error in form.title.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="text">Document text</label>
+                        <textarea id="text" class="form-control {{' is-invalid' if form.text.errors else ''}}"
+                                  name="text">{{ request.form.text }}</textarea>
+                        {% if form.text.errors %}
+                            {% for error in form.text.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group form-check">
+                        <input id="is_public" class="form-check-input {{' is-invalid' if form.is_public.errors else ''}}"
+                               name="is_public" type="checkbox" 
+                               {% if request.form.is_public %} checked {% endif %}/>
+                        <label for="is_public" class="form-check-label">Public document</label>
+                        {% if form.is_public.errors %}
+                            {% for error in form.is_public.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    {{ form.csrf_token }}
+
+                    <button type="submit" name="submit" class="btn btn-lg btn-info btn-block">
+                        Sign and publish
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

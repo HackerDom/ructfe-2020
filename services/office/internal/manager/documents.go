@@ -13,7 +13,7 @@ type documents struct {
 	users userstorage.Users
 }
 
-func (d *documents) Create(ctx context.Context, document *pb.Document) (int, error) {
+func (d *documents) Create(ctx context.Context, document *pb.Document) (int64, error) {
 	return d.s.Insert(ctx, document)
 }
 
@@ -39,6 +39,18 @@ func (d *documents) ExecForUser(ctx context.Context, id int64, username string) 
 		return "", err
 	}
 	doc := document.FromPB(docPB)
+	users, err := d.users.List(ctx, 0, 0, true)
+	if err != nil {
+		return "", err
+	}
+	return doc.Execute(map[string]string{"username": username}, users)
+}
+
+func (d *documents) TestForUser(ctx context.Context, content string, username string) (string, error) {
+	doc, err := document.Parse("test", []byte(content))
+	if err != nil {
+		return "", err
+	}
 	users, err := d.users.List(ctx, 0, 0, true)
 	if err != nil {
 		return "", err

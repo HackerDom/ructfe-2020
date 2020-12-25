@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %} Signature verification {% endblock %}
+
+{% block page_content %}
+
+<div class="row mb-4">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <h4 class="card-header">Verify a signature</h4>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <div class="form-group">
+                        <label for="title">Document title</label>
+                        <input id="title" class="form-control {{' is-invalid' if form.title.errors else ''}}"
+                               name="title" type="text" value="{{ request.form.title }}" autofocus>
+                        {% if form.title.errors %}
+                            {% for error in form.title.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="text">Document text</label>
+                        <textarea id="text" class="form-control {{' is-invalid' if form.text.errors else ''}}"
+                                  name="text">{{ request.form.text }}</textarea>
+                        {% if form.text.errors %}
+                            {% for error in form.text.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signature">Signature</label>
+                        <textarea id="signature" class="form-control {{' is-invalid' if form.signature.errors else ''}}"
+                                  name="signature">{{ request.form.signature }}</textarea>
+                        {% if form.signature.errors %}
+                            {% for error in form.signature.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="public_key">Author's public key</label>
+                        <textarea id="public_key" class="form-control {{' is-invalid' if form.public_key.errors else ''}}"
+                                  name="public_key">{{ request.form.public_key }}</textarea>
+                        {% if form.public_key.errors %}
+                            {% for error in form.public_key.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    {{ form.csrf_token }}
+
+                    <button type="submit" name="submit" class="btn btn-lg btn-info btn-block">
+                        Verify
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
