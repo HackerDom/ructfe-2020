@@ -1,6 +1,6 @@
 import string
 from gornilo import CheckRequest, PutRequest, GetRequest
-
+import client as c
 import checker
 import random
 
@@ -17,8 +17,18 @@ code = {
     110: "CHECKER_ERROR"
 }
 
+# python checker.py test localhost
+# python checker.py check localhost
+# python checker.py put localhost aaaa:aaaa aaaaaaaabbbbbbbbaaaabbbbaaaabbb= 1
+# python checker.py get localhost vglmxskblp:zwzkvrfiac aaaaaaaabbbbbbbbaaaabbbbaaaabbb= 1
+
 if __name__ == "__main__":
-    host = "10.60.4.2"
+    host = "10.60.5.2"
+    # host = "localhost"
+
+    # client = c.Client(host, 12345, 7000)
+    # print(client.send_flight_state(32 * 'a', 100, 100, 16 * b'1', 15 * 'a', 32 * 'b', False))
+
     verdict = checker.check_service(CheckRequest(host))
     print(code[verdict._code])
 

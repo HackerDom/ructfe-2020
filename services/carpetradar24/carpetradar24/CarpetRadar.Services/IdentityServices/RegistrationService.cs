@@ -24,7 +24,7 @@ namespace CarpetRadar.Services.IdentityServices
 
         public async Task<Guid?> RegisterUser(string login, string password, string companyName)
         {
-            if (!Regex.IsMatch(login, "\\w{3,15}"))
+            if (!Regex.IsMatch(login, "^\\w{3,15}$"))
                 return null;
 
             var userId = Guid.NewGuid();

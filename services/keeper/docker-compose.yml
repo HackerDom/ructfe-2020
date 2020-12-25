@@ -1,10 +1,6 @@
 version: '2.2'
 services:
   keeper:
-    devices:
-      - /dev/fuse:/dev/fuse
-    cap_add:
-      - SYS_ADMIN
     build: .
     restart: "always"
     stop_grace_period: 1s
@@ -17,5 +13,7 @@ services:
         hard: 12000
     ports:
       - "3687:3687"
+    volumes:
+      - "./volumes/service/:/app/mount/"
   redis:
     image: "redis:alpine"
