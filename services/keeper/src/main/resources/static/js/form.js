@@ -1,13 +1,10 @@
 function normalizeForm() {
-    normalizeFormWithParams(0.03, 0.37, 0.7);
-    try {
-        moveButton();
-    } catch (e) {}
+    normalizeFormWithParams(0.5, 0.6, 0.4, 1.23);
 }
 
 
-function normalizeFormWithParams(x, y, w) {
-    let chest = $("#chest");
+function normalizeFormWithParams(x, y, w, k) {
+    let chest = $("#cont");
     let pos = chest.offset();
     let normalObj = $("#reg");
 
@@ -19,17 +16,20 @@ function normalizeFormWithParams(x, y, w) {
         left: pos.left + chest.width() * x,
         top: pos.top + chest.height() * y,
     });
+
     normalObj.width(chest.width() * w);
+
+    moveButton(k);
 }
 
 
-function moveButton() {
+function moveButton(k) {
     let actionButton = $("#act-btn");
     let pos = actionButton.offset();
     let changeButton = $("#chg-btn");
     changeButton.offset({
         top: pos.top,
-        left: pos.left + actionButton.width() * 1.15,
+        left: pos.left + actionButton.width() * k,
     });
     changeButton.on("click", function () {
         if (location.href.includes("login")) {
