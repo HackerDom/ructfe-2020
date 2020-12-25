@@ -176,8 +176,6 @@ void sign_create(sign_ptr sign, private_srcptr private, size_t data_size, const 
 }
 
 bool sign_verify(sign_srcptr sign, public_srcptr public, size_t data_size, const uint8_t *data) {
-    const unsigned long default_x = 31337, default_y = 31337;
-
     mpz_t *mpzs;
     size_t mpzs_count;
     curve_t curve;

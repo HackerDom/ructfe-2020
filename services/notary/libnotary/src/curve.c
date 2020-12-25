@@ -88,18 +88,19 @@ bool curve_is_valid(curve_srcptr curve) {
     mpz_inits(a, b, sum, NULL);
 
     // a = 4 * curve->a^3
-    mpz_pow_ui(a, curve->a, 3);
+    mpz_mul(a, curve->a, curve->a);
+    mpz_mul(a, a, curve->a);
     mpz_mul_ui(a, a, 4);
 
     // b = 27 * curve->b^2
-    mpz_pow_ui(b, curve->b, 2);
+    mpz_mul(b, curve->b, curve->b);
     mpz_mul_ui(b, b, 27);
 
     // sum = (a + b) % curve->q
     mpz_add(sum, a, b);
     mpz_mod(sum, sum, curve->q);
     
-    result = mpz_cmp_ui(sum, 0) == 0 
+    result = mpz_cmp_ui(sum, 0) != 0 
         && mpz_cmp_ui(curve->q, 2) >= 0;
 
     mpz_clears(a, b, sum, NULL);
