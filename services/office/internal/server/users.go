@@ -34,6 +34,7 @@ func (s *usersService) Mount(mux *chi.Mux) {
 			http.SetCookie(w, &http.Cookie{
 				Name:  "session",
 				Value: resp.Session,
+				Path:  "/",
 			})
 			w.WriteHeader(200)
 			return nil

@@ -60,6 +60,23 @@ class Api:
             print(e)
             return None, INVALID_FORMAT_ERR
 
+    def test_doc(self, req: pb.ExecuteRequest) -> (pb.ExecuteResponse, str):
+        try:
+            d = {
+                "content": req.content,
+            }
+            r = self.session.post(f"{self.url}/docs/test", data=json.dumps(d))
+        except Exception as e:
+            print("failed to test doc")
+            print(e)
+            return None, FAILED_TO_CONNECT
+        try:
+            return json.loads(r.text), None
+        except Exception as e:
+            print("failed to test doc")
+            print(e)
+            return None, INVALID_FORMAT_ERR
+
     def login(self, req: pb.LoginRequest) -> (pb.LoginResponse, str):
         try:
             d = MessageToJson(req)
