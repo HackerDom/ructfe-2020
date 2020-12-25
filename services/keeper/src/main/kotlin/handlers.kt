@@ -2,6 +2,10 @@ import io.javalin.Javalin
 import io.javalin.http.Context
 import kotlinx.html.*
 import java.io.File
+import kotlin.math.min
+
+const val MAX_FILE_SIZE = 10240
+const val MAX_FILE_COUNT_IN_RESPONSE = 1024
 
 
 fun App.getAuthenticatedUser(ctx: Context): String? {
@@ -43,6 +47,7 @@ fun App.addFilesHandler(): Javalin = javalin.get("/files/*") { ctx ->
 
     val file = authenticatedUserDir.resolve(lastPath)
     if (!file.exists()) {
+        ctx.result("File already exists")
         ctx.status(400)
         return@get
     }
@@ -53,7 +58,11 @@ fun App.addFilesHandler(): Javalin = javalin.get("/files/*") { ctx ->
     }
 
     if (file.isDirectory) {
-        ctx.json((file.list() ?: emptyArray()) as Array<String>)
+        val offset = maxOf(ctx.queryParam("offset")?.toIntOrNull() ?: 0, 0)
+        val result = (file.list() ?: emptyArray()) as Array<String>
+        val left = min(result.size, offset)
+        val right = min(result.size, offset + MAX_FILE_COUNT_IN_RESPONSE)
+        ctx.json(result.sliceArray(left until right))
         return@get
     }
 }
@@ -64,6 +73,7 @@ fun App.addUploadFilesHandler(): Javalin = javalin.post("/files/*") { ctx ->
     val newFile = try {
         ctx.uploadedFile("file") ?: return@post
     } catch (e: IllegalStateException) {
+        ctx.result("Invalid uploading format")
         ctx.status(400)
         return@post
     }
@@ -72,10 +82,16 @@ fun App.addUploadFilesHandler(): Javalin = javalin.post("/files/*") { ctx ->
 
     val file = authenticatedUserDir.resolve(lastPath)
     if (file.exists()) {
+        ctx.result("File already exists")
         ctx.status(400)
         return@post
     }
 
+    if (newFile.size > MAX_FILE_SIZE) {
+        ctx.result("File is too big")
+        ctx.status(400)
+        return@post
+    }
     file.writeBytes(newFile.content.readAllBytes())
 }
 
