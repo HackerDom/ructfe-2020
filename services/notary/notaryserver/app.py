@@ -12,7 +12,7 @@ from notary import Notary, pack_document
 
 
 DB_URI = os.getenv('DATABASE_URI')
-SECRET_KEY_PATH = 'secret.key'
+SECRET_KEY_PATH = '/tmp/secret.key'
 
 login_manager = LoginManager()
 
