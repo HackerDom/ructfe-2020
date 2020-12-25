@@ -59,7 +59,7 @@ jobs:
       run: if [ -f services/carpetradar24/before_image_build.sh ]; then (cd ./services/carpetradar24 && ./before_image_build.sh); fi
 
     - name: stop carpetradar24, destroy volumes and cleanup service before fresh deploy
-      if: ${{ github.event.inputs.cleanup_before_deploy == "yes" }}
+      if: ${{ github.event.inputs.cleanup_before_deploy == 'yes' }}
       run: ./vuln_image/cleanup_first_ten_teams.sh
 
     - name: try to deploy carpetradar24
