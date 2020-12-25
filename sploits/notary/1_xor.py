@@ -87,7 +87,7 @@ def download_document(url, document_url):
     html = session.get(url + document_url).text
     csrf_token = re.search(r'<input id="csrf_token" name="csrf_token" type="hidden" value="(.*?)">', html).group(1)
     
-    document_id = int(document_url[len('/doc/'):])
+    document_id = document_url[len('/doc/'):]
     public_key = notary.deserialize_bytes(public_key)
 
     password = generate_password(public_key, document_id)
