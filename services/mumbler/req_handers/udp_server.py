@@ -5,6 +5,7 @@ import uuid
 import time
 import socket
 import threading
+import multiprocessing
 import sys
 
 allowed_key_name = re.compile(r"^[A-Za-z0-9=-]{1,60}$")
@@ -14,7 +15,7 @@ class UDPReceiver:
     udp_max_size = 8192
 
     def __init__(self):
-        self.max_ports_size = 1000
+        self.max_ports_size = 12000
         self.listeners = dict()
         self.lock = threading.Lock()
         threading.Thread(target=self.log_status).start()
@@ -27,23 +28,28 @@ class UDPReceiver:
             print >> sys.stderr, "Amount of working threads: {}"\
                 .format(threading.active_count())
 
-    def add_listener(self, buf_size, port):
+    def add_listener(self, data):
         with self.lock:
             if len(self.listeners) >= self.max_ports_size:
                 raise ValueError("too much listeners")
             lst_id = uuid.uuid4()
-            t = threading.Thread(target=self.__create_listener, args=(port, lst_id, buf_size))
-            self.listeners[lst_id] = t
-            t.start()
 
-    def __create_listener(self, port, lst_id, buf_size):
-        try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.settimeout(5)
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.bind(("0.0.0.0", port))
-            print >> sys.stderr, "opened socket at {}".format(port)
-            arr = bytearray(min(self.udp_max_size, buf_size))
+            sock.bind(("0.0.0.0", 0))
+            current_port = sock.getsockname()[1]
+
+            print >> sys.stderr, "opened socket at {}".format(current_port)
+
+            t = threading.Thread(target=self.__create_listener, args=(sock, current_port, lst_id, data))
+            self.listeners[lst_id] = t
+            t.start()
+            return current_port
+
+    def __create_listener(self, sock, port, lst_id, ds):
+        try:
+            arr = bytearray(min(self.udp_max_size, ds))
             _, __ = sock.recvfrom_into(arr, self.udp_max_size)
             self.__handle(arr)
         finally:

@@ -223,7 +223,7 @@ teams: |
 
 services: |
   {name => 'sesame',        path => 'checkers/sesame/checker.py',        timeout => 30, tcp_port => 4280},
-  {name => 'office',        path => 'checkers/office/checker.py',        timeout => 30, tcp_port => 8080},
+  {name => 'scrolls',        path => 'checkers/scrolls/checker.py',        timeout => 30, tcp_port => 8080},
   {name => 'keeper',        path => 'checkers/keeper/checker.py',        timeout => 30, tcp_port => 3687},
   {name => 'mudarabah',     path => 'checkers/mudarabah/checker.py',     timeout => 30, tcp_port => 3113},
   {name => 'carpetradar24', path => 'checkers/carpetradar24/checker.py', timeout => 30, tcp_port => 7000},

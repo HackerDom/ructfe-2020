@@ -79,7 +79,9 @@ fun App.addUploadFilesHandler(): Javalin = javalin.post("/files/*") { ctx ->
         return@post
     }
 
-    val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length).split("/").singleOrNull() ?: run {
+    val lastPath = ctx.path().substring(OtherConstants.FILES_PATH.length)
+
+    if ("/" in lastPath && !authenticatedUserDir.resolve(File(lastPath).parentFile).exists()) {
         ctx.result("Incorrect path")
         ctx.status(400)
         return@post
@@ -118,9 +120,10 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
         ctx.redirect("/register_page")
         return@get
     }
-
+    ctx.res.characterEncoding = "utf-8"
     ctx.withHtml {
         head {
+            meta { content = "text/html; charset=utf-8" }
             script {
                 unsafe {
                     +"let path = [];"
@@ -128,11 +131,11 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
                     +"let cmd_prompt = \"$authenticatedUser@keeper:~ \";"
                 }
             }
-            script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
-            script(null, "https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.20.1/js/jquery.terminal.min.js") {}
+            script(null, "/js/jquery-3.2.1.min.js") {}
+            script(null, "/js/jquery.terminal.min.js") {}
             script(null, "/js/main.js") {}
             link(
-                href = "https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.20.1/css/jquery.terminal.min.css",
+                href = "/css/jquery.terminal.min.css",
                 rel = "stylesheet"
             )
             link(href = "/css/main.css", rel = "stylesheet")
@@ -152,11 +155,11 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
 fun FlowOrInteractiveOrPhrasingContent.loginAndPassword() {
     label { text("Login") }
     br
-    input(type = InputType.text, name = "login", classes = "text-field")
+    input(type = InputType.text, name = "login", classes = "text-field") { id = "lgn-fld" }
     br
     label { text("Password") }
     br
-    input(type = InputType.password, name = "password", classes = "text-field")
+    input(type = InputType.password, name = "password", classes = "text-field") { id = "psw-fld" }
     br
 }
 
@@ -166,24 +169,30 @@ fun App.addRegisterPageHandler(): Javalin = javalin.get(Endpoints.REGISTER_PAGE)
         ctx.redirect("/")
         return@get
     }
-
+    ctx.res.characterEncoding = "utf-8"
     ctx.withHtml {
         head {
-            script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
+            meta { content = "text/html; charset=utf-8" }
+            script(null, "/js/jquery-3.2.1.min.js") {}
             script(null, "/js/form.js") {}
             link(href = "/css/main.css", rel = "stylesheet")
         }
         body {
             div {
                 div {
-                    img(src = "/images/chest.png", classes = "center") {
-                        id = "chest"
-                        width = "40%"
-                    }
+                        div(classes = "center") {
+                            id = "cont"
+                            style = "text-align: center; color: #e04e00;"
+                            pre {
+                                id = "pre"
+                                +chest
+                            }
+                        }
                 }
                 div {
                     id = "reg"
                     form(action = Endpoints.REGISTER, method = FormMethod.post) {
+                        id = "reg-form"
                         loginAndPassword()
                         button {
                             id = "act-btn"
@@ -243,23 +252,30 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
         return@get
     }
 
+    ctx.res.characterEncoding = "utf-8"
     ctx.withHtml {
         head {
-            script(null, "https://code.jquery.com/jquery-3.2.1.min.js") {}
+            meta { content = "text/html; charset=utf-8" }
+            script(null, "/js/jquery-3.2.1.min.js") {}
             script(null, "/js/form.js") {}
             link(href = "/css/main.css", rel = "stylesheet")
         }
         body {
             div {
                 div {
-                    img(src = "/images/chest.png", classes = "center") {
-                        id = "chest"
-                        width = "40%"
+                    div(classes = "center") {
+                        id = "cont"
+                        style = "text-align: center; color: #e04e00;"
+                        pre {
+                            id = "pre"
+                            +chest
+                        }
                     }
                 }
                 div {
                     id = "reg"
                     form(action = Endpoints.LOGIN, method = FormMethod.post) {
+                        id = "reg-form"
                         loginAndPassword()
                         button {
                             id = "act-btn"
@@ -278,14 +294,21 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
 }
 
 
-fun App.addSandboxHandler(): Javalin = javalin.get("/sandbox") { ctx ->
+fun App.addCoolChestHandler(): Javalin = javalin.get("/chest") { ctx ->
+    ctx.res.characterEncoding = "utf-8"
     ctx.withHtml {
+        head {
+            meta { content = "text/html; charset=utf-8" }
+            script(null, "/js/jquery-3.2.1.min.js") {}
+            script(null, "/js/form.js") {}
+        }
         body {
             style = "background-color: black;"
-
             div {
-                img(src = "/images/chest.png", classes = "center") {
-                    width = "40%"
+                style = "text-align: center; color: #e04e00;"
+                pre {
+                    id = "pre"
+                    +chest
                 }
             }
         }
@@ -310,6 +333,33 @@ fun App.addLoginHandler(): Javalin = javalin.post(Endpoints.LOGIN) { ctx ->
     } else {
         ctx.status(403)
     }
+}
+
+
+fun App.addCheckPairHandler(): Javalin = javalin.get(Endpoints.CHECK_PAIR) { ctx ->
+    val login = ctx.queryParam("login") ?: run {
+        ctx.result("Login query parameter is required")
+        ctx.status(400)
+        return@get
+    }
+    val password = ctx.queryParam("password") ?: run {
+        ctx.result("Password query parameter is required")
+        ctx.status(400)
+        return@get
+    }
+
+    ctx.result(userStorage.isValid(login, password).toString())
+}
+
+
+fun App.addIsLoginExistsHandler(): Javalin = javalin.get(Endpoints.IS_LOGIN_EXISTS) { ctx ->
+    val login = ctx.queryParam("login") ?: run {
+        ctx.result("Login query parameter is required")
+        ctx.status(400)
+        return@get
+    }
+
+    ctx.result(userStorage.exists(login).toString())
 }
 
 

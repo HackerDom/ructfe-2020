@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import os
-import sys
 import time
 import datetime
 
@@ -17,7 +16,7 @@ def clean_db(database_uri, table_names, interval):
         cursor.execute(query)
 
         count = len(cursor.fetchall())
-        print(f"DELETED {count} ROWS FROM '{table_name}' TABLE", file=sys.stderr)
+        print(f"DELETED {count} ROWS FROM '{table_name}' TABLE")
 
     connection.commit()
 
@@ -30,8 +29,8 @@ def main():
     time.sleep(10)
 
     table_names = [
-        'public.Document',
         'public.User', 
+        'public.Document',
     ]
 
     while True:

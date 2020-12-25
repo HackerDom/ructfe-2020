@@ -4,6 +4,7 @@ import (
 	"github.com/HackerDom/ructfe2020/internal/manager"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 	"time"
 
 	"fmt"
@@ -50,6 +51,7 @@ func (s *server) Register(mux *chi.Mux) {
 	mux.Use(middleware.RealIP)
 	mux.Use(middleware.Logger)
 	mux.Use(middleware.Recoverer)
+	mux.Use(cors.AllowAll().Handler)
 	if s.debug {
 		mux.Mount("/debug", middleware.Profiler())
 	}

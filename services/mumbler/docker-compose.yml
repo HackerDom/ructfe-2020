@@ -5,15 +5,13 @@ services:
     mem_limit: 1G
     memswap_limit: 1G
     pids_limit: 20
+    network_mode: host
 
     ulimits:
       nofile:
-        soft: 12000
-        hard: 12000
+        soft: 15000
+        hard: 15000
 
-    ports:
-     - "7124:7124"
-     - "30000-31000:30000-31000/udp"
     volumes:
       - ./storage:/app/storage
     restart: always

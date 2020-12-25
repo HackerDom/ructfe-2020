@@ -2,7 +2,7 @@
 
 SERVICES = [
   'sesame',
-  'office',
+  'scrolls',
   'keeper',
   'mudarabah',
   'carpetradar24',

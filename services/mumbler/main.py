@@ -60,11 +60,10 @@ def get_data(key):
         return make_response("something happened", 400)
 
 
-@app.route("/open/<size>")
-def open_receiver(size):
+@app.route("/open/<data>")
+def open_receiver(data):
     try:
-        port = random.randint(0, 1000) + 30000
-        udp.add_listener(abs(int(size)), port)
+        port = udp.add_listener(abs(int(data)))
         return make_response(str(port), 200)
     except:
         return make_response("something bad happened", 500)
