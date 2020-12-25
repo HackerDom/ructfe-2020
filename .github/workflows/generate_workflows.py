@@ -6,7 +6,8 @@ SERVICES = [
   'keeper',
   'mudarabah',
   'carpetradar24',
-  'mumbler'
+  'mumbler',
+  'notary',
 ]
 
 
@@ -19,7 +20,12 @@ on:
     paths:
       - 'services/{service}/**'
       - 'checkers/{service}/**'
-  workflow_dispatch: {{}}
+  workflow_dispatch:
+    inputs:
+      cleanup_before_deploy:
+        description: 'Stops and fully removes service (with volumes!) before deploying again.'
+        required: false
+        default: false
 
 jobs:
   check_{service}:
@@ -64,6 +70,10 @@ jobs:
 
     - name: Run prebuilt hook
       run: if [ -f services/{service}/before_image_build.sh ]; then (cd ./services/{service} && ./before_image_build.sh); fi
+
+    - name: stop {service}, destroy volumes and cleanup service before fresh deploy
+      if: ${{{{ github.event.inputs.cleanup_before_deploy }}}}
+      run: ./vuln_image/cleanup_first_ten_teams.sh
 
     - name: try to deploy {service}
       run: ./vuln_image/update_first_ten_teams.sh {service}
