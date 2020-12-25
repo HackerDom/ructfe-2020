@@ -8,4 +8,4 @@ printf " * Monitor:                https://monitor.ructfe.org (for oldfags: http
 printf " * Flags:                  read https://ructfe.org/http-flags, send to http://10.10.10.10/flags\n"
 printf "\n"
 
-TERM=xterm-256color tput setaf 255
+TERM=xterm-256color tput setaf 7
