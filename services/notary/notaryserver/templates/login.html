@@ -23,8 +23,8 @@
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input id="password" class="form-control {{' is-invalid' if form.password.errors else ''}}"
-                               name="password" type="password" value="{{ request.form.password }}">
+                        <textarea id="password" class="form-control {{' is-invalid' if form.password.errors else ''}}"
+                                  name="password">{{ request.form.password }}</textarea>
                         {% if form.password.errors %}
                             {% for error in form.password.errors %}
                                 <div class="invalid-feedback">{{ error }}</div>
