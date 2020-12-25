@@ -224,7 +224,7 @@ bool process_request(char *request, char *response, uint64 *response_length)
 			store_item(key, secret.data);
 			break;
 		}
-		fprintf(stderr, "Sending key: %s for secret: %s, i = %d\n", key, secret.data, i);
+		// fprintf(stderr, "Sending key: %s for secret: %s, i = %d\n", key, secret.data, i);
 
 		render_page(page, key, secret.data);
 		redirect(response, response_length, key);
