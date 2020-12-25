@@ -115,15 +115,7 @@ fun App.addMainHandler(): Javalin = javalin.get("/main") { ctx ->
     val authenticatedUser = getAuthenticatedUser(ctx)
 
     if (authenticatedUser == null) {
-        ctx.withHtml {
-            body {
-                p {
-                    +"You need to authorize "
-                    a(Endpoints.REGISTER_PAGE) { +"here" }
-                }
-            }
-        }
-        ctx.contentType("text/html")
+        ctx.redirect("/register_page")
         return@get
     }
 
@@ -183,8 +175,6 @@ fun App.addRegisterPageHandler(): Javalin = javalin.get(Endpoints.REGISTER_PAGE)
         }
         body {
             div {
-                id = "all"
-
                 div {
                     img(src = "/images/chest.png", classes = "center") {
                         id = "chest"
@@ -261,8 +251,6 @@ fun App.addLoginPageHandler(): Javalin = javalin.get(Endpoints.LOGIN_PAGE) { ctx
         }
         body {
             div {
-                id = "all"
-
                 div {
                     img(src = "/images/chest.png", classes = "center") {
                         id = "chest"

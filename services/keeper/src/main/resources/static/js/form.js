@@ -1,18 +1,25 @@
 function normalizeForm() {
     normalizeFormWithParams(0.03, 0.37, 0.7);
-    moveButton();
+    try {
+        moveButton();
+    } catch (e) {}
 }
 
 
 function normalizeFormWithParams(x, y, w) {
     let chest = $("#chest");
     let pos = chest.offset();
-    let reg = $("#reg");
-    reg.offset({
+    let normalObj = $("#reg");
+
+    if (normalObj.length === 0) {
+        return ;
+    }
+
+    normalObj.offset({
         left: pos.left + chest.width() * x,
         top: pos.top + chest.height() * y,
     });
-    reg.width(chest.width() * w);
+    normalObj.width(chest.width() * w);
 }
 
 
@@ -36,7 +43,6 @@ function moveButton() {
 
 function main() {
     normalizeForm();
-    moveButton();
 }
 
 
