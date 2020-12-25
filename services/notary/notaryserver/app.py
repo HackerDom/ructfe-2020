@@ -8,7 +8,7 @@ from sqlalchemy.sql.expression import exists
 
 from forms import DocumentForm, LoginForm, RegisterForm, SignForm, VerifyForm
 from models import db, Document, User
-from notary import Notary
+from notary import Notary, pack_document
 
 
 DB_URI = os.getenv('DATABASE_URI')
@@ -180,7 +180,9 @@ def verify():
     error = None
     
     if request.method == 'POST' and form.validate_on_submit():
-        if Notary.verify(form.public_key.data, form.title.data, form.text.data, form.signature.data):
+        document = pack_document(form.title.data, form.text.data)
+        
+        if Notary.verify(form.public_key.data, document, form.signature.data):
             flash('The signature is valid')
         else:
             error = 'The signature is invalid'

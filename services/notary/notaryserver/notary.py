@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import base64
+import msgpack
 
 import libnotary
 
@@ -17,7 +18,20 @@ def deserialize_bytes(string):
 
 
 def pack_document(title, text):
-    return title + '|' + text.replace('|', '\\|')
+    document = {
+        'title': title,
+        'text': text
+    }
+
+    return msgpack.dumps(document)
+
+
+def load_document(document_data):
+    try:
+        document = msgpack.loads(document_data)
+        return document['title'], document['text']
+    except (ValueError, KeyError):
+        raise ValueError('Failed to load document')
 
 
 class Notary:
@@ -40,12 +54,8 @@ class Notary:
         return serialize_bytes(public_key)
 
     @staticmethod
-    def sign(private_key, title, text):
-        document = pack_document(title, text)
-        
-        signature = libnotary.sign(
-            deserialize_bytes(private_key),
-            document.encode('utf-8'))
+    def sign(private_key, document):
+        signature = libnotary.sign(deserialize_bytes(private_key), document)
         
         if signature is None:
             raise ValueError('Invalid private key')
@@ -53,18 +63,14 @@ class Notary:
         return serialize_bytes(signature)
 
     @staticmethod
-    def verify(public_key, title, text, signature):
+    def verify(public_key, document, signature):
         try:
             public_key = deserialize_bytes(public_key)
             signature = deserialize_bytes(signature)
         except ValueError:
             return False  # Garbage input
-        
-        document = pack_document(title, text)
-        result = libnotary.verify(
-            public_key, 
-            document.encode('utf-8'), 
-            signature)
+
+        result = libnotary.verify(public_key, document, signature)
         
         if result is None:
             return False  # The public key is invalid, makes sense to return False

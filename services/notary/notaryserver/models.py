@@ -2,7 +2,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 
-from notary import Notary, serialize_bytes, deserialize_bytes, pack_document
+from notary import Notary, pack_document, load_document, serialize_bytes, deserialize_bytes
 
 
 db = SQLAlchemy()
@@ -39,10 +39,10 @@ class User(db.Model):
         return self.id
 
     def generate_password(self):
-        return Notary.sign(self.private_key, 'user', self.username)
+        return Notary.sign(self.private_key, self.username.encode('utf-8'))
 
     def verify_password(self, password):
-        return Notary.verify(self.public_key, 'user', self.username, password)
+        return Notary.verify(self.public_key, self.username.encode('utf-8'), password)
 
     def __repr__(self):
         return f'<User {self.username} (id={self.id})>'
@@ -60,30 +60,27 @@ class Document(db.Model):
         self.author_id = author.id
         self.title = title
         self.text = text
-        self.signature = Notary.sign(author.private_key, title, text)
         self.is_public = is_public
+        self.signature = Notary.sign(author.private_key, pack_document(title, text))
 
     def generate_password(self):
-        doc = pack_document('document_id', str(self.id))
-        doc_data = serialize_bytes(doc.encode('utf-8'))
+        document = pack_document('document_id', str(self.id))
+        signature = Notary.sign(self.author.private_key, document)
         
-        signature = Notary.sign(self.author.private_key, 'password', doc_data)
-        
-        return f'{doc_data}.{signature}'
+        return f'{serialize_bytes(document)}.{signature}'
 
     def verify_password(self, password):
         try:
-            doc_data, signature = password.split('.')
-            doc = deserialize_bytes(doc_data.encode('utf-8')).decode('utf-8')
+            document_data, signature = password.split('.')
+            document = deserialize_bytes(document_data)
+            title, text = load_document(document)
         except ValueError:
             return False
         
-        if not Notary.verify(self.author.public_key, 'password', doc_data, signature):
+        if not Notary.verify(self.author.public_key, document, signature):
             return False
-        
-        expected = pack_document('document_id', str(self.id))
 
-        return doc == expected
+        return title == 'document_id' and text == str(self.id)
 
     def __repr__(self):
         return f'<Document #{self.id} by {self.author.username} (author_id={self.author_id})>'
