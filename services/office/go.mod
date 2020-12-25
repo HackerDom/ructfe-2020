@@ -3,8 +3,8 @@ module github.com/HackerDom/ructfe2020
 go 1.15
 
 require (
-	github.com/Masterminds/squirrel v1.5.0
 	github.com/go-chi/chi v1.5.0
+	github.com/go-chi/cors v1.1.1
 	github.com/golang/protobuf v1.4.3
 	github.com/google/cel-go v0.6.0
 	github.com/jackc/pgx/v4 v4.10.0

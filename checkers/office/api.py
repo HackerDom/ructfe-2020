@@ -15,7 +15,7 @@ class Api:
     def create_doc(self, req: pb.CreateDocumentRequest) -> (pb.CreateDocumentResponse, str):
         try:
             d = MessageToJson(req)
-            r = self.session.post(f"{self.url}/docs/create", data=d)
+            r = self.session.post(f"{self.url}/api/docs/create", data=d)
         except Exception as e:
             print("failed to create doc")
             print(e)
@@ -30,7 +30,7 @@ class Api:
     def list_doc(self, req: pb.ListDocumentsRequest) -> (pb.ListDocumentsResponse, str):
         try:
             d = MessageToJson(req)
-            r = self.session.post(f"{self.url}/docs/list", data=d)
+            r = self.session.post(f"{self.url}/api/docs/list", data=d)
         except Exception as e:
             print("failed to list docs")
             print(e)
@@ -48,7 +48,7 @@ class Api:
                 "doc_id": int(req.doc_id),
                 "token": req.token,
             }
-            r = self.session.post(f"{self.url}/docs/execute", data=json.dumps(d))
+            r = self.session.post(f"{self.url}/api/docs/execute", data=json.dumps(d))
         except Exception as e:
             print("failed to execute doc")
             print(e)
@@ -65,7 +65,7 @@ class Api:
             d = {
                 "content": req.content,
             }
-            r = self.session.post(f"{self.url}/docs/test", data=json.dumps(d))
+            r = self.session.post(f"{self.url}/api/docs/test", data=json.dumps(d))
         except Exception as e:
             print("failed to test doc")
             print(e)
@@ -80,7 +80,7 @@ class Api:
     def login(self, req: pb.LoginRequest) -> (pb.LoginResponse, str):
         try:
             d = MessageToJson(req)
-            r = self.session.post(f"{self.url}/users/login", data=d)
+            r = self.session.post(f"{self.url}/api/users/login", data=d)
         except Exception as e:
             print("failed to login doc")
             print(e)
@@ -95,7 +95,7 @@ class Api:
     def register(self, req: pb.RegisterRequest) -> (pb.RegisterResponse, str):
         try:
             d = MessageToJson(req)
-            r = self.session.post(f"{self.url}/users/register", data=d)
+            r = self.session.post(f"{self.url}/api/users/register", data=d)
         except Exception as e:
             print("failed to register doc")
             print(e)
@@ -110,7 +110,7 @@ class Api:
     def list_users(self, req: pb.ListRequest) -> (pb.ListResponse, str):
         try:
             d = MessageToJson(req)
-            r = self.session.post(f"{self.url}/users/list", data=d)
+            r = self.session.post(f"{self.url}/api/users/list", data=d)
         except Exception as e:
             print("failed to list users")
             print(e)
