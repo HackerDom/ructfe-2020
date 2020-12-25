@@ -4,4 +4,4 @@ set -e
 mkdir -p /app/data/
 chown -R sesame:sesame /app/data/
 
-su sesame -s /app/sesame
+su sesame -s /app/sesame 2>/app/log
