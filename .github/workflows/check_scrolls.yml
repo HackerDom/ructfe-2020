@@ -1,12 +1,12 @@
 
-name: Check office
+name: Check scrolls
 on:
   push:
     branches:
       - main
     paths:
-      - 'services/office/**'
-      - 'checkers/office/**'
+      - 'services/scrolls/**'
+      - 'checkers/scrolls/**'
   workflow_dispatch:
     inputs:
       cleanup_before_deploy:
@@ -15,8 +15,8 @@ on:
         default: "no"
 
 jobs:
-  check_office:
-    name: Check office
+  check_scrolls:
+    name: Check scrolls
     runs-on: ubuntu-18.04
 
     steps:
@@ -24,10 +24,10 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Run prebuilt hook
-      run: if [ -f services/office/before_image_build.sh ]; then (cd ./services/office && ./before_image_build.sh); fi
+      run: if [ -f services/scrolls/before_image_build.sh ]; then (cd ./services/scrolls && ./before_image_build.sh); fi
 
-    - name: Setup office
-      run: (cd ./services/office && docker-compose pull && docker-compose build && docker-compose up --build -d)
+    - name: Setup scrolls
+      run: (cd ./services/scrolls && docker-compose pull && docker-compose build && docker-compose up --build -d)
 
     - name: Prepare python for checker
       uses: actions/setup-python@v2
@@ -35,14 +35,14 @@ jobs:
         python-version: 3.8.5
 
     - name: Setup checker libraries
-      run: if [ -f checkers/office/requirements.txt ]; then python -m pip install -r checkers/office/requirements.txt; fi
+      run: if [ -f checkers/scrolls/requirements.txt ]; then python -m pip install -r checkers/scrolls/requirements.txt; fi
 
     - name: Test checker on service
-      run: checkers/office/checker.py TEST 127.0.0.1
+      run: checkers/scrolls/checker.py TEST 127.0.0.1
 
-  update_office:
+  update_scrolls:
     name: Deploy service using ansible to first teams
-    needs: check_office
+    needs: check_scrolls
     runs-on: ubuntu-18.04
 
     steps:
@@ -56,12 +56,12 @@ jobs:
       run: chmod 0600 ./vuln_image/keys/id_rsa
 
     - name: Run prebuilt hook
-      run: if [ -f services/office/before_image_build.sh ]; then (cd ./services/office && ./before_image_build.sh); fi
+      run: if [ -f services/scrolls/before_image_build.sh ]; then (cd ./services/scrolls && ./before_image_build.sh); fi
 
-    - name: stop office, destroy volumes and cleanup service before fresh deploy
+    - name: stop scrolls, destroy volumes and cleanup service before fresh deploy
       if: ${{ github.event.inputs.cleanup_before_deploy == 'yes' }}
-      run: ./vuln_image/cleanup_first_ten_teams.sh office
+      run: ./vuln_image/cleanup_first_ten_teams.sh scrolls
 
-    - name: try to deploy office
-      run: ./vuln_image/update_first_ten_teams.sh office
+    - name: try to deploy scrolls
+      run: ./vuln_image/update_first_ten_teams.sh scrolls
 
