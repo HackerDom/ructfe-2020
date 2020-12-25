@@ -23,9 +23,9 @@ on:
   workflow_dispatch:
     inputs:
       cleanup_before_deploy:
-        description: 'Stops and fully removes service (with volumes!) before deploying again.'
+        description: 'Stops and fully removes service (with volumes!) before deploying again. Type "yes" to do it.'
         required: false
-        default: false
+        default: "no"
 
 jobs:
   check_{service}:
@@ -72,8 +72,8 @@ jobs:
       run: if [ -f services/{service}/before_image_build.sh ]; then (cd ./services/{service} && ./before_image_build.sh); fi
 
     - name: stop {service}, destroy volumes and cleanup service before fresh deploy
-      if: ${{{{ github.event.inputs.cleanup_before_deploy }}}}
-      run: ./vuln_image/cleanup_first_ten_teams.sh
+      if: ${{{{ github.event.inputs.cleanup_before_deploy == 'yes' }}}}
+      run: ./vuln_image/cleanup_first_ten_teams.sh {service}
 
     - name: try to deploy {service}
       run: ./vuln_image/update_first_ten_teams.sh {service}

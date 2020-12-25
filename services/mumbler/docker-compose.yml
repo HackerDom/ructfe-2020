@@ -16,4 +16,5 @@ services:
      - "30000-31000:30000-31000/udp"
     volumes:
       - ./storage:/app/storage
-    restart: unless-stopped
+    restart: always
+    stop_grace_period: 10s

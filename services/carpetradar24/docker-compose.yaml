@@ -13,6 +13,11 @@ services:
     pids_limit: 100
     mem_limit: 1G
     memswap_limit: 1G
+    ulimits:
+      nofile:
+        soft: 12000
+        hard: 12000
+    stop_grace_period: 10s
 
   web:
     build:
@@ -26,6 +31,11 @@ services:
     pids_limit: 100
     mem_limit: 1G
     memswap_limit: 1G
+    ulimits:
+      nofile:
+        soft: 12000
+        hard: 12000
+    stop_grace_period: 10s
 
   cassandra:
     image: cassandra:3.11.9
@@ -36,5 +46,10 @@ services:
     volumes:
       - ./data:/var/lib/cassandra
     pids_limit: 200
-    mem_limit: 2G
-    memswap_limit: 2G
+    mem_limit: 1G
+    memswap_limit: 1G
+    ulimits:
+      nofile:
+        soft: 12000
+        hard: 12000
+    stop_grace_period: 10s

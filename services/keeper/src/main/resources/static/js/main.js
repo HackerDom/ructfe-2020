@@ -52,16 +52,6 @@ function buildPrompt() {
 }
 
 
-// function getCommandArgs(parts, cmd) {
-//     if (parts.length === 0) {
-//         return null
-//     }
-//     if (parts[0] === cmd) {
-//         return parts
-//     }
-// }
-
-
 function processLS(args, term) {
     listFiles().forEach(function (name) {
         term.echo(name);
@@ -132,6 +122,34 @@ function processUpload(args, term) {
 }
 
 
+function processMkdir(args, term) {
+    if (args.length === 0 || args[0].length === 0) {
+        term.echo("Pass one argument as directory name to create");
+        return;
+    }
+    let newDirName = args[0];
+    let formData = new FormData();
+    fetch(buildFileUrl(newDirName), {method: "POST", body: formData});
+}
+
+
+function clearCookies() {
+    let cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i];
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
+}
+
+
+function processLogout(args, term) {
+    clearCookies();
+    location.reload();
+}
+
+
 const processors = {
     'ls': processLS,
     'cd': processCD,
@@ -139,6 +157,8 @@ const processors = {
     'pwd': processPWD,
     'download': processDownload,
     'upload': processUpload,
+    'mkdir': processMkdir,
+    'logout': processLogout,
 };
 
 

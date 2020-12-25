@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %} Document #{{ doc.id }} {% endblock %}
+
+{% block page_content %}
+
+<div class="row mb-4">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <h4 class="card-header">
+                <a href="{{ url_for('doc', doc_id=doc.id) }}">{{ doc.title }}</a>
+            </h4>
+            <div class="card-body">
+                {% if visible %}
+                <p> {{ doc.text }} </p>
+                {% else %}
+                <p> <em>Sorry, the document text is private.</em> </p>
+                <form method="POST" action="">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <textarea id="password" class="form-control {{' is-invalid' if form.password.errors else ''}}"
+                                  name="password">{{ request.form.password }}</textarea>
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    {{ form.csrf_token }}
+
+                    <button type="submit" name="submit" class="btn btn-lg btn-info btn-block">
+                        View
+                    </button>
+                </form>
+                {% endif %}
+                <hr/>
+                <p>Signed by <a href="{{ url_for('user', user_id=doc.author.id) }}">{{ doc.author.name }}</a> </p>
+                {% if visible %}
+                <p>Document signature: <code>{{ doc.signature }}</code> </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

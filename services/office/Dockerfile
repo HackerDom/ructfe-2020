@@ -1,16 +1,17 @@
-FROM golang:1.15.6-alpine3.12
+FROM golang:1.15.6-alpine3.12 as build-env
 
-ENV GO111MODULE=on
-
-RUN mkdir /app
+RUN mkdir -p /app/
 WORKDIR /app/
 
-# cache modules
-COPY go.mod .
-COPY go.sum .
-RUN go mod download
+ENV GO111MODULE=on
+ENV CGO_ENABLED=0
 
 COPY . .
 
-RUN CGOENABLED=0 go build -o service ./cmd
-CMD ["/app/service"]
+# cache modules
+RUN go build -o service ./cmd
+
+# minify image
+FROM scratch
+COPY --from=build-env /app/service /app/service
+ENTRYPOINT ["/app/service"]

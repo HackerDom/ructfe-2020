@@ -1,0 +1,5 @@
+bs4
+faker
+gornilo
+lxml
+requests

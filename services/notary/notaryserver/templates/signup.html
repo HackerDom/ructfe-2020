@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %} Registration {% endblock %}
+
+{% block page_content %}
+
+<div class="row mb-4">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <h4 class="card-header">Registration</h4>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input id="username" class="form-control {{' is-invalid' if form.username.errors else ''}}"
+                               name="username" type="text" value="{{ request.form.username }}" autofocus>
+                        {% if form.username.errors %}
+                            {% for error in form.username.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="name">Legal name</label>
+                        <input id="name" class="form-control {{' is-invalid' if form.name.errors else ''}}"
+                               name="name" type="text" value="{{ request.form.name }}" autofocus>
+                        {% if form.name.errors %}
+                            {% for error in form.name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Your phone</label>
+                        <input id="phone" class="form-control {{' is-invalid' if form.phone.errors else ''}}"
+                               name="phone" type="text" value="{{ request.form.phone }}">
+                        {% if form.phone.errors %}
+                            {% for error in form.phone.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Your address</label>
+                        <textarea id="address" class="form-control {{' is-invalid' if form.address.errors else ''}}"
+                                  name="address">{{ request.form.address }}</textarea>
+                        <small class="form-text text-muted">
+                            We need your phone or address for notarization purposes and won't share them with
+                            anybody.
+                        </small>
+                        {% if form.address.errors %}
+                            {% for error in form.address.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    {{ form.csrf_token }}
+
+                    <button type="submit" name="submit" class="btn btn-lg btn-info btn-block">Register</button>
+
+                    <a href="login" class="btn btn-lg btn-link btn-block">I already have an account</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

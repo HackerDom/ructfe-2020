@@ -76,3 +76,14 @@ class Api:
             return r.json()
         except Exception:
             return None
+
+    def check_card(self, login, credit_card_credentials):
+        data = {"addition": {
+            "login": login,
+            "credit_card_credentials": credit_card_credentials
+        }}
+        try:
+            r = requests.post(f"{self.hostname}/check_card", json=data, headers=HEADERS)
+            return r.json()
+        except Exception:
+            return None
