@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.sparse import csr_matrix
 
-from cipher.utils import binaryproduct, bit_flipping, gaussjordan
+from cipher.utils import binaryproduct, bit_flipping, gauss_jordan
 
 class LDPC:
     def __init__(self, G, H):
@@ -57,7 +57,7 @@ def coding_matrix_systematic(H):
 
     P1 = np.identity(n_code, dtype=int)
 
-    Hrowreduced = gaussjordan(H)
+    Hrowreduced = gauss_jordan(H)
 
     n_bits = n_code - sum([a.any() for a in Hrowreduced])
 

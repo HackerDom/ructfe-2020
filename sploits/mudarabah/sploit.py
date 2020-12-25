@@ -2,36 +2,30 @@ import sys
 import numpy as np
 from base64 import b85decode
 
-from scipy.special import comb
-from cipher.utils import gaussjordan, bytes_to_codeword, load, codeword_to_bytes
+from cipher.utils import gauss_jordan, bytes_to_codeword, load, codeword_to_bytes
 from api import Api
 
 K = 5
 
 def information_set_decoding(encrypted, public_key, epochs, wrong_indexes):
-    rng = np.random.default_rng()
-    G = public_key
     t = 10
-    k, n = G.shape
-    arr = np.arange(n)
-    arr = np.array([x for x in arr if x not in wrong_indexes])
+    k, n = public_key.shape
+    arr = np.array([x for x in np.arange(n) if x not in wrong_indexes])
     wt = -1
     step = 0
-    tao = comb(n, t) / comb(n - k, t)
 
     E = np.eye(k, dtype=int)
-    while wt != t and step <= max(2*tao, epochs):
-        rng.shuffle(arr)
+    while wt < t and step <= epochs:
+        np.random.shuffle(arr)
         J = arr[:k]
-        G1 = G[:, J]
-        I, G1_inv = gaussjordan(G1, True)
+        G = public_key[:, J]
+        I, G_inv = gauss_jordan(G, True)
         if not (I == E).all():
             continue
-        wt = np.sum((encrypted + encrypted[J] @ G1_inv @ G) % 2)
+        wt = np.sum((encrypted + encrypted[J] @ G_inv @ public_key) % 2)
         step += 1
         
-    if wt == t:
-        return (encrypted[J] @ G1_inv) % 2
+    return (encrypted[J] @ G_inv) % 2
     
 def load_public(data):
     return load(data[2:])
@@ -62,32 +56,21 @@ def crack(transactions, pub_key):
 
 def list_users(api):
     res = api.list_users()
-    if res is None:
-        return []
-    if 'addition' not in res or 'users' not in res['addition']:
-        return []
+    if res is None: return []
+    if 'addition' not in res or 'users' not in res['addition']: return []
     return res['addition']['users']
 
 def get_user_pub_key(api, login):
     result = api.get_user(login)
-    if result is None:
-        return None
-
-    if "addition" not in result or "pub_key" not in result["addition"]:
-        return None
-
+    if result is None: return None
+    if "addition" not in result or "pub_key" not in result["addition"]: return None
     return result["addition"]["pub_key"]
 
 def get_transactions(api, login):
     result = api.get_transacions(login)
-    if result is None:
-        return None
-
-    if "addition" not in result or "transactions" not in result["addition"]:
-        return None
-
-    transactions = result["addition"]["transactions"]
-    return transactions
+    if result is None: return None
+    if "addition" not in result or "transactions" not in result["addition"]: return None
+    return result["addition"]["transactions"]
 
 
 if __name__ == "__main__":
@@ -104,4 +87,5 @@ if __name__ == "__main__":
             for _ in range(K):
                 transactions.append(get_transactions(api, user))
             pub_key = get_user_pub_key(api, user)
+            print(f'Trying to hack {user}')
             crack(transactions, pub_key)

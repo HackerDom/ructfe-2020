@@ -41,12 +41,8 @@ def send_money(cookie=None, login_to=None, description=None, amount=None):
 @app.route('/get_cookie', methods=['POST'])
 @need_args("login", "password")
 def login(login=None, password=None):
-    print("login_post")
-    print(f"login {login}, pass {password}", flush=True)
     with DatabaseClient() as db:
-        print(f"all users {db.get_all_users()}")
         user = db.get_user_by_login_and_pass(login, password)
-        print(f"login {user}", flush=True)
         if not user:
             return "Incorrect username or password"
     return jsonify({"status": 200, "addition": {"cookie":user.cookie}})
@@ -55,8 +51,6 @@ def login(login=None, password=None):
 @app.route('/register', methods=['POST'])
 @need_args("login", "password", "credit_card_credentials")
 def register(login=None, password=None, credit_card_credentials=None):
-    print("reg_post")
-    print(f"reg {login}, pass {password}, credit_card {credit_card_credentials}")
     with DatabaseClient() as db:
         if db.check_if_username_free(login):
             code = LDPC.from_params(512, 4, 8)
@@ -84,7 +78,6 @@ def get_transactions(login=None):
         "amount": x.amount,
         "description": crypter.encrypt(x.description).hex()
     } for x in transactions]
-    print(transactions, flush=True)
     return jsonify({"status": 200, "addition": {"transactions": transactions}})
 
 
