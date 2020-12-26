@@ -5,8 +5,11 @@ import string
 from contextlib import contextmanager
 from dataclasses import dataclass
 
+import requests
 from faker import Faker
 from gornilo.models.verdict.verdict_codes import MUMBLE, CORRUPT, DOWN
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 
 @dataclass
@@ -123,3 +126,16 @@ def generate_document(author_name=None):
     return DocumentInfo(
         title=fake.sentence(),
         text=fake.text(max_nb_chars=400))
+
+
+def requests_with_retry(retries=3, backoff_factor=0.3, status_forcelist=(400, 404, 500, 502), session=None):
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    return session
