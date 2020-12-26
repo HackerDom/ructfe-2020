@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from bs4 import BeautifulSoup
-from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
+from requests.exceptions import ConnectionError, HTTPError, RetryError, RequestException, Timeout
 
 from utils import CONTEXT, DocumentInfo, down, mumble, requests_with_retry, UserInfo
 
@@ -119,7 +119,7 @@ class Client:
 
     def _request(self, method, url, data=None):
         with mumble(None, {RequestException: 'An error occurred while making the request'}, details=(url, data)):
-            with down('connecting to your server', {Timeout, ConnectionError}, details=(url, data)):
+            with down('connecting to your server', {Timeout, ConnectionError, RetryError}, details=(url, data)):
                 resp = self.sess.request(method, url, data=data, timeout=REQUESTS_TIMEOUT)
         with mumble(None, {HTTPError: 'Unexpected HTTP return code'}, details=resp.status_code):
             resp.raise_for_status()
