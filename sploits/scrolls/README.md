@@ -7,7 +7,7 @@ This sequence is used to generate access token for documents. Hence, you can seq
 ### How to fix
 This gap can be easily be fixed by explicit setting different random seed in `hashutil.go`
 
-### [Exploit](../../sploits/scrolls/spl2/main.go)
+### [Exploit](./spl2/main.go)
 
 
 ## Vuln 2
@@ -34,4 +34,4 @@ exprs:
 ### How to fix
 FIX
 
-### [Exploit](../../sploits/scrolls/main.py)
+### [Exploit](./main.py)
