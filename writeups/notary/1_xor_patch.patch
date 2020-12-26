@@ -1,0 +1,15 @@
+diff --git a/services/notary/notaryserver/notary.py b/services/notary/notaryserver/notary.py
+index 53ede5c2..cd1abed1 100644
+--- a/services/notary/notaryserver/notary.py
++++ b/services/notary/notaryserver/notary.py
+@@ -29,6 +29,10 @@ def pack_document(title, text):
+ def load_document(document_data):
+     try:
+         document = msgpack.loads(document_data)
++        
++        if len(document.items()) > 2:
++            raise ValueError
++
+         return document['title'], document['text']
+     except (ValueError, KeyError):
+         raise ValueError('Failed to load document')
