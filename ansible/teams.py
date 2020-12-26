@@ -18,7 +18,7 @@ for team in teams:
 
     name = team['name'].replace("'", "\\'")
     if team['logo'].find("ctf-static/dummy") != -1:
-      logo = "/data/sprite_1.png"
+      logo = "/logo.png"
     else:
       logo = "https://ructfe.org{}".format(team['logo'])
 
