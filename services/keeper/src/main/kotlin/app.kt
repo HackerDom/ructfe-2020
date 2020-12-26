@@ -1,6 +1,6 @@
 import io.javalin.Javalin
 import io.javalin.http.staticfiles.Location
-import redis.clients.jedis.Jedis
+import redis.clients.jedis.JedisPool
 import java.io.File
 
 
@@ -17,9 +17,9 @@ class App(
 
 fun main() {
     val userStorage = UserStorage("mount/users")
-    val jedis = Jedis("redis", 6379)
     val chest = File("src/main/resources/static/chest.txt").readText()
-    val sessionManager = SessionManager(jedis)
+    val jedisPool = JedisPool("redis", 6379)
+    val sessionManager = SessionManager(jedisPool)
     val javalin = Javalin.create { config ->
         config.addStaticFiles("src/main/resources/static", Location.EXTERNAL)
     }.start(3687)
