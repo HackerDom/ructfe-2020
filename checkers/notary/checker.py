@@ -20,14 +20,14 @@ def check_user_crypto(user: UserInfo):
         assert Verify.public_key(user.public_key), 'public key is invalid'
         assert Verify.private_key(user.private_key), 'private key is invalid'
         assert Verify.key_pair(user.private_key, user.public_key), 'key pair is invalid'
-        assert Verify.user_password(user.password, user.username), 'password is invalid'
+        assert Verify.user_password(user.public_key, user.password, user.username), 'password is invalid'
 
 
-def check_doc_crypto(doc: DocumentInfo):
+def check_doc_crypto(doc: DocumentInfo, author_public_key):
     with mumble('checking a document\'s cryptographic data for integrity'):
-        assert Verify.signature(doc.signature, doc.text), 'signature is invalid'
+        assert Verify.signature(doc.signature), 'signature is invalid'
         if doc.password is not None:
-            assert Verify.document_password(doc.password, doc.id), 'password is invalid'
+            assert Verify.document_password(author_public_key, doc.password, doc.id), 'password is invalid'
 
 
 def create_user(client: Client, flag=None):
@@ -43,13 +43,13 @@ def create_user(client: Client, flag=None):
     return user
 
 
-def create_document(client: Client, author_id, public=False, flag=None, author_name=None):
+def create_document(client: Client, author_id, author_public_key, public=False, flag=None, author_name=None):
     doc = generate_document(author_name)
     if flag is not None:
         doc.text = flag
     doc = client.sign(title=doc.title, text=doc.text, author_id=author_id, public=public)
     CONTEXT.set_document(doc)
-    check_doc_crypto(doc)
+    check_doc_crypto(doc, author_public_key)
     return doc
 
 
@@ -141,14 +141,14 @@ def check_service(request: CheckRequest) -> Verdict:
     public_client = Client(request.hostname)
     public_user = create_user(public_client)
     public_doc = create_document(
-        public_client, author_id=public_user.id, public=True, author_name=public_user.name)
+        public_client, author_id=public_user.id, author_public_key=public_user.public_key, public=True, author_name=public_user.name)
     check_user_profile_privately(Client(request.hostname), public_user, (public_doc,))
 
     CONTEXT.reset()
     private_client = Client(request.hostname)
     private_user = create_user(private_client)
     private_doc = create_document(
-        private_client, author_id=private_user.id, public=False, author_name=private_user.name)
+        private_client, author_id=private_user.id, author_public_key=private_user.public_key, public=False, author_name=private_user.name)
     check_user_profile_publicly(Client(request.hostname), private_user, (private_doc,))
 
     CONTEXT.set(public_user, public_doc)
@@ -167,11 +167,11 @@ def put_flag(request: PutRequest) -> Verdict:
     if request.vuln_id == 1:
         user = create_user(client, flag=request.flag)
         doc = create_document(
-            client, author_id=user.id, public=True, author_name=user.name)
+            client, author_id=user.id, author_public_key=user.public_key, public=True, author_name=user.name)
     else:
         user = create_user(client)
         doc = create_document(
-            client, author_id=user.id, public=False, flag=request.flag, author_name=user.name)
+            client, author_id=user.id, author_public_key=user.public_key, public=False, flag=request.flag, author_name=user.name)
 
     user.document_ids = []  # Don't need to compare them
     info_hash = hash_dict(dict(user=vars(user), doc=vars(doc)))

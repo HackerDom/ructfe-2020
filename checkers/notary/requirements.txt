@@ -3,3 +3,5 @@ faker
 gornilo
 lxml
 requests
+msgpack
+pycryptodome
