@@ -57,6 +57,7 @@ jobs:
     name: Deploy service using ansible to first teams
     needs: check_{service}
     runs-on: ubuntu-18.04
+    if: ${{{{ false }}}} # disable on game just in case
 
     steps:
     - name: install ansible
