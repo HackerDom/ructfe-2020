@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import re
 import sys
 import string
 import struct
@@ -9,6 +8,7 @@ import msgpack
 import requests
 
 import notary
+from parse import Parser
 
 
 def find_pair(x):
@@ -79,13 +79,13 @@ def download_document(url, document_url):
     session = requests.session()
 
     html = session.get(url + document_url).text
-    user_url = re.search(r'Signed by <a href="(.*?)">', html).group(1)
+    user_url = Parser(html).author_url()
     
     html = session.get(url + user_url).text
-    public_key = re.search(r'<code>(.*?)</code>', html).group(1)
+    public_key = Parser(html).public_key()
     
     html = session.get(url + document_url).text
-    csrf_token = re.search(r'<input id="csrf_token" name="csrf_token" type="hidden" value="(.*?)">', html).group(1)
+    csrf_token = Parser(html).csrf_token()
     
     document_id = document_url[len('/doc/'):]
     public_key = notary.deserialize_bytes(public_key)
@@ -93,7 +93,7 @@ def download_document(url, document_url):
     password = generate_password(public_key, document_id)
 
     html = session.post(url + document_url, data={'csrf_token': csrf_token, 'password': password}).text
-    text = re.search(r'<p>(.*?)</p>', html).group(1)
+    text = Parser(html).document_text()
 
     return text
 
@@ -105,9 +105,9 @@ def main():
     url = f'http://{IP}:{PORT}'
 
     html = requests.get(url).text
-    document_urls = re.findall(r'<a href="(/doc/.*?)">.*?<p>(.*?)</p>', html, re.DOTALL)
+    cards = Parser(html).document_cards()
 
-    for document_url, text in document_urls:
+    for document_url, text, _ in cards:
         if 'Private document' in text:
             content = download_document(url, document_url)
             print(document_url, content)
