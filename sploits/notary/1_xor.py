@@ -7,8 +7,8 @@ import random
 import msgpack
 import requests
 
+import parse
 import notary
-from parse import Parser
 
 
 def find_pair(x):
@@ -34,25 +34,25 @@ def forge_data(expected, length, prefix, suffix):
     return prefix + b''.join(map(bytes, blocks)) + suffix
 
 
-def forge_signature(public_key, prefix, suffix):
-    length = (public_key.N.bit_length() + 7) // 8
+def forge_signature(public, prefix, suffix):
+    length = (public.N.bit_length() + 7) // 8
 
-    signature_point = notary.Point(
-        random.randrange(2, public_key.N - 2),
-        random.randrange(2, public_key.N - 2)
+    signature = notary.Point(
+        random.randrange(2, public.N - 2),
+        random.randrange(2, public.N - 2)
     )
 
-    curve = notary.curve_from_point(signature_point, public_key.N)
-    data_point = notary.point_multiply(signature_point, public_key.e, curve)
-    expected = notary.point_to_data(data_point, public_key.N)
+    curve = notary.Curve.from_point(signature, public.N)
+    data_point = notary.Elliptic.multiply(signature, public.e, curve)
+    expected = notary.Hash.point_to_data(data_point, public.N)
 
     data = forge_data(expected, length, prefix, suffix)
 
-    return data, notary.pack_numbers(signature_point.x, signature_point.y)
+    return data, signature
 
 
 def generate_password(public_key, document_id):
-    public = notary.Public(*notary.load_numbers(public_key))
+    public = notary.Public.unpack(public_key)
 
     length = (public.N.bit_length() + 7) // 8
     
@@ -70,30 +70,29 @@ def generate_password(public_key, document_id):
     
     fake_data, signature = forge_signature(public, prefix, suffix)
 
-    assert notary.verify_sign(public_key, fake_data, signature)
+    assert notary.Signature.verify(public, fake_data, signature)
 
-    return f'{notary.serialize_bytes(fake_data)}.{notary.serialize_bytes(signature)}'
+    return f'{notary.Bytes.pack(fake_data)}.{notary.Point.pack(signature)}'
 
 
 def download_document(url, document_url):
     session = requests.session()
 
     html = session.get(url + document_url).text
-    user_url = Parser(html).author_url()
+    user_url = parse.Parser(html).author_url()
     
     html = session.get(url + user_url).text
-    public_key = Parser(html).public_key()
+    public_key = parse.Parser(html).public_key()
     
     html = session.get(url + document_url).text
-    csrf_token = Parser(html).csrf_token()
+    csrf_token = parse.Parser(html).csrf_token()
     
     document_id = document_url[len('/doc/'):]
-    public_key = notary.deserialize_bytes(public_key)
-
+    
     password = generate_password(public_key, document_id)
-
+    
     html = session.post(url + document_url, data={'csrf_token': csrf_token, 'password': password}).text
-    text = Parser(html).document_text()
+    text = parse.Parser(html).document_text()
 
     return text
 
@@ -105,7 +104,7 @@ def main():
     url = f'http://{IP}:{PORT}'
 
     html = requests.get(url).text
-    cards = Parser(html).document_cards()
+    cards = parse.Parser(html).document_cards()
 
     for document_url, text, _ in cards:
         if 'Private document' in text:

