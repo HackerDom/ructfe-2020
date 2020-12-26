@@ -107,7 +107,7 @@ def generate_user():
     fake = select_fake()
     profile = fake.profile()
     return UserInfo(
-        username=profile['username'] + ''.join(random.choices(string.digits, k=7)),
+        username=profile['username'][:16] + ''.join(random.choices(string.digits, k=7)),
         name=profile['name'],
         phone=fake.phone_number(),
         address=profile['address'])
