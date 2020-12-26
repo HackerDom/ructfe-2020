@@ -204,7 +204,7 @@ def get_flag(request: GetRequest) -> Verdict:
         actual_flag = user.address
     else:
         actual_flag = doc.text
-    with corrupt():
+    with corrupt(details=(request.flag, actual_flag)):
         assert request.flag == actual_flag, 'A flag is missing'
 
     user.document_ids = []
@@ -223,7 +223,7 @@ def get_flag(request: GetRequest) -> Verdict:
 def test_run():
     global DEBUG
     DEBUG = True
-    hostname = '10.60.17.2'
+    hostname = 'localhost'
 
     print('Checking...')
     check_service(CheckRequest(hostname))
