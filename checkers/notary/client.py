@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
 
-from utils import DocumentInfo, down, mumble, UserInfo
+from utils import DocumentInfo, down, mumble, requests_with_retry, UserInfo
 
 
 PORT = 17171
@@ -116,7 +116,7 @@ class Urls:
 class Client:
     def __init__(self, hostname):
         self.urls = Urls(hostname)
-        self.sess = requests.Session()
+        self.sess = requests_with_retry()
 
     def _request(self, method, url, data=None):
         with mumble(None, {RequestException: 'An error occurred while making the request'}):
