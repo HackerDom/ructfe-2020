@@ -60,34 +60,34 @@ Here is the memory view of some objects that are placed below [_PyByteArray_empt
 
 ```
 (gdb) x/100xg _PyByteArray_empty_string
-0x7e4568 <_PyByteArray_empty_string>:	0x0000000000000000	0x0000000000000000
-0x7e4578:	                            0x0000000000000000	0x0000000000000000
-0x7e4588 <emptystring.10526>:	        0x0000000000000000	0x0000000000000000
-0x7e4598:	                            0x0000000000000000	0x0000000000000000
-0x7e45a8 <ok_name_char.10482+8>:	    0x0000000000000000	0x0000000000000000
-0x7e45b8 <ok_name_char.10482+24>:	    0x0000000000000000	0x0000000000000000
-0x7e45c8 <ok_name_char.10482+40>:	    0x0000000000000000	0x0101010101010101
-0x7e45d8 <ok_name_char.10482+56>:	    0x0000000000000101	0x0101010101010100
-0x7e45e8 <ok_name_char.10482+72>:	    0x0101010101010101	0x0101010101010101
-0x7e45f8 <ok_name_char.10482+88>:	    0x0100000000010101	0x0101010101010100
-0x7e4608 <ok_name_char.10482+104>:	    0x0101010101010101	0x0101010101010101
-0x7e4618 <ok_name_char.10482+120>:	    0x0000000000010101	0x0000000000000000
-0x7e4628 <ok_name_char.10482+136>:	    0x0000000000000000	0x0000000000000000
-0x7e4638 <ok_name_char.10482+152>:	    0x0000000000000000	0x0000000000000000
-0x7e4648 <ok_name_char.10482+168>:	    0x0000000000000000	0x0000000000000000
-0x7e4658 <ok_name_char.10482+184>:	    0x0000000000000000	0x0000000000000000
-0x7e4668 <ok_name_char.10482+200>:	    0x0000000000000000	0x0000000000000000
-0x7e4678 <ok_name_char.10482+216>:	    0x0000000000000000	0x0000000000000000
-0x7e4688 <ok_name_char.10482+232>:	    0x0000000000000000	0x0000000000000000
-0x7e4698 <ok_name_char.10482+248>:	    0x0000000000000000	0x0000000000000000
-0x7e46a8 <reversed_cache.10506>:	    0x0000000000000000	0x0000000000000000
-0x7e46b8 <builtin_object>:	            0x00007f15ca66b9d0	0x0000000000000000
-0x7e46c8 <free_list>:	                0x0000000000000000	0x00007f15ca66cfc0
+0x7e4568 <_PyByteArray_empty_string>:   0x0000000000000000	0x0000000000000000
+0x7e4578:                               0x0000000000000000	0x0000000000000000
+0x7e4588 <emptystring.10526>:           0x0000000000000000	0x0000000000000000
+0x7e4598:                               0x0000000000000000	0x0000000000000000
+0x7e45a8 <ok_name_char.10482+8>:        0x0000000000000000	0x0000000000000000
+0x7e45b8 <ok_name_char.10482+24>:       0x0000000000000000	0x0000000000000000
+0x7e45c8 <ok_name_char.10482+40>:       0x0000000000000000	0x0101010101010101
+0x7e45d8 <ok_name_char.10482+56>:       0x0000000000000101	0x0101010101010100
+0x7e45e8 <ok_name_char.10482+72>:       0x0101010101010101	0x0101010101010101
+0x7e45f8 <ok_name_char.10482+88>:       0x0100000000010101	0x0101010101010100
+0x7e4608 <ok_name_char.10482+104>:      0x0101010101010101	0x0101010101010101
+0x7e4618 <ok_name_char.10482+120>:      0x0000000000010101	0x0000000000000000
+0x7e4628 <ok_name_char.10482+136>:      0x0000000000000000	0x0000000000000000
+0x7e4638 <ok_name_char.10482+152>:      0x0000000000000000	0x0000000000000000
+0x7e4648 <ok_name_char.10482+168>:      0x0000000000000000	0x0000000000000000
+0x7e4658 <ok_name_char.10482+184>:      0x0000000000000000	0x0000000000000000
+0x7e4668 <ok_name_char.10482+200>:      0x0000000000000000	0x0000000000000000
+0x7e4678 <ok_name_char.10482+216>:      0x0000000000000000	0x0000000000000000
+0x7e4688 <ok_name_char.10482+232>:      0x0000000000000000	0x0000000000000000
+0x7e4698 <ok_name_char.10482+248>:      0x0000000000000000	0x0000000000000000
+0x7e46a8 <reversed_cache.10506>:        0x0000000000000000	0x0000000000000000
+0x7e46b8 <builtin_object>:              0x00007f15ca66b9d0	0x0000000000000000
+0x7e46c8 <free_list>:                   0x0000000000000000	0x00007f15ca66cfc0
 0x7e46d8 <numfree>:	                    0x0000000000000000	0x0000000000000000
-0x7e46e8 <initialized.11498>:	        0x0000000000000000	0x0000000000000000
-0x7e46f8 <keyword_type>:	            0x0000000000000000	0x0000000000000000
-0x7e4708 <ExceptHandler_type>:	        0x0000000000000000	0x0000000000000000
-0x7e4718 <comprehension_type>:	        0x0000000000000000	0x0000000000000000
+0x7e46e8 <initialized.11498>:           0x0000000000000000	0x0000000000000000
+0x7e46f8 <keyword_type>:                0x0000000000000000	0x0000000000000000
+0x7e4708 <ExceptHandler_type>:          0x0000000000000000	0x0000000000000000
+0x7e4718 <comprehension_type>:          0x0000000000000000	0x0000000000000000
 ```
 
 From this point the most interesting part starts. After `recvfrom_into` function call some chain of function calls happen and the process flow gets into [PyFrame_New](https://github.com/python/cpython/blob/2.7/Objects/frameobject.c#L662) function. Look closely at this part of code:
@@ -205,17 +205,17 @@ Dump of assembler code for function PyDict_GetItem:
    0x000000000045b1d3 <+3>:	    push   rbx
    0x000000000045b1d4 <+4>:	    sub    rsp,0x20
    0x000000000045b1d8 <+8>:	    mov    rax,QWORD PTR fs:0x28
-   0x000000000045b1e1 <+17>:	mov    QWORD PTR [rsp+0x18],rax
-   0x000000000045b1e6 <+22>:	xor    eax,eax
-   0x000000000045b1e8 <+24>:	mov    rax,QWORD PTR [rdi+0x8]
-   0x000000000045b1ec <+28>:	test   BYTE PTR [rax+0xab],0x20
-   0x000000000045b1f3 <+35>:	je     0x45b2d0 <PyDict_GetItem+256>
-   0x000000000045b1f9 <+41>:	cmp    QWORD PTR [rsi+0x8],0x7a9440
-   0x000000000045b201 <+49>:	mov    rbx,rdi
-   0x000000000045b204 <+52>:	mov    rbp,rsi      <-- rsi is the controlled key
-   0x000000000045b207 <+55>:	je     0x45b2b8 <PyDict_GetItem+232>
-   0x000000000045b20d <+61>:	mov    rdi,rbp      <-- rdi = rbp = rsi
-   0x000000000045b210 <+64>:	call   0x45fa00 <PyObject_Hash>
+   0x000000000045b1e1 <+17>:    mov    QWORD PTR [rsp+0x18],rax
+   0x000000000045b1e6 <+22>:    xor    eax,eax
+   0x000000000045b1e8 <+24>:    mov    rax,QWORD PTR [rdi+0x8]
+   0x000000000045b1ec <+28>:    test   BYTE PTR [rax+0xab],0x20
+   0x000000000045b1f3 <+35>:    je     0x45b2d0 <PyDict_GetItem+256>
+   0x000000000045b1f9 <+41>:    cmp    QWORD PTR [rsi+0x8],0x7a9440
+   0x000000000045b201 <+49>:    mov    rbx,rdi
+   0x000000000045b204 <+52>:    mov    rbp,rsi      <-- rsi is the controlled key
+   0x000000000045b207 <+55>:    je     0x45b2b8 <PyDict_GetItem+232>
+   0x000000000045b20d <+61>:    mov    rdi,rbp      <-- rdi = rbp = rsi
+   0x000000000045b210 <+64>:    call   0x45fa00 <PyObject_Hash>
 ```
 
 Pay carefull attention to the register of `PyObject` that is passed into [PyObject_Hash](https://github.com/python/cpython/blob/32bd68c839adb7b42af12366ab0892303115d1d1/Objects/object.c#L766) - it's `RBP`! Hence, attacker also controls `rbp` register which is super useful for [stack pivoting](https://bananamafia.dev/post/binary-rop-stackpivot/). The rest is to find `leave; ret` gadget. But not any `leave; ret` gadget will fit in our conditions - don't forget, it's `PyObject` that we control, so if we do stack pivoting, then the resulting ROP chain will be placed onto `PyObject`. And another funny thing about this `Python` binary - it doesn't use `leave; ret` epiloge. Instead, it uses `add rsp, X` for the purposes of restoring previous stack frames, so it took some time to find useful gadget:
