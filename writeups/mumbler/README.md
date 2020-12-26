@@ -83,7 +83,7 @@ Here is the memory view of some objects that are placed below [_PyByteArray_empt
 0x7e46a8 <reversed_cache.10506>:        0x0000000000000000	0x0000000000000000
 0x7e46b8 <builtin_object>:              0x00007f15ca66b9d0	0x0000000000000000
 0x7e46c8 <free_list>:                   0x0000000000000000	0x00007f15ca66cfc0
-0x7e46d8 <numfree>:	                    0x0000000000000000	0x0000000000000000
+0x7e46d8 <numfree>:                     0x0000000000000000	0x0000000000000000
 0x7e46e8 <initialized.11498>:           0x0000000000000000	0x0000000000000000
 0x7e46f8 <keyword_type>:                0x0000000000000000	0x0000000000000000
 0x7e4708 <ExceptHandler_type>:          0x0000000000000000	0x0000000000000000
@@ -200,11 +200,11 @@ It's time to inspect part of the assembly of [PyDict_GetItem](https://github.com
 
 ```asm
 Dump of assembler code for function PyDict_GetItem:
-   0x000000000045b1d0 <+0>:	    push   r12
-   0x000000000045b1d2 <+2>:	    push   rbp
-   0x000000000045b1d3 <+3>:	    push   rbx
-   0x000000000045b1d4 <+4>:	    sub    rsp,0x20
-   0x000000000045b1d8 <+8>:	    mov    rax,QWORD PTR fs:0x28
+   0x000000000045b1d0 <+0>:     push   r12
+   0x000000000045b1d2 <+2>:     push   rbp
+   0x000000000045b1d3 <+3>:     push   rbx
+   0x000000000045b1d4 <+4>:     sub    rsp,0x20
+   0x000000000045b1d8 <+8>:     mov    rax,QWORD PTR fs:0x28
    0x000000000045b1e1 <+17>:    mov    QWORD PTR [rsp+0x18],rax
    0x000000000045b1e6 <+22>:    xor    eax,eax
    0x000000000045b1e8 <+24>:    mov    rax,QWORD PTR [rdi+0x8]
