@@ -1,14 +1,14 @@
 ## VULN 1
 [Crypter](../../services/mudarabah/service/cipher/crypter.py) class is McEliece cryptosystem on LDPC.
 
-All flags in transactions are encrypted on each request with same public key. It means that with same ct-vector xored with different error-vector. So U can use this Multiple Encryption attack to found some errors to reduce index-space for [ISD attack](https://crypto.stackexchange.com/a/22779). 
+All flags in transactions on each request are encrypted with same public key. That means that same ct-vector is xored with different error-vector. So U can use this Multiple Encryption attack to found some places of errors to reduce index-space for [ISD attack](https://crypto.stackexchange.com/a/22779). 
 
 [sploit](./sploit1.py)
 
 To fix this U can store encrypted flags or just freeze error-vector in encryption function.
 
 ## VULN 2
-`/check_card` method is used with `LIKE` in query. So U can send `{"login": login, "credit_card_credentials":"%"}` or `{"login": login, "credit_card_credentials":"<32 underscores>"}` and steal user's flag.
+`/check_card` method uses `LIKE` in query. So U can send `{"login": login, "credit_card_credentials":"%"}` or `{"login": login, "credit_card_credentials":"<32 underscores>"}` and steal user's flag.
 
 [sploit](./sploit2.py)
 
