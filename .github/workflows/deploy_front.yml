@@ -16,6 +16,7 @@ jobs:
   update_front:
     name: Deploy front using ansible to first teams
     runs-on: ubuntu-18.04
+    if: ${{ false }}
 
     steps:
     - name: install ansible
