@@ -14,7 +14,7 @@ This gap can be easily be fixed by explicit setting different random seed in `ha
 
 ### Explanation
 Second one is based on self made template language for making documents. There is no verification, if user making request about himself or not.
-This weakness lets user insert information about any other user in his or her document. 
+With injection in doc. We can get bio of any user (we can override args.username with any other usernames). This weakness lets user insert information about any other user in his or her document.
 
 ### Example
 There is an example of stealing doc
@@ -32,6 +32,6 @@ exprs:
 ```
 
 ### How to fix
-FIX
+Add contxt vars before global vars here https://github.com/HackerDom/ructfe-2020/blob/main/services/scrolls/internal/document/document.go#L66
 
 ### [Exploit](./main.py)
